@@ -5,8 +5,6 @@ from .slack import lookup_username
 def parse_karma_change(giverid, userid, voting):
     giver = lookup_username(giverid)
 
-    print(giverid)
-    print(userid)
     if IS_USER.match(userid):
         receiver = lookup_username(userid)
     else:

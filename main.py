@@ -36,7 +36,6 @@ def main():
             logging.debug('karma changes: {}'.format(str(karma_changes)))
 
             for kc in karma_changes:
-                print(kc)
                 userid, voting = kc
                 giver, receiver, points = parse_karma_change(giverid,
                                                              userid,
