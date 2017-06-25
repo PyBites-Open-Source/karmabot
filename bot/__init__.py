@@ -3,13 +3,20 @@ import logging
 import os
 import pickle
 import re
+import sys
 
 from slackclient import SlackClient
 
-SLACK_CLIENT = SlackClient(os.environ.get('SLACK_KARMA'))
+botuser = os.environ.get('SLACK_KARMA_BOTUSER')
+token = os.environ.get('SLACK_KARMA_TOKEN')
+if not botuser or not token:
+    print('Make sure you set SLACK_KARMA_BOTUSER and SLACK_KARMA_TOKEN in env')
+    sys.exit(1)
+
+KARMA_BOT = botuser
+SLACK_CLIENT = SlackClient(token)
 
 MAX_POINTS = 5
-KARMA_BOT = 'U5Z6KGX4L'
 
 KARMA_ACTION = re.compile(r'(?:^| )([^\+\- ]+)\s*([\+\-]+)')
 IS_USER = re.compile(r'^<@[^>]+>$')
