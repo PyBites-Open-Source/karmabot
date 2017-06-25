@@ -3,10 +3,9 @@ import pickle
 import sys
 import time
 
+from bot import SLACK_CLIENT, KARMA_CACHE, KARMA_ACTION, karmas
 from bot.slack import post_msg, parse_next_msg
 from bot.karma import parse_karma_change, change_karma
-
-from bot import SLACK_CLIENT, KARMA_CACHE, KARMA_ACTION, karmas
 
 SAVE_INTERVAL = 60
 
