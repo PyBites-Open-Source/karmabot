@@ -1,0 +1,5 @@
+*pyc
+*swp
+venv
+**__pycache__
+*log
