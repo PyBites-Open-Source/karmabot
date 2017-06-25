@@ -21,7 +21,7 @@ def main():
         if not SLACK_CLIENT.rtm_connect():
             logging.error('Connection Failed, invalid token?')
             sys.exit(1)
-    
+
         count = 0
         while True:
             count += 1
