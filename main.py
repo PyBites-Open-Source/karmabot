@@ -8,11 +8,10 @@ from bot.karma import parse_karma_change, change_karma
 
 from bot import SLACK_CLIENT, KARMA_CACHE, KARMA_ACTION, karmas
 
+SAVE_INTERVAL = 60
 
-def _end_script():
-    # making sure we store karma cache before exiting the script, see
-    # https://stackoverflow.com/questions/3850261/doing-something-before-program-exit
-    logging.info('Script ended, saving karma cache to file')
+
+def _save_cache():
     pickle.dump(karmas, open(KARMA_CACHE, "wb"))
 
 
@@ -22,8 +21,13 @@ def main():
         if not SLACK_CLIENT.rtm_connect():
             logging.error('Connection Failed, invalid token?')
             sys.exit(1)
-
+    
+        count = 0
         while True:
+            count += 1
+            if count % SAVE_INTERVAL == 0:
+                _save_cache()
+
             time.sleep(1)
 
             channel, text, giverid = parse_next_msg()
@@ -47,7 +51,10 @@ def main():
 
                 post_msg(channel, msg)
     finally:
-        _end_script()
+        logging.info('Script ended, saving karma cache to file')
+        # making sure we store karma cache before exiting the script, see
+        # https://stackoverflow.com/questions/3850261/doing-something-before-program-exit
+        _save_cache()
 
 
 if __name__ == '__main__':
