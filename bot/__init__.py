@@ -18,7 +18,7 @@ SLACK_CLIENT = SlackClient(token)
 
 MAX_POINTS = 5
 
-KARMA_ACTION = re.compile(r'(?:^| )(\S+?)([\+\-]{2,})')
+KARMA_ACTION = re.compile(r'(?:^| )(\S{2,}?)\s?([\+\-]{2,})')
 IS_USER = re.compile(r'^<@[^>]+>$')
 
 USERNAME_CACHE = {}
