@@ -10,6 +10,9 @@ def parse_karma_change(giverid, userid, voting):
     else:
         receiver = userid.strip(' #').lower()
 
+    # ++ = +1 point, +++ = +2, etc
+    # same for negative:
+    # -- = -1 point, --- = -2 etc
     points = voting.count('+') - voting.count('-')
 
     return giver, receiver, points

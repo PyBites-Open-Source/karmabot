@@ -18,7 +18,9 @@ SLACK_CLIENT = SlackClient(token)
 
 MAX_POINTS = 5
 
-KARMA_ACTION = re.compile(r'(?:^| )(\S{2,}?)\s?([\+\-]{2,})')
+# the first +/- is merely signaling, start counting (regex capture)
+# from second +/- onwards, so bob++ adds 1 point, bob+++ = +2, etc
+KARMA_ACTION = re.compile(r'(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)')
 IS_USER = re.compile(r'^<@[^>]+>$')
 
 USERNAME_CACHE = {}
