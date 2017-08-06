@@ -1,0 +1,6 @@
+exclude:
+- /bot/__init__.py
+component_depth: 1
+languages:
+- python
+- script
