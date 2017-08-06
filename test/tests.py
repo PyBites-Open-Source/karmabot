@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from bot import SLACK_CLIENT, KARMA_BOT, KARMA_CACHE, MAX_POINTS
 from bot import KARMA_ACTION, USERNAME_CACHE, karmas
-from bot.slack import post_msg, parse_next_msg, lookup_username
+from bot.slack import post_msg, parse_next_msg, lookup_username, Message
 from bot.karma import parse_karma_change, change_karma
 
 userinfo = {
@@ -54,21 +54,23 @@ class TestKarma(object):
 
 
     def test_parse_next_msg(self):
-        ret = None, None, None
         self.mock_rtm_read.return_value = None
-        assert parse_next_msg() == ret
+        assert parse_next_msg() == None
         self.mock_rtm_read.return_value = [
-            {'user': 'U5Z6KGX4L'}
+            {'user': 'U5Z6KGX4L'}  # karmabot self
         ]
-        assert parse_next_msg() == ret
+        assert parse_next_msg() == None
+        channel, text = None, 'some text'
+        assert parse_next_msg() == None
+        channel, text = 'codechallenges', None
+        assert parse_next_msg() == None
         channel, text, giverid = 'codechallenges', 'some new message', 'U5Z6ABCDE'
-        ret = channel, text, giverid
         self.mock_rtm_read.return_value = [
             {'user': giverid,
             'channel': channel,
             'text': text,}
         ]
-        assert parse_next_msg() == ret
+        assert parse_next_msg() == Message(giverid=giverid, channel=channel, text=text)
 
 
     def test_parse_karma_change(self):

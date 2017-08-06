@@ -1,7 +1,9 @@
+from collections import namedtuple
 import logging
 
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
+Message = namedtuple('Message', 'giverid channel text')
 
 def lookup_username(userid):
     user = userid.strip('<>@')
@@ -23,21 +25,21 @@ def post_msg(channel, text):
 
 
 def parse_next_msg():
-    ret = None, None, None
-
     msg = SLACK_CLIENT.rtm_read()
     if not msg:
-        return ret
+        return None
 
     msg = msg[0]
     giverid = msg.get('user')
 
     # ignore anything karma bot says!
     if giverid == KARMA_BOT:
-        return ret
+        return None
 
     channel = msg.get('channel')
     text = msg.get('text')
 
-    ret = channel, text, giverid
-    return ret
+    if not channel or not text:
+        return None
+
+    return Message(giverid=giverid, channel=channel, text=text)

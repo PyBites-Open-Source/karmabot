@@ -19,18 +19,18 @@ def _save_cache():
     pickle.dump(karmas, open(KARMA_CACHE, "wb"))
 
 
-def _process_karma_changes(giverid, channel, karma_changes):
+def _process_karma_changes(message, karma_changes):
     for kc in karma_changes:
         userid, voting = kc
-        giver, receiver, points = parse_karma_change(giverid,
+        giver, receiver, points = parse_karma_change(message.giverid,
                                                      userid,
                                                      voting)
         try:
-            msg = change_karma(giver, receiver, points)
+            karma_msg = change_karma(giver, receiver, points)
         except ValueError as err:
-            msg = str(err)
+            karma_msg = str(err)
 
-        post_msg(channel, msg)
+        post_msg(message.channel, karma_msg)
 
 
 def main():
@@ -43,14 +43,16 @@ def main():
 
             time.sleep(1)
 
-            channel, text, giverid = parse_next_msg()
-            if not channel or not text or not giverid:
+            message = parse_next_msg()
+            if not message:
                 continue
 
-            karma_changes = KARMA_ACTION.findall(text)
-            if karma_changes:
-                logging.debug('karma changes: {}'.format(str(karma_changes)))
-                _process_karma_changes(giverid, channel, karma_changes)
+            karma_changes = KARMA_ACTION.findall(message.text)
+            if not karma_changes:
+                continue
+
+            logging.debug('karma changes: {}'.format(str(karma_changes)))
+            _process_karma_changes(message, karma_changes)
     finally:
         logging.info('Script ended, saving karma cache to file')
         # making sure we store karma cache before exiting the script, see
