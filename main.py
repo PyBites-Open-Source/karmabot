@@ -5,7 +5,7 @@ import time
 
 from bot import SLACK_CLIENT, KARMA_CACHE, KARMA_ACTION, karmas
 from bot.slack import post_msg, parse_next_msg, lookup_username
-from bot.karma import parse_karma_change, change_karma
+from bot.karma import Karma, parse_karma_change
 
 SAVE_INTERVAL = 60
 
@@ -20,17 +20,20 @@ def _save_cache():
 
 
 def _process_karma_changes(message, karma_changes):
-    for kc in karma_changes:
-        userid, voting = kc
+    for karma_change in karma_changes:
         giver = lookup_username(message.giverid)
-        giver, receiver, points = parse_karma_change(userid,
-                                                     voting)
-        try:
-            karma_msg = change_karma(giver, receiver, points)
-        except ValueError as err:
-            karma_msg = str(err)
+        channel = message.channel
 
-        post_msg(message.channel, karma_msg)
+        receiver, points = parse_karma_change(karma_change)
+
+        karma = Karma(giver, receiver)
+
+        try:
+            msg = karma.change_karma(points)
+        except Exception as exc:
+            msg = str(exc)
+
+        post_msg(channel, msg)
 
 
 def main():

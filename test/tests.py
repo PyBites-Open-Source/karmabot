@@ -5,7 +5,7 @@ from unittest.mock import patch
 from bot import SLACK_CLIENT, KARMA_BOT, KARMA_CACHE, MAX_POINTS
 from bot import KARMA_ACTION, USERNAME_CACHE, karmas
 from bot.slack import post_msg, parse_next_msg, lookup_username, Message
-from bot.karma import parse_karma_change, change_karma
+from bot.karma import Karma, parse_karma_change
 
 userinfo = {
     'user': {
@@ -74,28 +74,34 @@ class TestKarma(object):
 
 
     def test_parse_karma_change(self):
-        receiver, points = parse_karma_change('<@bbelderbos>', ' +++')
+        karma_change = '<@bbelderbos>', ' +++'
+        receiver, points = parse_karma_change(karma_change)
         assert receiver == 'bob'
         assert points == 3
-        receiver, points = parse_karma_change('subject', ' +-++')
+        karma_change = 'subject', ' +-++'
+        receiver, points = parse_karma_change(karma_change)
         assert receiver == 'subject'
         assert points == 2
-        receiver, points = parse_karma_change('subject', ' ++---')
+        karma_change = 'subject', ' ++---'
+        receiver, points = parse_karma_change(karma_change)
         assert points == -1
 
 
     def test_change_karma(self):
-        assert_raises(ValueError, change_karma, 'bob', 'bob', 4)
-        assert_raises(RuntimeError, change_karma, 'bob', 'tim', 'string')
-        msg = change_karma('bob', 'tim', 4)
-        assert msg == "tim's karma increased to 4"
+        assert_raises(ValueError, Karma, 'bob', 'bob')
+        karma = Karma('bob', 'tim')
+        assert_raises(RuntimeError, karma.change_karma, 'string')
+        karma = Karma('bob', 'tim')
+        assert karma.change_karma(4) == "tim's karma increased to 4"
         assert karmas.get('tim') == 4
-        msg = change_karma('bob', 'tim', 2)
+        assert karma.change_karma(2) == "tim's karma increased to 6"
         assert karmas.get('tim') == 6
-        msg = change_karma('bob', 'tim', -1)
+        assert karma.change_karma(-1) == "tim's karma decreased to 5"
         assert karmas.get('tim') == 5
-        assert msg == "tim's karma decreased to 5"
-        msg = change_karma('bob', 'tim', MAX_POINTS + 3)
+        msg = "tim's karma increased to 10 (= max increase of {})".format(MAX_POINTS)
+        assert karma.change_karma(MAX_POINTS + 3) == msg
         assert karmas.get('tim') == 5 + MAX_POINTS
-        assert msg == "tim's karma increased to 10 (= max increase of {})".format(MAX_POINTS), msg
-
+        msg = "tim's karma decreased to 5 (= max decrease of {})".format(MAX_POINTS)
+        prev_score = karmas.get('tim')  # 10
+        assert karma.change_karma(-12) == msg
+        assert karmas.get('tim') == prev_score - MAX_POINTS  # 5
