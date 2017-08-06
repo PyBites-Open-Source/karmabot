@@ -1,6 +1,8 @@
 from . import IS_USER, MAX_POINTS, karmas
 from .slack import lookup_username
 
+START_KARMA = 0
+
 
 def parse_karma_change(userid, voting):
     if IS_USER.match(userid):
@@ -35,7 +37,7 @@ def change_karma(giver, receiver, points):
 
     poses = "'" if receiver.endswith('s') else "'s"
     action = 'increase' if points > 0 else 'decrease'
-    receiver_karma = karmas.get(receiver, 0)
+    receiver_karma = karmas.get(receiver, START_KARMA)
 
     msg = '{}{} karma {}d to {}'.format(receiver,
                                         poses,
