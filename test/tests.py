@@ -74,14 +74,13 @@ class TestKarma(object):
 
 
     def test_parse_karma_change(self):
-        giver, receiver, points = parse_karma_change('fred', '<@bbelderbos>', ' +++')
-        assert giver == 'bob'  # mock lookup_username
+        receiver, points = parse_karma_change('<@bbelderbos>', ' +++')
         assert receiver == 'bob'
         assert points == 3
-        giver, receiver, points = parse_karma_change('fred', 'subject', ' +-++')
+        receiver, points = parse_karma_change('subject', ' +-++')
         assert receiver == 'subject'
         assert points == 2
-        giver, receiver, points = parse_karma_change('fred', 'subject', ' ++---')
+        receiver, points = parse_karma_change('subject', ' ++---')
         assert points == -1
 
 
