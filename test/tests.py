@@ -97,5 +97,5 @@ class TestKarma(object):
         assert msg == "tim's karma decreased to 5"
         msg = change_karma('bob', 'tim', MAX_POINTS + 3)
         assert karmas.get('tim') == 5 + MAX_POINTS
-        assert msg == "tim's karma increased to 10 (= max increase of {})".format(MAX_POINTS)
+        assert msg == "tim's karma increased to 10 (= max increase of {})".format(MAX_POINTS), msg
 
