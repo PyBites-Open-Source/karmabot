@@ -1,8 +1,8 @@
 from . import IS_USER, MAX_POINTS, karmas
-from .slack import lookup_username
+from .slack import lookup_username, post_msg
 
 
-def parse_karma_change(karma_change):
+def _parse_karma_change(karma_change):
     userid, voting = karma_change
 
     if IS_USER.match(userid):
@@ -13,6 +13,23 @@ def parse_karma_change(karma_change):
     points = voting.count('+') - voting.count('-')
 
     return receiver, points
+
+
+def process_karma_changes(message, karma_changes):
+    for karma_change in karma_changes:
+        giver = lookup_username(message.giverid)
+        channel = message.channel
+
+        receiver, points = _parse_karma_change(karma_change)
+
+        karma = Karma(giver, receiver)
+
+        try:
+            msg = karma.change_karma(points)
+        except Exception as exc:
+            msg = str(exc)
+
+        post_msg(channel, msg)
 
 
 class Karma:

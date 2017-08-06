@@ -4,8 +4,8 @@ import sys
 import time
 
 from bot import SLACK_CLIENT, KARMA_CACHE, KARMA_ACTION, karmas
-from bot.slack import post_msg, parse_next_msg, lookup_username
-from bot.karma import Karma, parse_karma_change
+from bot.slack import parse_next_msg
+from bot.karma import process_karma_changes
 
 SAVE_INTERVAL = 60
 
@@ -17,23 +17,6 @@ if not SLACK_CLIENT.rtm_connect():
 
 def _save_cache():
     pickle.dump(karmas, open(KARMA_CACHE, "wb"))
-
-
-def _process_karma_changes(message, karma_changes):
-    for karma_change in karma_changes:
-        giver = lookup_username(message.giverid)
-        channel = message.channel
-
-        receiver, points = parse_karma_change(karma_change)
-
-        karma = Karma(giver, receiver)
-
-        try:
-            msg = karma.change_karma(points)
-        except Exception as exc:
-            msg = str(exc)
-
-        post_msg(channel, msg)
 
 
 def main():
@@ -55,7 +38,7 @@ def main():
                 continue
 
             logging.debug('karma changes: {}'.format(str(karma_changes)))
-            _process_karma_changes(message, karma_changes)
+            process_karma_changes(message, karma_changes)
     finally:
         logging.info('Script ended, saving karma cache to file')
         # making sure we store karma cache before exiting the script, see

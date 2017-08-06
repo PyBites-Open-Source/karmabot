@@ -5,7 +5,7 @@ from unittest.mock import patch
 from bot import SLACK_CLIENT, KARMA_BOT, KARMA_CACHE, MAX_POINTS
 from bot import KARMA_ACTION, USERNAME_CACHE, karmas
 from bot.slack import post_msg, parse_next_msg, lookup_username, Message
-from bot.karma import Karma, parse_karma_change
+from bot.karma import Karma, _parse_karma_change
 
 userinfo = {
     'user': {
@@ -75,15 +75,15 @@ class TestKarma(object):
 
     def test_parse_karma_change(self):
         karma_change = '<@bbelderbos>', ' +++'
-        receiver, points = parse_karma_change(karma_change)
+        receiver, points = _parse_karma_change(karma_change)
         assert receiver == 'bob'
         assert points == 3
         karma_change = 'subject', ' +-++'
-        receiver, points = parse_karma_change(karma_change)
+        receiver, points = _parse_karma_change(karma_change)
         assert receiver == 'subject'
         assert points == 2
         karma_change = 'subject', ' ++---'
-        receiver, points = parse_karma_change(karma_change)
+        receiver, points = _parse_karma_change(karma_change)
         assert points == -1
 
 
