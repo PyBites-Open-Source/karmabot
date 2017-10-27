@@ -105,3 +105,11 @@ class TestKarma(object):
         prev_score = karmas.get('tim')  # 10
         assert karma.change_karma(-12) == msg
         assert karmas.get('tim') == prev_score - MAX_POINTS  # 5
+
+    def test_change_karma_bot_self(self):
+        karma = Karma('bob', 'karmabot')
+        assert karma.change_karma(2) == "Thanks @bob for the extra karma, my karma is 2 now"
+        karma = Karma('tim', 'karmabot')
+        assert karma.change_karma(3) == "Thanks @tim for the extra karma, my karma is 5 now"
+        karma = Karma('julian', 'karmabot')
+        assert karma.change_karma(-3) == "Not cool @julian lowering my karma to 2, but you are probably right, I will work harder next time"
