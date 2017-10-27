@@ -1,6 +1,8 @@
 from . import IS_USER, MAX_POINTS, karmas
 from .slack import lookup_username, post_msg
 
+KARMABOT = 'karmabot'
+
 
 def _parse_karma_change(karma_change):
     userid, voting = karma_change
@@ -49,6 +51,18 @@ class Karma:
             self.last_score_maxed_out = False
             return points
 
+    def _create_msg_bot_self_karma(self, points):
+        receiver_karma = karmas.get(self.receiver, 0)
+        if points > 0:
+            msg = 'Thanks @{} for the extra karma'.format(self.giver)
+            msg += ', my karma is {} now'.format(receiver_karma)
+        else:
+            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver,
+                                                                receiver_karma)
+            msg += ', but you are probably right'
+            msg += ', I will work harder next time'
+        return msg
+
     def _create_msg(self, points):
         poses = "'" if self.receiver.endswith('s') else "'s"
         action = 'increase' if points > 0 else 'decrease'
@@ -75,4 +89,7 @@ class Karma:
 
         karmas[self.receiver] += points
 
-        return self._create_msg(points)
+        if self.receiver == KARMABOT:
+            return self._create_msg_bot_self_karma(points)
+        else:
+            return self._create_msg(points)
