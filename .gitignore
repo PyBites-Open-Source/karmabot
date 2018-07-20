@@ -5,3 +5,4 @@ venv
 *log
 data
 .*cache*
+.coverage
