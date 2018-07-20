@@ -1,10 +1,19 @@
 from collections import namedtuple
 import logging
 import os
+import random
+from urllib.request import urlretrieve
 
 from slackclient import SlackClient
 
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
+
+# thanks Erik!
+WELCOME_MSG = """Welcome {user}++! Introduce yourself if you like.
+What do you use Python for? What is your day job?
+{fun_question}"""
+FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/funny_questions.txt'
+FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'funny_questions.txt')
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -50,6 +59,21 @@ def bot_joins_new_channel(msg):
     post_msg(new_channel, msg)
 
 
+def _get_random_question():
+    if not os.path.isfile(FUNNY_QUESTIONS_TEMPFILE):
+        urlretrieve(FUNNY_QUESTIONS, FUNNY_QUESTIONS_TEMPFILE)
+
+    with open(FUNNY_QUESTIONS_TEMPFILE) as f:
+        questions = f.readlines()[1:]
+        return random.choice(questions)
+
+
+def _welcome_new_user(user, channel, msg):
+    msg = WELCOME_MSG.format(user=user,
+                             fun_question=_get_random_question())
+    post_msg(channel, msg)
+
+
 def parse_next_msg():
     msg = SLACK_CLIENT.rtm_read()
     if not msg:
@@ -61,15 +85,22 @@ def parse_next_msg():
         bot_joins_new_channel(msg)
         return None
 
+    user = msg.get('user')
+
     # ignore anything karma bot says!
-    giverid = msg.get('user')
-    if giverid == KARMA_BOT:
+    if user == KARMA_BOT:
         return None
 
     channel = msg.get('channel')
+
+    # if a new user joins send a welcome msg
+    if type_event == 'team_join':
+        _welcome_new_user(user, channel, msg)
+        return None
+
     text = msg.get('text')
 
     if not channel or not text:
         return None
 
-    return Message(giverid=giverid, channel=channel, text=text)
+    return Message(giverid=user, channel=channel, text=text)
