@@ -12,9 +12,9 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 WELCOME_MSG = """Hey {user}++ I am @karmabot, welcome to PyBites!
 Introduce yourself if you like ...
 What do you use Python for? What is your day job?
-And a random fun question for you: {fun_question}"""
-FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/funny_questions.txt'
-FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'funny_questions.txt')
+And a random one: {welcome_question}"""
+FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/welcome_questions.txt'
+FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'welcome_questions.txt')
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 
 Message = namedtuple('Message', 'giverid channel text')
@@ -72,7 +72,7 @@ def _get_random_question():
 
 def _welcome_new_user(user, msg):
     msg = WELCOME_MSG.format(user=user['real_name'],
-                             fun_question=_get_random_question())
+                             welcome_question=_get_random_question())
     post_msg(GENERAL_CHANNEL, msg)
 
 
