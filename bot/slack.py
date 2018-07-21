@@ -9,10 +9,14 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # thanks Erik!
-WELCOME_MSG = """Hey {user}++ I am @karmabot, welcome to PyBites!
+WELCOME_MSG = """Welcome {user}!
+
 Introduce yourself if you like ...
 What do you use Python for? What is your day job?
-And a random one: {welcome_question}"""
+And a random question: {welcome_question}
+
+Enjoy PyBites Slack"""
+
 FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/welcome_questions.txt'
 FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'welcome_questions.txt')
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
