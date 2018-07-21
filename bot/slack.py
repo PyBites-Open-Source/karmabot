@@ -63,7 +63,7 @@ def _get_random_question():
     if not os.path.isfile(FUNNY_QUESTIONS_TEMPFILE):
         urlretrieve(FUNNY_QUESTIONS, FUNNY_QUESTIONS_TEMPFILE)
 
-    with open(FUNNY_QUESTIONS_TEMPFILE) as f:
+    with open(FUNNY_QUESTIONS_TEMPFILE, encoding='utf8') as f:
         questions = f.readlines()[1:]
         return random.choice(questions)
 
