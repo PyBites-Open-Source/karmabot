@@ -9,11 +9,13 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # thanks Erik!
-WELCOME_MSG = """Welcome {user}++! Introduce yourself if you like.
+WELCOME_MSG = """Hey {user}++ I am @karmabot, welcome to PyBites!
+Introduce yourself if you like ...
 What do you use Python for? What is your day job?
-{fun_question}"""
+And a random fun question for you: {fun_question}"""
 FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/funny_questions.txt'
 FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'funny_questions.txt')
+GENERAL_CHANNEL = 'C4SFQJJ9Z'
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -68,10 +70,10 @@ def _get_random_question():
         return random.choice(questions)
 
 
-def _welcome_new_user(user, channel, msg):
-    msg = WELCOME_MSG.format(user=user,
+def _welcome_new_user(user, msg):
+    msg = WELCOME_MSG.format(user=user['real_name'],
                              fun_question=_get_random_question())
-    post_msg(channel, msg)
+    post_msg(GENERAL_CHANNEL, msg)
 
 
 def parse_next_msg():
@@ -95,7 +97,7 @@ def parse_next_msg():
 
     # if a new user joins send a welcome msg
     if type_event == 'team_join':
-        _welcome_new_user(user, channel, msg)
+        _welcome_new_user(user, msg)
         return None
 
     text = msg.get('text')
