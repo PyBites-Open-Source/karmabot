@@ -9,7 +9,7 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # thanks Erik!
-WELCOME_MSG = """Welcome {user}!
+WELCOME_MSG = """Welcome {user}++!
 
 Introduce yourself if you like ...
 What do you use Python for? What is your day job?
@@ -74,10 +74,11 @@ def _get_random_question():
         return random.choice(questions)
 
 
-def _welcome_new_user(user, msg):
+def _welcome_new_user(user):
     msg = WELCOME_MSG.format(user=user['real_name'],
                              welcome_question=_get_random_question())
     post_msg(GENERAL_CHANNEL, msg)
+    return msg
 
 
 def parse_next_msg():
@@ -98,13 +99,14 @@ def parse_next_msg():
         return None
 
     channel = msg.get('channel')
+    text = msg.get('text')
 
     # if a new user joins send a welcome msg
     if type_event == 'team_join':
-        _welcome_new_user(user, msg)
-        return None
-
-    text = msg.get('text')
+        # return the message to apply the karma change
+        text = _welcome_new_user(user)
+        channel = GENERAL_CHANNEL
+        user = KARMA_BOT
 
     if not channel or not text:
         return None
