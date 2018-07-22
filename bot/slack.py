@@ -13,9 +13,11 @@ WELCOME_MSG = """Welcome {user}++!
 
 Introduce yourself if you like ...
 What do you use Python for? What is your day job?
-And a random question: {welcome_question}
 
-Enjoy PyBites Slack"""
+>>> random.choice(pybites_init_questions)
+{welcome_question}
+
+Enjoy PyBites Slack!"""
 
 FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/welcome_questions.txt'
 FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'welcome_questions.txt')
