@@ -75,7 +75,7 @@ def _get_random_question():
 
 
 def _welcome_new_user(user):
-    msg = WELCOME_MSG.format(user=user['real_name'],
+    msg = WELCOME_MSG.format(user=user['display_name'],
                              welcome_question=_get_random_question())
     post_msg(GENERAL_CHANNEL, msg)
     return msg
