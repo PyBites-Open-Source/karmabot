@@ -77,6 +77,7 @@ def _get_random_question():
 
 
 def _welcome_new_user(user):
+    # https://api.slack.com/methods/users.info
     msg = WELCOME_MSG.format(user=user['name'],
                              welcome_question=_get_random_question())
     post_msg(GENERAL_CHANNEL, msg)
