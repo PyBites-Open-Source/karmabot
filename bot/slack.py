@@ -14,7 +14,7 @@ WELCOME_MSG = """Welcome {user}++!
 Introduce yourself if you like ...
 What do you use Python for? What is your day job?
 
->>> random.choice(pybites_init_questions)
+And finally: >>> random.choice(pybites_init_questions)
 {welcome_question}
 
 Enjoy PyBites Slack!"""
