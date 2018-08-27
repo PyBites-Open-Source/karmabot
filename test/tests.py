@@ -88,9 +88,6 @@ class TestKarma(object):
 
 
     def test_change_karma(self):
-        assert_raises(ValueError, Karma, 'bob', 'bob')
-        karma = Karma('bob', 'tim')
-        assert_raises(RuntimeError, karma.change_karma, 'string')
         karma = Karma('bob', 'tim')
         assert karma.change_karma(4) == "tim's karma increased to 4"
         assert karmas.get('tim') == 4
@@ -105,6 +102,14 @@ class TestKarma(object):
         prev_score = karmas.get('tim')  # 10
         assert karma.change_karma(-12) == msg
         assert karmas.get('tim') == prev_score - MAX_POINTS  # 5
+
+
+    def test_change_karma_exceptions(self):
+        karma = Karma('bob', 'tim')
+        assert_raises(RuntimeError, karma.change_karma, 'string')
+        karma = Karma('bob', 'bob')
+        assert_raises(ValueError, karma.change_karma, 1)
+
 
     def test_change_karma_bot_self(self):
         karma = Karma('bob', 'karmabot')

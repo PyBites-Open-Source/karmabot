@@ -39,8 +39,6 @@ class Karma:
     def __init__(self, giver, receiver):
         self.giver = giver
         self.receiver = receiver
-        if self.giver == self.receiver:
-            raise ValueError('Sorry, cannot give karma to self')
         self.last_score_maxed_out = False
 
     def _calc_final_score(self, points):
@@ -81,9 +79,12 @@ class Karma:
         '''updates karmas dict and returns message string'''
         if not isinstance(points, int):
             err = ('Program bug: change_karma should '
-                   'not be called wiht a non int for '
+                   'not be called with a non int for '
                    'points arg!')
             raise RuntimeError(err)
+
+        if self.giver == self.receiver:
+            raise ValueError('Sorry, cannot give karma to self')
 
         points = self._calc_final_score(points)
 
