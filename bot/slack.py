@@ -115,7 +115,7 @@ def perform_bot_cmd(text):
     if KARMA_BOT not in text and 'karmabot' not in text:
         return None
 
-    cmd = text.split()[1]
+    cmd = text.split()[1].strip('\n? ')
 
     # of course ignore karma points
     if cmd.startswith(('+', '-')):
