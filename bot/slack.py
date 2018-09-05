@@ -33,7 +33,9 @@ Message = namedtuple('Message', 'giverid channel text')
 def _get_bot_commands():
     commands_file = 'http://projects.bobbelderbos.com/bot_commands.txt'
     commands_tempfile = os.path.join('/tmp', 'bot_commands.txt')
-    urlretrieve(commands_file, commands_tempfile)
+    if not os.path.isfile(commands_tempfile):
+        urlretrieve(commands_file, commands_tempfile)
+
     bot_commands = {}
 
     with open(commands_tempfile, encoding='utf8') as f:
