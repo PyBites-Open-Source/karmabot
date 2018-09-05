@@ -8,22 +8,59 @@ from slackclient import SlackClient
 
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
+
 # thanks Erik!
+KARMA_BOT_HANDLE = '@karmabot'
 WELCOME_MSG = """Welcome {user}++!
 
 Introduce yourself if you like ...
-What do you use Python for? What is your day job?
-
-And finally: >>> random.choice(pybites_init_questions)
+- What do you use Python for?
+- What is your day job?
+- And: >>> random.choice(pybites_init_questions)
 {welcome_question}
 
-Enjoy PyBites Slack!"""
+My creators are making me smarter, type this if you need anything
+@karmabot help
+
+Enjoy PyBites Slack and keep calm and code in Python!"""
 
 FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/welcome_questions.txt'
 FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'welcome_questions.txt')
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 
 Message = namedtuple('Message', 'giverid channel text')
+
+
+def _get_bot_commands():
+    commands_file = 'http://projects.bobbelderbos.com/bot_commands.txt'
+    commands_tempfile = os.path.join('/tmp', 'bot_commands.txt')
+    urlretrieve(commands_file, commands_tempfile)
+    bot_commands = {}
+
+    with open(commands_tempfile, encoding='utf8') as f:
+        lines = f.readlines()[1:]
+        cmd = None
+        help_text = []
+
+        for line in lines:
+            if not line.strip():
+                cmd = None
+                continue
+
+            if line.startswith('*'):
+                cmd, cmd_str = line.strip('\n* ').split('|')
+                bot_commands[cmd] = []
+                help_text.append((cmd, cmd_str))
+                continue
+
+            bot_commands[cmd].append(line)
+
+    bot_commands['help'] = '\n'.join(['{:<20}: {}'.format(cmd, cmd_str) for
+                                      (cmd, cmd_str) in help_text])
+    return bot_commands
+
+
+BOT_COMMANDS = _get_bot_commands()
 
 
 def lookup_username(userid):
@@ -67,6 +104,23 @@ def bot_joins_new_channel(msg):
     post_msg(new_channel, msg)
 
 
+def perform_bot_cmd(msg):
+    """Parses message for valid bot command and returns output or None if
+       not a valid bot command request"""
+    if not msg.startswith(KARMA_BOT_HANDLE):
+        return None
+
+    if msg.count(' ') < 1:
+        return None
+
+    cmd = msg.split()[1]
+
+    if cmd not in BOT_COMMANDS:
+        return None
+
+    return BOT_COMMANDS.get(cmd)
+
+
 def _get_random_question():
     if not os.path.isfile(FUNNY_QUESTIONS_TEMPFILE):
         urlretrieve(FUNNY_QUESTIONS, FUNNY_QUESTIONS_TEMPFILE)
@@ -93,6 +147,12 @@ def parse_next_msg():
     type_event = msg.get('type')
     if type_event == 'channel_created':
         bot_joins_new_channel(msg)
+        return None
+
+    # if we recognize a valid bot command post its output, done
+    cmd_output = perform_bot_cmd(msg)
+    if cmd_output:
+        post_msg(GENERAL_CHANNEL, cmd_output)
         return None
 
     user = msg.get('user')
