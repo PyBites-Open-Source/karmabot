@@ -104,16 +104,16 @@ def bot_joins_new_channel(msg):
     post_msg(new_channel, msg)
 
 
-def perform_bot_cmd(msg):
+def perform_bot_cmd(text):
     """Parses message for valid bot command and returns output or None if
        not a valid bot command request"""
-    if not msg.startswith(KARMA_BOT_HANDLE):
+    if not text.startswith(KARMA_BOT_HANDLE):
         return None
 
-    if msg.count(' ') < 1:
+    if text.count(' ') < 1:
         return None
 
-    cmd = msg.split()[1]
+    cmd = text.split()[1]
 
     if cmd not in BOT_COMMANDS:
         return None
@@ -149,12 +149,6 @@ def parse_next_msg():
         bot_joins_new_channel(msg)
         return None
 
-    # if we recognize a valid bot command post its output, done
-    cmd_output = perform_bot_cmd(msg)
-    if cmd_output:
-        post_msg(GENERAL_CHANNEL, cmd_output)
-        return None
-
     user = msg.get('user')
 
     # ignore anything karma bot says!
@@ -163,6 +157,12 @@ def parse_next_msg():
 
     channel = msg.get('channel')
     text = msg.get('text')
+
+    # if we recognize a valid bot command post its output, done
+    cmd_output = perform_bot_cmd(text)
+    if cmd_output:
+        post_msg(GENERAL_CHANNEL, cmd_output)
+        return None
 
     # if a new user joins send a welcome msg
     if type_event == 'team_join':
