@@ -107,7 +107,7 @@ def bot_joins_new_channel(msg):
 def perform_bot_cmd(text):
     """Parses message for valid bot command and returns output or None if
        not a valid bot command request"""
-    if not text.startswith(KARMA_BOT_HANDLE):
+    if not text or not text.startswith(KARMA_BOT_HANDLE):
         return None
 
     if text.count(' ') < 1:
