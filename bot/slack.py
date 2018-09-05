@@ -80,6 +80,7 @@ def post_msg(channel, text):
     SLACK_CLIENT.api_call("chat.postMessage",
                           channel=channel,
                           text=text,
+                          link_names=True,  # convert # and @ in links
                           as_user=True)
 
 
