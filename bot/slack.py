@@ -1,67 +1,34 @@
 from collections import namedtuple
 import logging
 import os
-import random
-from urllib.request import urlretrieve
 
 from slackclient import SlackClient
 
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
+# bot commands
+from commands.feed import get_pybites_last_entries
+from commands.hello import hello_user
+from commands.score import get_karma, top_karma
+from commands.topchannels import get_recommended_channels
+from commands.welcome import welcome_user
 
-# thanks Erik!
-WELCOME_MSG = """Welcome {user}++!
-
-Introduce yourself if you like ...
-- What do you use Python for?
-- What is your day job?
-- And: >>> random.choice(pybites_init_questions)
-{welcome_question}
-
-My creators are making me smarter, type this if you need anything
-@karmabot help
-
-Enjoy PyBites Slack and keep calm and code in Python!"""
-
-FUNNY_QUESTIONS = 'http://projects.bobbelderbos.com/welcome_questions.txt'
-FUNNY_QUESTIONS_TEMPFILE = os.path.join('/tmp', 'welcome_questions.txt')
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
+TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
+                           cheers=':beers:')
+
+BOT_COMMANDS = dict(hello=hello_user,
+                    topchannels=get_recommended_channels,
+                    feed=get_pybites_last_entries,
+                    karma=get_karma,
+                    top_karma=top_karma)
+HELP_TEXT = '\n'.join(['{:<20}: {}'.format(f, f.__doc__)
+                       for f in sorted(BOT_COMMANDS.keys())])
+BOT_COMMANDS['help'] = HELP_TEXT
+
+PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 
 Message = namedtuple('Message', 'giverid channel text')
-
-
-def _get_bot_commands():
-    commands_file = 'http://projects.bobbelderbos.com/bot_commands.txt'
-    commands_tempfile = os.path.join('/tmp', 'bot_commands.txt')
-    if not os.path.isfile(commands_tempfile):
-        urlretrieve(commands_file, commands_tempfile)
-
-    bot_commands = {}
-
-    with open(commands_tempfile, encoding='utf8') as f:
-        lines = f.readlines()[1:]
-        cmd = None
-        help_text = []
-
-        for line in lines:
-            if not line.strip():
-                cmd = None
-                continue
-
-            if line.startswith('*'):
-                cmd, cmd_str = line.strip('\n* ').split('|')
-                bot_commands[cmd] = []
-                help_text.append((cmd, cmd_str))
-                continue
-
-            bot_commands[cmd].append(line)
-
-    bot_commands['help'] = '\n'.join(['{:<20}: {}'.format(cmd, cmd_str) for
-                                      (cmd, cmd_str) in help_text])
-    return bot_commands
-
-
-BOT_COMMANDS = _get_bot_commands()
 
 
 def lookup_username(userid):
@@ -106,17 +73,22 @@ def bot_joins_new_channel(msg):
     post_msg(new_channel, msg)
 
 
-def perform_bot_cmd(text):
+def perform_bot_cmd(msg):
     """Parses message for valid bot command and returns output or None if
        not a valid bot command request"""
-    # commands are of @karma cmd, so only one space
-    if not text or text.strip().count(' ') != 1:
-        return None
+    user = msg.get('user')
+    channel = msg.get('channel')
+    text = msg.get('text')
 
     if KARMA_BOT not in text and 'karmabot' not in text:
         return None
 
-    cmd = text.split()[1].strip('\n? ')
+    # need at least something after karmabot
+    if text.strip().count(' ') < 1:
+        return None
+
+    # @karmabot blabla -> get blabla
+    cmd = ' '.join(text.split()[1:]).strip().lower()
 
     # of course ignore karma points
     if cmd.startswith(('+', '-')):
@@ -128,24 +100,10 @@ def perform_bot_cmd(text):
         help_msg += BOT_COMMANDS['help']
         return help_msg
 
-    return ''.join(BOT_COMMANDS.get(cmd))
-
-
-def _get_random_question():
-    if not os.path.isfile(FUNNY_QUESTIONS_TEMPFILE):
-        urlretrieve(FUNNY_QUESTIONS, FUNNY_QUESTIONS_TEMPFILE)
-
-    with open(FUNNY_QUESTIONS_TEMPFILE, encoding='utf8') as f:
-        questions = f.readlines()[1:]
-        return random.choice(questions)
-
-
-def _welcome_new_user(user):
-    # https://api.slack.com/methods/users.info
-    msg = WELCOME_MSG.format(user=user['name'],
-                             welcome_question=_get_random_question())
-    post_msg(GENERAL_CHANNEL, msg)
-    return msg
+    kwargs = dict(user=user,
+                  channel=channel,
+                  text=text)
+    return BOT_COMMANDS[cmd](**kwargs)
 
 
 def parse_next_msg():
@@ -168,8 +126,17 @@ def parse_next_msg():
     channel = msg.get('channel')
     text = msg.get('text')
 
+    # text replacements on first matching word in text
+    words = text and text.lower().split()
+    if words:
+        matching_words = [word for word in words
+                          if word in TEXT_FILTER_REPLIES]
+        if matching_words:
+            replacement_word = TEXT_FILTER_REPLIES.get(matching_words[0])
+            post_msg(channel, replacement_word)
+
     # if we recognize a valid bot command post its output, done
-    cmd_output = perform_bot_cmd(text)
+    cmd_output = text and perform_bot_cmd(msg)
     if cmd_output:
         post_msg(channel, cmd_output)
         return None
@@ -177,9 +144,12 @@ def parse_next_msg():
     # if a new user joins send a welcome msg
     if type_event == 'team_join':
         # return the message to apply the karma change
-        text = _welcome_new_user(user)
+        # https://api.slack.com/methods/users.info
         channel = GENERAL_CHANNEL
-        user = KARMA_BOT
+        msg = PRIVATE_BOT_COMMANDS['welcome'](user)  # new user joining
+        post_msg(channel, msg)
+        text = msg  # make sure to get to Message for karma
+        user = KARMA_BOT  # do this last for the karma giving
 
     if not channel or not text:
         return None
