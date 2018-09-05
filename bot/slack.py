@@ -54,8 +54,8 @@ def _get_bot_commands():
 
             bot_commands[cmd].append(line)
 
-    bot_commands['help'] = ['{:<20}: {}'.format(cmd, cmd_str) for
-                            (cmd, cmd_str) in help_text]
+    bot_commands['help'] = '\n'.join(['{:<20}: {}'.format(cmd, cmd_str) for
+                                      (cmd, cmd_str) in help_text])
     return bot_commands
 
 
@@ -106,16 +106,24 @@ def bot_joins_new_channel(msg):
 def perform_bot_cmd(text):
     """Parses message for valid bot command and returns output or None if
        not a valid bot command request"""
-    if not text or text.count(' ') < 1:
+    # commands are of @karma cmd, so only one space
+    if not text or text.strip().count(' ') != 1:
         return None
 
-    if not KARMA_BOT in text and not 'karmabot' in text:
+    if KARMA_BOT not in text and 'karmabot' not in text:
         return None
 
     cmd = text.split()[1]
 
-    if cmd not in BOT_COMMANDS:
+    # of course ignore karma points
+    if cmd.startswith(('+', '-')):
         return None
+
+    if cmd not in BOT_COMMANDS:
+        help_msg = ('raise ValueError ... '
+                    'I am not that smart, valid commands:\n\n')
+        help_msg += BOT_COMMANDS['help']
+        return help_msg
 
     return ''.join(BOT_COMMANDS.get(cmd))
 
