@@ -10,7 +10,6 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 
 # thanks Erik!
-KARMA_BOT_HANDLE = '@karmabot'
 WELCOME_MSG = """Welcome {user}++!
 
 Introduce yourself if you like ...
@@ -107,10 +106,10 @@ def bot_joins_new_channel(msg):
 def perform_bot_cmd(text):
     """Parses message for valid bot command and returns output or None if
        not a valid bot command request"""
-    if not text or not text.startswith(KARMA_BOT_HANDLE):
+    if not text or text.count(' ') < 1:
         return None
 
-    if text.count(' ') < 1:
+    if not KARMA_BOT in text and not 'karmabot' in text:
         return None
 
     cmd = text.split()[1]
