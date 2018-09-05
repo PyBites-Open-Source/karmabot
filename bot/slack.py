@@ -54,8 +54,8 @@ def _get_bot_commands():
 
             bot_commands[cmd].append(line)
 
-    bot_commands['help'] = '\n'.join(['{:<20}: {}'.format(cmd, cmd_str) for
-                                      (cmd, cmd_str) in help_text])
+    bot_commands['help'] = ['{:<20}: {}'.format(cmd, cmd_str) for
+                            (cmd, cmd_str) in help_text]
     return bot_commands
 
 
@@ -117,7 +117,7 @@ def perform_bot_cmd(text):
     if cmd not in BOT_COMMANDS:
         return None
 
-    return BOT_COMMANDS.get(cmd)
+    return ''.join(BOT_COMMANDS.get(cmd))
 
 
 def _get_random_question():
@@ -160,7 +160,7 @@ def parse_next_msg():
     # if we recognize a valid bot command post its output, done
     cmd_output = perform_bot_cmd(text)
     if cmd_output:
-        post_msg(GENERAL_CHANNEL, cmd_output)
+        post_msg(channel, cmd_output)
         return None
 
     # if a new user joins send a welcome msg
