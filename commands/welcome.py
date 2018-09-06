@@ -19,7 +19,9 @@ Want to propose a new command?
 - add your command script under the commands/ subdirectory
 - open a PR for your branch for PyBites to approve
 
-Enjoy PyBites Slack and keep calm and code in Python!"""
+Enjoy PyBites Slack and keep calm and code in Python!
+@pybob and @julian.sequeira
+"""
 # some Pythonic welcome questions
 WELCOME_QUESTIONS = """How did you use Python for the first time?
 What is your favorite Python module?
