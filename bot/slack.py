@@ -95,8 +95,10 @@ def perform_bot_cmd(msg):
         return None
 
     if cmd not in BOT_COMMANDS:
-        help_msg = ('raise ValueError ... '
-                    'I am not that smart, valid commands:\n\n')
+        help_msg = ''
+        if cmd != 'help':
+            help_msg += '`raise ValueError` ... I am not that smart (yet), valid commands:\n\n'  # noqa E501
+        help_msg += '{:<30}: {}\n'.format('help', 'print this help message')
         help_msg += HELP_TEXT
         return help_msg
 
