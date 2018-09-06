@@ -10,7 +10,7 @@ MAX_ENTRIES = 5
 
 
 def get_pybites_last_entries(**kwargs):
-    """Get the last 5 entries of PyBites blog"""
+    """Get the last 5 entries of PyBites blog (might take a bit)"""
     data = feedparser.parse(RSS)
 
     output = []

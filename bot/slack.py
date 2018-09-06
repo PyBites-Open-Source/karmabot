@@ -98,7 +98,7 @@ def perform_bot_cmd(msg):
         help_msg = ''
         if cmd != 'help':
             help_msg += '`raise ValueError` ... I am not that smart (yet), valid commands:\n\n'  # noqa E501
-        help_msg += '{:<30}: {}\n'.format('help', 'print this help message')
+        help_msg += '{:<30}: {}\n'.format('help', 'Print this help message')
         help_msg += HELP_TEXT
         return help_msg
 
