@@ -11,10 +11,10 @@ Introduce yourself if you like ...
 {welcome_question}
 
 My creators are making me smarter, type this if you need anything:
-@karmabot help
+`@karmabot help`
 
 Enjoy PyBites Slack and keep calm and code in Python!
-@pybob and @julian.sequeira
+@bbelderbos and @julian.sequeira
 """
 # some Pythonic welcome questions
 WELCOME_QUESTIONS = """How did you use Python for the first time?
