@@ -81,9 +81,10 @@ def perform_bot_cmd(msg):
     user = msg.get('user')
     channel = msg.get('channel')
     text = msg.get('text')
+    text = text.strip()
 
     # bot command needs to have bot fist in msg
-    if not text.startswith((KARMA_BOT, 'karmabot')):
+    if not text.startswith(KARMA_BOT) and not text.startswith('karmabot'):
         return None
 
     # need at least a command after karmabot
