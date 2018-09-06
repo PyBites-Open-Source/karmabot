@@ -43,11 +43,11 @@ def lookup_username(userid):
     return username
 
 
-def post_msg(channel, text):
-    logging.debug('posting to {}'.format(channel))
+def post_msg(channel_or_user, text):
+    logging.debug('posting to {}'.format(channel_or_user))
     logging.debug(text)
     SLACK_CLIENT.api_call("chat.postMessage",
-                          channel=channel,
+                          channel=channel_or_user,
                           text=text,
                           link_names=True,  # convert # and @ in links
                           as_user=True)
@@ -143,7 +143,8 @@ def parse_next_msg():
     # if we recognize a valid bot command post its output, done
     cmd_output = text and perform_bot_cmd(msg)
     if cmd_output:
-        post_msg(channel, cmd_output)
+        # post bot commands to the requesting user
+        post_msg(user, cmd_output)
         return None
 
     # if a new user joins send a welcome msg
