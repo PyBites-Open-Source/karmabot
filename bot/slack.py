@@ -25,8 +25,8 @@ BOT_COMMANDS = dict(hello=hello_user,
                     feed=get_pybites_last_entries,
                     karma=get_karma,
                     top_karma=top_karma)
-HELP_TEXT = '\n'.join(['{:<20}: {}'.format(f, f.__doc__)
-                       for f in sorted(BOT_COMMANDS.keys())])
+HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
+                       for name, func in sorted(BOT_COMMANDS.items())])
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -100,7 +100,7 @@ def perform_bot_cmd(msg):
         help_msg += HELP_TEXT
         return help_msg
 
-    kwargs = dict(user=user,
+    kwargs = dict(user=lookup_username(user),
                   channel=channel,
                   text=text)
     return BOT_COMMANDS[cmd](**kwargs)
