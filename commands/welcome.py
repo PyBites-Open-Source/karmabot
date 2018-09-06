@@ -13,12 +13,6 @@ Introduce yourself if you like ...
 My creators are making me smarter, type this if you need anything:
 @karmabot help
 
-Want to propose a new command?
-- karmabot repo: https://github.com/pybites/karmabot/commands
-- fork the repo, make your branch
-- add your command script under the commands/ subdirectory
-- open a PR for your branch for PyBites to approve
-
 Enjoy PyBites Slack and keep calm and code in Python!
 @pybob and @julian.sequeira
 """

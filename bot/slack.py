@@ -7,6 +7,7 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # bot commands
+from commands.add import add_command
 from commands.feed import get_pybites_last_entries
 from commands.hello import hello_user
 from commands.score import get_karma, top_karma
@@ -20,11 +21,12 @@ TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
                            braces='braces?! `SyntaxError: not a chance`')
 
 PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
-BOT_COMMANDS = dict(hello=hello_user,
-                    topchannels=get_recommended_channels,
+BOT_COMMANDS = dict(add=add_command,
                     feed=get_pybites_last_entries,
+                    hello=hello_user,
                     karma=get_karma,
-                    top_karma=top_karma)
+                    top_karma=top_karma,
+                    topchannels=get_recommended_channels)
 HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
                        for name, func in sorted(BOT_COMMANDS.items())])
 
