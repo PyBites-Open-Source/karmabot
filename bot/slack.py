@@ -80,7 +80,8 @@ def perform_bot_cmd(msg):
     channel = msg.get('channel')
     text = msg.get('text')
 
-    if KARMA_BOT not in text and 'karmabot' not in text:
+    # bot command needs to have bot fist in msg
+    if not text.startswith((KARMA_BOT, 'karmabot')):
         return None
 
     # need at least a command after karmabot
@@ -131,8 +132,8 @@ def parse_next_msg():
     # text replacements on first matching word in text
     words = text and text.lower().split()
     if words:
-        matching_words = [word for word in words
-                          if word in TEXT_FILTER_REPLIES]
+        matching_words = [word.strip('?!') for word in words
+                          if word.strip('?!') in TEXT_FILTER_REPLIES]
         if matching_words:
             replacement_word = TEXT_FILTER_REPLIES.get(matching_words[0])
             post_msg(channel, replacement_word)
