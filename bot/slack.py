@@ -19,6 +19,7 @@ TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
                            zen='`import this`',
                            braces='braces?! `SyntaxError: not a chance`')
 
+PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 BOT_COMMANDS = dict(hello=hello_user,
                     topchannels=get_recommended_channels,
                     feed=get_pybites_last_entries,
@@ -26,9 +27,6 @@ BOT_COMMANDS = dict(hello=hello_user,
                     top_karma=top_karma)
 HELP_TEXT = '\n'.join(['{:<20}: {}'.format(f, f.__doc__)
                        for f in sorted(BOT_COMMANDS.keys())])
-BOT_COMMANDS['help'] = HELP_TEXT
-
-PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -99,7 +97,7 @@ def perform_bot_cmd(msg):
     if cmd not in BOT_COMMANDS:
         help_msg = ('raise ValueError ... '
                     'I am not that smart, valid commands:\n\n')
-        help_msg += BOT_COMMANDS['help']
+        help_msg += HELP_TEXT
         return help_msg
 
     kwargs = dict(user=user,
