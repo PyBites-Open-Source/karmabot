@@ -83,12 +83,12 @@ def perform_bot_cmd(msg):
     if KARMA_BOT not in text and 'karmabot' not in text:
         return None
 
-    # need at least something after karmabot
+    # need at least a command after karmabot
     if text.strip().count(' ') < 1:
         return None
 
     # @karmabot blabla -> get blabla
-    cmd = ' '.join(text.split()[1:]).strip().lower()
+    cmd = text.split()[1].strip().lower()
 
     # of course ignore karma points
     if cmd.startswith(('+', '-')):
