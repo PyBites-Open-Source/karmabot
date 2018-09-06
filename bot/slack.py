@@ -15,7 +15,9 @@ from commands.welcome import welcome_user
 
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
-                           cheers=':beers:')
+                           cheers=':beers:',
+                           zen='`import this`',
+                           braces='braces?! `SyntaxError: not a chance`')
 
 BOT_COMMANDS = dict(hello=hello_user,
                     topchannels=get_recommended_channels,
