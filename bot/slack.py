@@ -18,8 +18,6 @@ from commands.welcome import welcome_user
 Message = namedtuple('Message', 'giverid channel text')
 
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
-KARMABOT_DM = 'D5ZV30XU6'
-
 ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
 TEXT_FILTER_REPLIES = dict(cheers=':beers:',
                            zen='`import this`',
@@ -131,11 +129,9 @@ def perform_bot_cmd(msg, private=True):
     if cmd == 'help':
         return create_help_msg(is_admin)
 
+    command = command_set.get(cmd)
     if is_admin and cmd in ADMIN_BOT_COMMANDS:
         command = ADMIN_BOT_COMMANDS.get(cmd)
-        private = True
-    else:
-        command = command_set.get(cmd)
 
     if not command:
         return None
@@ -188,7 +184,11 @@ def parse_next_msg():
         post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    private = channel == KARMABOT_DM
+    logging.debug('new msg = channel: {} user: {} text: {}'.format(channel,
+                                                                   user,
+                                                                   text))
+
+    private = channel == KARMA_BOT
     cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
         post_to = private and user or channel
