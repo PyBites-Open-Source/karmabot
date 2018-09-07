@@ -37,12 +37,12 @@ PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
 
 def create_help_msg(is_admin):
     help_msg = []
-    help_msg.append('\nPublic commands')
+    help_msg.append('\n1. Channel commands (format: `@karmabot command`)')
     help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
-    help_msg.append('\n---\nDM commands')
+    help_msg.append('\n2. DM commands (open chat with `@karmabot` and type `command`)')
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
-        help_msg.append('\n---\nAdmin commands')
+        help_msg.append('\n3. Admin only commands')
         help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
     return '\n'.join(help_msg)
 
