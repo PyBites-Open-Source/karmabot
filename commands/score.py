@@ -12,7 +12,7 @@ def get_karma(**kwargs):
 
     score = karmas.get(user)
     if score is None:
-        return 'No karma score for user'
+        return "Sorry, you don't have any karma yet"
 
     return MSG.format(user=user, score=score)
 
