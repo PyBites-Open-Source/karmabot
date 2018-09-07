@@ -198,7 +198,8 @@ def parse_next_msg():
         post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    private = channel and channel.startswith('D')
+    # DM's = channels start with a 'D' / channel can be dict?!
+    private = channel and isinstance(channel, str) and channel.startswith('D')
     cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
         post_msg(channel, cmd_output)
