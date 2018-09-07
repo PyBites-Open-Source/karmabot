@@ -12,6 +12,7 @@ ADD_TIP = '\nSource: {} | Share more tips: {}\n'.format(CC_ES,
 
 
 def get_random_tip(**kwargs):
+    """Print a random tip or quote from CodeChalleng.es"""
     resp = requests.get(TIPS_ENDPOINT)
     tips = resp.json()
     tip = random.choice(tips)

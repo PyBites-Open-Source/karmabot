@@ -142,7 +142,7 @@ def perform_bot_cmd(msg, private=True):
     kwargs = dict(user=lookup_username(user),
                   channel=channel,
                   text=text)
-    return private, command(**kwargs)
+    return command(**kwargs)
 
 
 def perform_text_replacements(text):
