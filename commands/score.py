@@ -22,7 +22,8 @@ def top_karma(**kwargs):
     output = ['PyBites members with most karma:']
     for person, score in karmas.most_common(TOP_NUMBER):
         output.append('{:<20} -> {}'.format(person, score))
-    return '\n'.join(output)
+    ret = '\n'.join(output)
+    return '```{}```'.format(ret)
 
 
 if __name__ == '__main__':
