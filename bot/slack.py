@@ -28,8 +28,7 @@ ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
 PUBLIC_BOT_COMMANDS = dict(add=add_command,
                            help=create_commands_table,
                            tip=get_random_tip,
-                           topchannels=get_recommended_channels,
-                           zen=import_this)
+                           topchannels=get_recommended_channels)
 PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
