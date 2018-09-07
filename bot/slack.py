@@ -23,8 +23,8 @@ TEXT_FILTER_REPLIES = dict(cheers=':beers:',
                            zen='`import this`',
                            braces='`SyntaxError: not a chance`')
 
-ADMIN_BOT_COMMANDS = dict(welcome=welcome_user,
-                          top_karma=top_karma)
+AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
+ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
 PUBLIC_BOT_COMMANDS = dict(add=add_command,
                            help=create_commands_table,
                            tip=get_random_tip,
@@ -195,7 +195,7 @@ def parse_next_msg():
         # return the message to apply the karma change
         # https://api.slack.com/methods/users.info
         channel = GENERAL_CHANNEL
-        msg = ADMIN_BOT_COMMANDS['welcome'](user)  # new user joining
+        msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
         post_msg(channel, msg)
         text = msg  # make sure to get to Message for karma
         user = KARMA_BOT  # do this last for the karma giving
