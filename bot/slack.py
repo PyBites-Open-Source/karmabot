@@ -40,7 +40,7 @@ def create_help_msg(is_admin):
     help_msg = []
     help_msg.append('\n1. Channel commands (format: `@karmabot command`)')
     help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
-    help_msg.append('\n2. DM commands (open chat with `@karmabot` and type `command`)')
+    help_msg.append('\n2. Message commands (DM `@karmabot` typing `command`)')
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
         help_msg.append('\n3. Admin only commands')
@@ -164,6 +164,15 @@ def parse_next_msg():
     if not msg:
         return None
     msg = msg[0]
+    user = msg.get('user')
+    channel = msg.get('channel')
+    text = msg.get('text')
+
+    # not sure but sometimes we get dicts?
+    if (not isinstance(channel, str) or
+       not isinstance(user, str) or
+       not isinstance(text, str)):
+        return None
 
     # handle events first
     type_event = msg.get('type')
@@ -171,10 +180,6 @@ def parse_next_msg():
     if type_event == 'channel_created':
         bot_joins_new_channel(msg)
         return None
-
-    user = msg.get('user')
-    channel = msg.get('channel')
-    text = msg.get('text')
 
     # 2. if a new user joins send a welcome msg
     if type_event == 'team_join':
@@ -200,7 +205,7 @@ def parse_next_msg():
 
     # if we recognize a valid bot command post its output, done
     # DM's = channels start with a 'D' / channel can be dict?!
-    private = channel and isinstance(channel, str) and channel.startswith('D')
+    private = channel and channel.startswith('D')
     cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
         post_msg(channel, cmd_output)
