@@ -112,7 +112,7 @@ def _get_cmd(text, private=True):
     return cmd.strip().lower()
 
 
-def perform_bot_cmd(msg):
+def perform_bot_cmd(msg, private=True):
     """Parses message and perform valid bot commands"""
     user = msg.get('user')
     userid = user and user.strip('<>@')
@@ -121,7 +121,6 @@ def perform_bot_cmd(msg):
     channel = msg.get('channel')
     text = msg.get('text')
 
-    private = channel == KARMABOT_DM
     command_set = private and PRIVATE_BOT_COMMANDS or PUBLIC_BOT_COMMANDS
     cmd = text and _get_cmd(text, private=private)
 
@@ -188,7 +187,8 @@ def parse_next_msg():
         post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    private, cmd_output = perform_bot_cmd(msg)
+    private = channel == KARMABOT_DM
+    cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
         post_to = private and user or channel
         post_msg(post_to, cmd_output)
