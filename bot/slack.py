@@ -123,7 +123,7 @@ def perform_bot_cmd(msg):
 
     private = channel == KARMABOT_DM
     command_set = private and PRIVATE_BOT_COMMANDS or PUBLIC_BOT_COMMANDS
-    cmd = _get_cmd(text, private=private)
+    cmd = text and _get_cmd(text, private=private)
 
     if not cmd:
         return None
