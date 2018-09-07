@@ -164,21 +164,35 @@ def parse_next_msg():
         return None
     msg = msg[0]
 
+    # handle events first
     type_event = msg.get('type')
+    # 1. if new channel auto-join bot
     if type_event == 'channel_created':
         bot_joins_new_channel(msg)
         return None
 
     user = msg.get('user')
+    channel = msg.get('channel')
+    text = msg.get('text')
+
+    # 2. if a new user joins send a welcome msg
+    if type_event == 'team_join':
+        # return the message to apply the karma change
+        # https://api.slack.com/methods/users.info
+        welcome_msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
+        post_msg(GENERAL_CHANNEL, welcome_msg)
+        # return Message object to handle karma in main
+        return Message(giverid=KARMA_BOT,
+                       channel=GENERAL_CHANNEL,
+                       text=welcome_msg)
+    # end events
 
     # ignore anything karma bot says!
     if user == KARMA_BOT:
         return None
 
-    channel = msg.get('channel')
-    text = msg.get('text')
-
     # text replacements on first matching word in text
+    # TODO: maybe this should replace all instances in text message ...
     text_replace_output = text and perform_text_replacements(text)
     if text_replace_output:
         post_msg(channel, text_replace_output)
@@ -189,16 +203,6 @@ def parse_next_msg():
     if cmd_output:
         post_msg(channel, cmd_output)
         return None
-
-    # if a new user joins send a welcome msg
-    if type_event == 'team_join':
-        # return the message to apply the karma change
-        # https://api.slack.com/methods/users.info
-        channel = GENERAL_CHANNEL
-        msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
-        post_msg(channel, msg)
-        text = msg  # make sure to get to Message for karma
-        user = KARMA_BOT  # do this last for the karma giving
 
     if not channel or not text:
         return None
