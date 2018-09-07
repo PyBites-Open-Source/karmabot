@@ -14,13 +14,13 @@ from commands.score import get_karma, top_karma
 from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
 from commands.welcome import welcome_user
+from commands.zen import import_this
 
 Message = namedtuple('Message', 'giverid channel text')
 
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
 TEXT_FILTER_REPLIES = dict(cheers=':beers:',
-                           zen='`import this`',
                            braces='`SyntaxError: not a chance`')
 
 AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
@@ -28,7 +28,8 @@ ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
 PUBLIC_BOT_COMMANDS = dict(add=add_command,
                            help=create_commands_table,
                            tip=get_random_tip,
-                           topchannels=get_recommended_channels)
+                           topchannels=get_recommended_channels,
+                           zen=import_this)
 PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
