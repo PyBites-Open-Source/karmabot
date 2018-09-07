@@ -10,6 +10,9 @@ Introduce yourself if you like ...
 - And: >>> random.choice(pybites_init_questions)
 {welcome_question}
 
+Although you will meet some awesome folks here, you can also talk to me :)
+Type `help` in a direct message to me (@karmabot) to get started ...
+
 Enjoy PyBites Slack and keep calm and code in Python!
 @bbelderbos and @julian.sequeira
 """

@@ -9,7 +9,7 @@ TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommend
 
 
 def get_recommended_channels(**kwargs):
-    """Show the channels that our community recommend"""
+    """Show some of our Community's favorite channels you can join"""
     return TOP_CHANNELS
 
 

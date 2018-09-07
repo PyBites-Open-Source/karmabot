@@ -5,7 +5,7 @@ TOP_NUMBER = 10
 
 
 def get_karma(**kwargs):
-    """Lookup your current karma score"""
+    """Get your current karma score"""
     user = kwargs.get('user')
     if not user:
         return 'User not found'
