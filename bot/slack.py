@@ -43,7 +43,7 @@ def create_help_msg(is_admin):
     help_msg.append('\n---\nDM commands')
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
-        help_msg.append('\n---\Admin commands')
+        help_msg.append('\n---\nAdmin commands')
         help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
     return '\n'.join(help_msg)
 
@@ -133,6 +133,7 @@ def perform_bot_cmd(msg):
 
     if is_admin and cmd in ADMIN_BOT_COMMANDS:
         command = ADMIN_BOT_COMMANDS.get(cmd)
+        private = True
     else:
         command = command_set.get(cmd)
 
@@ -142,7 +143,7 @@ def perform_bot_cmd(msg):
     kwargs = dict(user=lookup_username(user),
                   channel=channel,
                   text=text)
-    return command(**kwargs)
+    return private, command(**kwargs)
 
 
 def perform_text_replacements(text):
@@ -187,10 +188,10 @@ def parse_next_msg():
         post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    cmd_output = text and perform_bot_cmd(msg)
+    private, cmd_output = perform_bot_cmd(msg)
     if cmd_output:
-        # post bot commands to the requesting user
-        post_msg(user, cmd_output)
+        post_to = private and user or channel
+        post_msg(post_to, cmd_output)
         return None
 
     # if a new user joins send a welcome msg
