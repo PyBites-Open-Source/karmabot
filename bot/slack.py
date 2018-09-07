@@ -27,13 +27,14 @@ TEXT_FILTER_REPLIES = dict(cheers=':beers:',
 
 ADMIN_BOT_COMMANDS = dict(welcome=welcome_user,
                           top_karma=top_karma)
-PRIVATE_BOT_COMMANDS = dict(add=add_command,
-                            feed=get_pybites_last_entries)
 PUBLIC_BOT_COMMANDS = dict(add=add_command,
                            help=create_commands_table,
-                           karma=get_karma,
                            tip=get_random_tip,
                            topchannels=get_recommended_channels)
+PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
+                            help=create_commands_table,  # have everywhere
+                            karma=get_karma,
+                            )
 
 
 def create_help_msg(is_admin):
