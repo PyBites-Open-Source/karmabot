@@ -115,8 +115,8 @@ def _get_cmd(text, private=True):
 def perform_bot_cmd(msg):
     """Parses message and perform valid bot commands"""
     user = msg.get('user')
-    userid = user.strip('<>@')
-    is_admin = userid in ADMINS
+    userid = user and user.strip('<>@')
+    is_admin = userid and userid in ADMINS
 
     channel = msg.get('channel')
     text = msg.get('text')
