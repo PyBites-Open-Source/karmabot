@@ -130,7 +130,7 @@ def perform_bot_cmd(msg, private=True):
         return create_help_msg(is_admin)
 
     command = command_set.get(cmd)
-    if is_admin and cmd in ADMIN_BOT_COMMANDS:
+    if private and is_admin and cmd in ADMIN_BOT_COMMANDS:
         command = ADMIN_BOT_COMMANDS.get(cmd)
 
     if not command:
@@ -184,15 +184,10 @@ def parse_next_msg():
         post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    logging.debug('new msg = channel: {} user: {} text: {}'.format(channel,
-                                                                   user,
-                                                                   text))
-
-    private = channel == KARMA_BOT
+    private = channel and channel.startswith('D')
     cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
-        post_to = private and user or channel
-        post_msg(post_to, cmd_output)
+        post_msg(channel, cmd_output)
         return None
 
     # if a new user joins send a welcome msg
