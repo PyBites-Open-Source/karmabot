@@ -1,6 +1,7 @@
 from bot import karmas
 
 MSG = """Hey {user}, your current karma is {score}"""
+TOP_NUMBER = 10
 
 
 def get_karma(**kwargs):
@@ -17,9 +18,9 @@ def get_karma(**kwargs):
 
 
 def top_karma(**kwargs):
-    """Get the 5 PyBites members with most karma"""
+    """Get the PyBites members with most karma"""
     output = ['PyBites members with most karma:']
-    for person, score in karmas.most_common(5):
+    for person, score in karmas.most_common(TOP_NUMBER):
         output.append('{:<20} -> {}'.format(person, score))
     return '\n'.join(output)
 
