@@ -20,7 +20,7 @@ Message = namedtuple('Message', 'giverid channel text')
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 KARMABOT_DM = 'D5ZV30XU6'
 
-ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFME')  # bob, julian, pybites
+ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
 TEXT_FILTER_REPLIES = dict(cheers=':beers:',
                            zen='`import this`',
                            braces='`SyntaxError: not a chance`')
