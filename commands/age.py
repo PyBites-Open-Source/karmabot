@@ -5,7 +5,7 @@ TODAY = datetime.now()
 
 
 def pybites_age(**kwargs: dict) -> str:
-    """Text that will appear in the help section"""
+    """Print PyBites age in days"""
     days_old = (TODAY - PYBITES_BORN).days
     return 'PyBites is {} days old'.format(days_old)
 
