@@ -1,10 +1,19 @@
 """
-1. Add logic to my_command
-2. Optionally you can access user, channel, text from the passed in **kwargs (don't remove this)
-3. Return a message string that the command/bot should post to the channel
+0. Save/copy this file to a new file under commands/
+
+1. Add logic to my_command and rename it to something more meaningful.
+   Optionally you can access user, channel, text from the passed in **kwargs (don't remove this).
+
+2. Add a useful docstring to your renamed my_command.
+
+3. Return a message string that the command/bot should post to the channel.
+   You probably want to add some code under __main__ to make sure the function does what you want ...
+   
 4. In bot/slack.py import the script, e.g.: from commands.template import my_command
+
 5. Add the command to the appropriate dict: ADMIN_BOT_COMMANDS, PUBLIC_BOT_COMMANDS or PRIVATE_BOT_COMMANDS 
    (public = for us in channels, private = for use in @karmabot DM)
+
 6. PR your work. Thanks
 """
 
