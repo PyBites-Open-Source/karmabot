@@ -8,6 +8,7 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # bot commands
 from commands.add import add_command
+from commands.age import pybites_age
 from commands.help import create_commands_table
 from commands.feed import get_pybites_last_entries
 from commands.score import get_karma, top_karma
@@ -25,7 +26,8 @@ TEXT_FILTER_REPLIES = dict(cheers=':beers:',
 
 AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
 ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
-PUBLIC_BOT_COMMANDS = dict(add=add_command,
+PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
+                           add=add_command,
                            help=create_commands_table,
                            tip=get_random_tip,
                            topchannels=get_recommended_channels)
