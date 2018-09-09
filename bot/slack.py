@@ -169,12 +169,6 @@ def parse_next_msg():
     channel = msg.get('channel')
     text = msg.get('text')
 
-    # not sure but sometimes we get dicts?
-    if (not isinstance(channel, str) or
-       not isinstance(user, str) or
-       not isinstance(text, str)):
-        return None
-
     # handle events first
     type_event = msg.get('type')
     # 1. if new channel auto-join bot
@@ -193,6 +187,12 @@ def parse_next_msg():
                        channel=GENERAL_CHANNEL,
                        text=welcome_msg)
     # end events
+
+    # not sure but sometimes we get dicts?
+    if (not isinstance(channel, str) or
+       not isinstance(user, str) or
+       not isinstance(text, str)):
+        return None
 
     # ignore anything karma bot says!
     if user == KARMA_BOT:
