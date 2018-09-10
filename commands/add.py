@@ -7,6 +7,9 @@ Awesome! Here are the steps:
 4. Open a PR of your branch against PyBites repo.
 5. Bob/Julian/Community to approve and merge it in.
 
+Here is a walk-through video:
+https://www.youtube.com/watch?v=Yx9qYl6lmzM&t=2s
+
 Thanks!
 """
 
