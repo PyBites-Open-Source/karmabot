@@ -21,7 +21,8 @@ Message = namedtuple('Message', 'giverid channel text')
 
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
 ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
-TEXT_FILTER_REPLIES = dict(cheers=':beers:',
+TEXT_FILTER_REPLIES = dict(zen='`import this`',
+                           cheers=':beers:',
                            braces='`SyntaxError: not a chance`')
 
 AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
