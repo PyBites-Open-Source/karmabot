@@ -8,4 +8,4 @@ PyBites Article: [From Script to Project part 1. - Building a Karma Bot with Pyt
 
 ![karma example](https://pybit.es/images/karma_example.png)
 
-__Update 06.09.2018__: karmabot now supports commands, add them to the `commands/` subdirectory, then import it to `bot/slack.py` and add it to `BOT_COMMANDS`.
+__Update 06.09.2018__: karmabot now supports commands, add them to the `commands/` subdirectory, then import it to `bot/slack.py` and add it to `BOT_COMMANDS`. More info: https://www.youtube.com/watch?v=Yx9qYl6lmzM&amp;t=2s

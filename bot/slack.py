@@ -9,6 +9,7 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 # bot commands
 from commands.add import add_command
 from commands.age import pybites_age
+from commands.doc import doc_command
 from commands.help import create_commands_table
 from commands.feed import get_pybites_last_entries
 from commands.score import get_karma, top_karma
@@ -33,6 +34,7 @@ PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
                            tip=get_random_tip,
                            topchannels=get_recommended_channels)
 PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
+                            doc=doc_command,
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
                             )
