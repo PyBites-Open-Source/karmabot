@@ -5,6 +5,7 @@ TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommend
 - #instagram: submit inspiring Python/coding/developer pictures for PyBites Instagram
 - #meetups / #pycon: the PyBites community is growing so maybe you can meet fellow Pythonistas in person!
 - #pybites-news: share interesting Python news/articles here helping us with our weekly Twitter news digest
+- #checkins: share your pythonic adventures with the community and help everyone grow!
 """
 
 
