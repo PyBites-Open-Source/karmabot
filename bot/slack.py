@@ -17,6 +17,7 @@ from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
 from commands.welcome import welcome_user
 from commands.zen import import_this
+from commands.network import how_many_ips
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -32,11 +33,14 @@ PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
                            add=add_command,
                            help=create_commands_table,
                            tip=get_random_tip,
-                           topchannels=get_recommended_channels)
+                           topchannels=get_recommended_channels,
+                           howmanyipsin=how_many_ips, # public and private
+                           )
 PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
                             doc=doc_command,
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
+                            howmanyipsin=how_many_ips, # public and private
                             )
 
 
