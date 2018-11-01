@@ -34,13 +34,13 @@ PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
                            help=create_commands_table,
                            tip=get_random_tip,
                            topchannels=get_recommended_channels,
-                           howmanyipsin=how_many_ips, # public and private
+                           howmanyipsin=how_many_ips,
                            )
 PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
                             doc=doc_command,
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
-                            howmanyipsin=how_many_ips, # public and private
+                            howmanyipsin=how_many_ips,
                             )
 
 
