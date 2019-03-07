@@ -69,7 +69,9 @@ def post_msg(channel_or_user, text):
                           channel=channel_or_user,
                           text=text,
                           link_names=True,  # convert # and @ in links
-                          as_user=True)
+                          as_user=True,
+                          unfurl_links=False,
+                          unfurl_media=False)
 
 
 def bot_joins_new_channel(msg):
