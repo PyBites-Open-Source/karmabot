@@ -171,6 +171,7 @@ def parse_next_msg():
         return None
     msg = msg[0]
     user = msg.get('user')
+    user_id = user.get('id')
     channel = msg.get('channel')
     text = msg.get('text')
 
@@ -186,7 +187,7 @@ def parse_next_msg():
         # return the message to apply the karma change
         # https://api.slack.com/methods/users.info
         welcome_msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
-        post_msg(user, welcome_msg)
+        post_msg(user_id, welcome_msg)
         # return Message object to handle karma in main
         return Message(giverid=KARMA_BOT,
                        channel=GENERAL_CHANNEL,
