@@ -4,14 +4,14 @@ from random import choice
 # thanks Erik!
 WELCOME_MSG = """Welcome {user}++!
 
-Introduce yourself if you like ...
+Introduce yourself in #general if you like ...
 - What do you use Python for?
 - What is your day job?
 - And: >>> random.choice(pybites_init_questions)
 {welcome_question}
 
 Although you will meet some awesome folks here, you can also talk to me :)
-Type `help` in a direct message to me (@karmabot) to get started ...
+Type `help` here to get started ...
 
 Enjoy PyBites Slack and keep calm and code in Python!
 @bbelderbos and @julian.sequeira
