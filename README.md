@@ -1,5 +1,7 @@
 # Building a Karma Bot with Python and the Slack API
 
+![karma avatar](https://user-images.githubusercontent.com/24620154/56662126-952d7f00-66a3-11e9-99b4-924dc6313b2e.png)
+
 [![BCH compliance](https://bettercodehub.com/edge/badge/pybites/karmabot?branch=master)](https://bettercodehub.com/)
 
 Inspiration: [hipchat](https://blog.hipchat.com/2016/05/02/meet-karma-bot/)
