@@ -1,7 +1,7 @@
 from . import IS_USER, MAX_POINTS, karmas
 from .slack import lookup_username, post_msg
 
-KARMABOT = 'karmabot'
+KARMABOT = 'lord_commander'
 
 
 def _parse_karma_change(karma_change):
@@ -84,7 +84,7 @@ class Karma:
             raise RuntimeError(err)
 
         if self.giver == self.receiver:
-            raise ValueError('Sorry, cannot give karma to self')
+            raise ValueError('No-way Jose, or Josb for that matter.')
 
         points = self._calc_final_score(points)
 

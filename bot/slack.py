@@ -21,7 +21,7 @@ from commands.zen import import_this
 Message = namedtuple('Message', 'giverid channel text')
 
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
-ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
+ADMINS = ('UEMN5QPLM') # I'm the admin now.
 TEXT_FILTER_REPLIES = dict(zen='`import this`',
                            cheers=':beers:',
                            braces='`SyntaxError: not a chance`')
@@ -42,9 +42,9 @@ PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
 
 def create_help_msg(is_admin):
     help_msg = []
-    help_msg.append('\n1. Channel commands (format: `@karmabot command`)')
+    help_msg.append('\n1. Channel commands format: `@lord_commander command`)')
     help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
-    help_msg.append('\n2. Message commands (DM `@karmabot` typing `command`)')
+    help_msg.append('\n2. Message commands (DM `@lord_commander` typing `command`)')
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
         help_msg.append('\n3. Admin only commands')
@@ -101,14 +101,14 @@ def _get_cmd(text, private=True):
         return text.split()[0].strip().lower()
 
     # bot command needs to have bot fist in msg
-    if not text.strip('<>@').startswith((KARMA_BOT, 'karmabot')):
+    if not text.strip('<>@').startswith((KARMA_BOT, 'lord_commander')):
         return None
 
     # need at least a command after karmabot
     if text.strip().count(' ') < 1:
         return None
 
-    # @karmabot blabla -> get blabla
+    # @lord_commander blabla -> get blabla
     cmd = text.split()[1]
 
     # of course ignore karma points
