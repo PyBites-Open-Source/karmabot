@@ -26,10 +26,10 @@ IS_USER = re.compile(r'^<@[^>]+>$')
 USERNAME_CACHE = {}
 KARMA_CACHE = 'data'
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',  # noqa E501
                     datefmt='%m-%d %H:%M',
-                    filename='bot.log')
+                    filename='.bot.log')
 
 logging.info('Script started')
 
