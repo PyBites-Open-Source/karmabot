@@ -19,19 +19,23 @@ def _parse_karma_change(karma_change):
 
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
+        banned_list = [] 
         giver = lookup_username(message.giverid)
         channel = message.channel
-
-        receiver, points = _parse_karma_change(karma_change)
-
-        karma = Karma(giver, receiver)
-
-        try:
-            msg = karma.change_karma(points)
-        except Exception as exc:
-            msg = str(exc)
-
-        post_msg(channel, msg)
+        with open('BANNED', 'r') as banned_file:
+            for line in banned_file.readlines():
+                banned_list.append(line.strip('\n'))
+        if message.giverid in banned_list:
+            msg = '@{0} you are banned, please talk to an admin'.format(giver)
+            post_msg(channel, msg)
+        else:
+            receiver, points = _parse_karma_change(karma_change)
+            karma = Karma(giver, receiver)
+            try:
+                msg = karma.change_karma(points)
+            except Exception as exc:
+                msg = str(exc)
+            post_msg(channel, msg)
 
 
 class Karma:
@@ -84,7 +88,7 @@ class Karma:
             raise RuntimeError(err)
 
         if self.giver == self.receiver:
-            raise ValueError('No-way Jose, or Josb for that matter.')
+            raise ValueError('Giving yourself karma is stricky prohibited')
 
         points = self._calc_final_score(points)
 
