@@ -15,7 +15,7 @@ def _parse_karma_change(karma_change):
 
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
-        banned_list = [] 
+        banned_list = []
         giver = lookup_username(message.giverid)
         channel = message.channel
         with open('BANNED', 'r') as banned_file:
@@ -40,7 +40,6 @@ class Karma:
         self.receiver = receiver
         self.last_score_maxed_out = False
 
-
     def _calc_final_score(self, points):
         if abs(points) > MAX_POINTS:
             self.last_score_maxed_out = True
@@ -48,7 +47,6 @@ class Karma:
         else:
             self.last_score_maxed_out = False
             return points
-
 
     def _create_msg_bot_self_karma(self, points):
         receiver_karma = karmas.get(self.receiver, 0)
@@ -62,19 +60,17 @@ class Karma:
             msg += ', I will work harder next time'
         return msg
 
-
     def _create_msg(self, points):
         poses = "'" if self.receiver.endswith('s') else "'s"
         action = 'increase' if points > 0 else 'decrease'
         receiver_karma = karmas.get(self.receiver, 0)
         msg = '@{}{} karma {}d to {}'.format(self.receiver,
-                                            poses,
-                                            action,
-                                            receiver_karma)
+                                             poses,
+                                             action,
+                                             receiver_karma)
         if self.last_score_maxed_out:
             msg += ' (= max {} of {})'.format(action, MAX_POINTS)
         return msg
-
 
     def change_karma(self, points):
         '''updates karmas dict and returns message string'''

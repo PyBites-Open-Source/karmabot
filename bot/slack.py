@@ -1,9 +1,7 @@
 from collections import namedtuple
 import logging
 import os
-
 from slackclient import SlackClient
-
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # bot commands
@@ -20,19 +18,18 @@ from commands.welcome import welcome_user
 from commands.zen import import_this
 
 Message = namedtuple('Message', 'giverid channel text')
-
 GENERAL_CHANNEL = 'C4SFQJJ9Z'
-ADMINS = ('UEMN5QPLM') # I'm the admin now.
+ADMINS = ('UEMN5QPLM')  # I'm the admin now.
 TEXT_FILTER_REPLIES = dict(zen='`import this`',
                            cheers=':beers:',
                            braces='`SyntaxError: not a chance`')
 
 AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
 ADMIN_BOT_COMMANDS = dict(top_karma=top_karma,
-                         ban=ban_user,
-                         unban=unban_user,
-                         unbanall=unban_all
-                         )
+                          ban=ban_user,
+                          unban=unban_user,
+                          unbanall=unban_all
+                          )
 PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
                            add=add_command,
                            help=create_commands_table,
@@ -45,10 +42,12 @@ PRIVATE_BOT_COMMANDS = dict(
 
 
 def create_help_msg(is_admin):
+    bot = "@lord_commander"
     help_msg = []
-    help_msg.append('\n1. Channel commands format: `@lord_commander command`)')
+    help_msg.append('\n1. Channel commands format: `{0} command`)'.format(bot))
     help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
-    help_msg.append('\n2. Message commands (DM `@lord_commander` typing `command`)')
+    help_msg.append('\n2. Message commands (DM {0} typing `command`)'.format(
+        bot))
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
         help_msg.append('\n3. Admin only commands')
