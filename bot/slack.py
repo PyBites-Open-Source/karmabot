@@ -9,12 +9,13 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 # bot commands
 from commands.add import add_command
 from commands.age import pybites_age
+from commands.ban_user import ban_user
+from commands.unban_user import unban_user
+from commands.unban_all import unban_all
 from commands.doc import doc_command
 from commands.help import create_commands_table
-from commands.feed import get_pybites_last_entries
 from commands.score import get_karma, top_karma
 from commands.tip import get_random_tip
-from commands.topchannels import get_recommended_channels
 from commands.welcome import welcome_user
 from commands.zen import import_this
 
@@ -27,13 +28,16 @@ TEXT_FILTER_REPLIES = dict(zen='`import this`',
                            braces='`SyntaxError: not a chance`')
 
 AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
-ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
+ADMIN_BOT_COMMANDS = dict(top_karma=top_karma,
+                         ban=ban_user,
+                         unban=unban_user,
+                         unbanall=unban_all
+                         )
 PUBLIC_BOT_COMMANDS = dict(age=pybites_age,
                            add=add_command,
                            help=create_commands_table,
-                           tip=get_random_tip,
-                           topchannels=get_recommended_channels)
-PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
+                           tip=get_random_tip)
+PRIVATE_BOT_COMMANDS = dict(
                             doc=doc_command,
                             help=create_commands_table,  # have everywhere
                             karma=get_karma,
