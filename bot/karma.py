@@ -26,12 +26,17 @@ def process_karma_changes(message, karma_changes):
             post_msg(channel, msg)
         else:
             receiver, points = _parse_karma_change(karma_change)
-            karma = Karma(giver, receiver)
-            try:
-                msg = karma.change_karma(points)
-            except Exception as exc:
-                msg = str(exc)
-            post_msg(channel, msg)
+            if 'here' in str(receiver):
+                return
+            elif 'channel' in str(receiver):
+                return
+            else:
+                karma = Karma(giver, receiver)
+                try:
+                    msg = karma.change_karma(points)
+                except Exception as exc:
+                    msg = str(exc)
+                post_msg(channel, msg)
 
 
 class Karma:
