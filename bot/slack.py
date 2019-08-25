@@ -77,27 +77,6 @@ def post_msg(channel_or_user, text):
                           unfurl_media=False)
 
 
-def bot_joins_new_channel(msg):
-    '''Bots cannot autojoin channels, but there is a hack: create a user token:
-       https://stackoverflow.com/a/44107313/1128469 and
-       https://api.slack.com/custom-integrations/legacy-tokens'''
-    new_channel = msg['channel']['id']
-
-    grant_user_token = os.environ.get('SLACK_KARMA_INVITE_USER_TOKEN')
-    if not grant_user_token:
-        logging.info('cannot invite bot, no env SLACK_KARMA_INVITE_USER_TOKEN')
-        return None
-
-    sc = SlackClient(grant_user_token)
-    sc.api_call('channels.invite',
-                channel=new_channel,
-                user=KARMA_BOT)
-
-    msg = 'Awesome, a new PyBites channel! Birds of a feather flock together!'
-    msg += ' Keep doing your nerdy stuff, I will keep track of your karmas :)'
-
-    post_msg(new_channel, msg)
-
 
 def _get_cmd(text, private=True):
     if private:
@@ -177,24 +156,10 @@ def parse_next_msg():
     channel = msg.get('channel')
     text = msg.get('text')
 
-    # handle events first
     type_event = msg.get('type')
-    # 1. if new channel auto-join bot
     if type_event == 'channel_created':
         bot_joins_new_channel(msg)
         return None
-
-    # 2. if a new user joins send a welcome msg
-    if type_event == 'team_join':
-        # return the message to apply the karma change
-        # https://api.slack.com/methods/users.info
-        welcome_msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
-        post_msg(user['id'], welcome_msg)
-        # return Message object to handle karma in main
-        return Message(giverid=KARMA_BOT,
-                       channel=GENERAL_CHANNEL,
-                       text=welcome_msg)
-    # end events
 
     # not sure but sometimes we get dicts?
     if (not isinstance(channel, str) or
@@ -206,14 +171,10 @@ def parse_next_msg():
     if user == KARMA_BOT:
         return None
 
-    # text replacements on first matching word in text
-    # TODO: maybe this should replace all instances in text message ...
     text_replace_output = text and perform_text_replacements(text)
     if text_replace_output:
         post_msg(channel, text_replace_output)
 
-    # if we recognize a valid bot command post its output, done
-    # DM's = channels start with a 'D' / channel can be dict?!
     private = channel and channel.startswith('D')
     cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
