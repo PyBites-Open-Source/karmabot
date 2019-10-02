@@ -1,6 +1,9 @@
 import os
+import unittest
 from nose.tools import assert_raises
 from unittest.mock import patch
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir)) # to find bot package
 
 from bot import SLACK_CLIENT, KARMA_BOT, KARMA_CACHE, MAX_POINTS
 from bot import KARMA_ACTION, USERNAME_CACHE, karmas
@@ -18,7 +21,7 @@ if os.path.isfile(KARMA_CACHE):
     os.remove(KARMA_CACHE)
 
 
-class TestKarma(object):
+class TestKarma(unittest.TestCase):
     '''https://realpython.com/blog/python/testing-third-party-apis-with-mocks/'''
 
     @classmethod
@@ -118,3 +121,7 @@ class TestKarma(object):
         assert karma.change_karma(3) == "Thanks @tim for the extra karma, my karma is 5 now"
         karma = Karma('julian', 'karmabot')
         assert karma.change_karma(-3) == "Not cool @julian lowering my karma to 2, but you are probably right, I will work harder next time"
+
+
+if __name__ == "__main__":
+    unittest.main()
