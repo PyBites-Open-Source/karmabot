@@ -3,6 +3,7 @@ from collections import namedtuple
 from typing import List, Dict
 import logging
 from datetime import datetime as dt
+from math import exp
 
 TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommends:
 - #100daysofcode: share your 100 days journey and/or feedback on our course
@@ -43,23 +44,26 @@ def get_recommended_channels(**kwargs):
     channels: List[Dict] = response['channels']
     
     # retrieve channel info for each channel in channel list
+    # only consider channels that are not the general channel, that are not private and that have at least one message
     for channel in channels:
-        response: Dict = SLACK_CLIENT.api_call('channels.info', channel=channel['id'])
-        if not response['ok']:
-            logging.error(f'Error for API call "channel.info": {response["error"]}')
-            return "I am truly sorry but something went wrong ;("
-        
-        channel_info: Dict = response['channel']
+        channel_is_potential = channel['is_channel'] and not channel['is_general'] and not channel['is_private']
 
-        # only consider channels that are not the general channel, that are not private and that have at least one message
-        if channel['is_channel'] and not channel['is_general'] and not channel['is_private'] and channel_info.get('latest', None):
-            potential_channels.append(Channel(channel['id'], channel['name'], channel_info['purpose']['value'], channel['num_members'], float(channel_info['latest']['ts'])))
+        if channel_is_potential:
+            response: Dict = SLACK_CLIENT.api_call('channels.info', channel=channel['id'])
+            if not response['ok']:
+                logging.error(f'Error for API call "channel.info": {response["error"]}')
+                return "I am truly sorry but something went wrong ;("
+            
+            channel_info: Dict = response['channel']
+
+            if channel_info.get('latest', None):
+                potential_channels.append(Channel(channel['id'], channel['name'], channel_info['purpose']['value'], channel['num_members'], float(channel_info['latest']['ts'])))
 
     # now weight channels and return message
     potential_channels = sorted(potential_channels, key=calc_channel_score, reverse=True)
 
     for channel in potential_channels[:nr_channels]:
-        msg += f'{LIST_ICON} #{channel.name}({channel.num_members}): {channel.purpose if channel.purpose else "a sad and empty description"}\n'
+        msg += f'{LIST_ICON} #{channel.name} ({channel.num_members} members, {seconds_since_last_post(channel) / 3600:.0f} hour(s) since last post): {channel.purpose if channel.purpose else "<Invest today and get an awesome description!>"}\n'
 
     return msg
 
@@ -69,9 +73,15 @@ def calc_channel_score(channel: Channel):
     the higher the number of members and the less the number of seconds since the last post the higher the channels score
     """
     num_members = channel.num_members
-    time_delta_in_days = ((dt.now() - dt.fromtimestamp(channel.latest_ts)).seconds) / (60*60*24)
+    time_delta_in_hours = seconds_since_last_post(channel) / 3600
 
-    return num_members * 1 / max(1, time_delta_in_days)
+    return num_members * (exp(-time_delta_in_hours))
+
+
+def seconds_since_last_post(channel: Channel) -> float:
+    """return the fraction of days since the last post in a channel
+    """
+    return (dt.now() - dt.fromtimestamp(channel.latest_ts)).seconds
 
 
 if __name__ == '__main__':
