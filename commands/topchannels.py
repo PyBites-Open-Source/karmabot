@@ -15,7 +15,7 @@ TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommend
 - #checkins: share your pythonic adventures with the community and help everyone grow!
 """
 
-MSG_BEGIN = "Glad you asked, here are some channels our Communtiy recommends:\n"
+MSG_BEGIN = "Glad you asked, here are some channels our Communtiy recommends (based on member count and activity):\n"
 LIST_ICON = "-"
 DEFAULT_NR_CHANNELS = 7
 
@@ -49,6 +49,11 @@ def get_recommended_channels(**kwargs):
         channel_is_potential = channel['is_channel'] and not channel['is_general'] and not channel['is_private']
 
         if channel_is_potential:
+            # we have to stick with channel.info, also it could be
+            # that the latest message is a bot or join message
+            # but channels.history is not allowed for bots.
+            # However, it seems that in the future, Slack will update the bot permissions
+            # see: https://api.slack.com/methods/channels.history
             response: Dict = SLACK_CLIENT.api_call('channels.info', channel=channel['id'])
             if not response['ok']:
                 logging.error(f'Error for API call "channel.info": {response["error"]}')
