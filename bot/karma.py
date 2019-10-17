@@ -1,6 +1,9 @@
 from . import IS_USER, MAX_POINTS, karmas
 from .slack import lookup_username, post_msg
 
+from .db import db_session
+from .db.slack_user import SlackUser
+
 KARMABOT = 'karmabot'
 
 
@@ -8,9 +11,9 @@ def _parse_karma_change(karma_change):
     userid, voting = karma_change
 
     if IS_USER.match(userid):
-        receiver = lookup_username(userid)
+        receiver = userid.strip("<>@")
     else:
-        receiver = userid.strip(' #').lower()
+        receiver = userid.strip(' #').lower()  # ?
 
     points = voting.count('+') - voting.count('-')
 
@@ -19,12 +22,11 @@ def _parse_karma_change(karma_change):
 
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
-        giver = lookup_username(message.giverid)
         channel = message.channel
 
-        receiver, points = _parse_karma_change(karma_change)
+        receiverid, points = _parse_karma_change(karma_change)
 
-        karma = Karma(giver, receiver)
+        karma = Karma(message.giverid, receiverid)
 
         try:
             msg = karma.change_karma(points)
@@ -36,9 +38,11 @@ def process_karma_changes(message, karma_changes):
 
 class Karma:
 
-    def __init__(self, giver, receiver):
-        self.giver = giver
-        self.receiver = receiver
+    def __init__(self, giver_id, receiver_id):
+        self.giver_id = giver_id
+        self.receiver_id = receiver_id
+        self.giver_name = lookup_username(giver_id)
+        self.receiver_name = lookup_username(receiver_id)
         self.last_score_maxed_out = False
 
     def _calc_final_score(self, points):
@@ -52,21 +56,21 @@ class Karma:
     def _create_msg_bot_self_karma(self, points):
         receiver_karma = karmas.get(self.receiver, 0)
         if points > 0:
-            msg = 'Thanks @{} for the extra karma'.format(self.giver)
-            msg += ', my karma is {} now'.format(receiver_karma)
+            msg = 'Thanks @{} for the extra karma'.format(self.giver_name)
+            msg += ', my karma is {} now'.format(receiver_karma)  # TODO: let karmabot get his points from db
         else:
-            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver,
+            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver_name,
                                                                 receiver_karma)
             msg += ', but you are probably right'
             msg += ', I will work harder next time'
         return msg
 
     def _create_msg(self, points):
-        poses = "'" if self.receiver.endswith('s') else "'s"
+        poses = "'" if self.receiver_name.endswith('s') else "'s"
         action = 'increase' if points > 0 else 'decrease'
-        receiver_karma = karmas.get(self.receiver, 0)
+        receiver_karma = karmas.get(self.receiver_id, 0)  # TODO: let points from db
 
-        msg = '{}{} karma {}d to {}'.format(self.receiver,
+        msg = '{}{} karma {}d to {}'.format(self.receiver_name,
                                             poses,
                                             action,
                                             receiver_karma)
@@ -76,21 +80,25 @@ class Karma:
         return msg
 
     def change_karma(self, points):
-        '''updates karmas dict and returns message string'''
+        """ Updates Karma in the database """
         if not isinstance(points, int):
             err = ('Program bug: change_karma should '
                    'not be called with a non int for '
                    'points arg!')
             raise RuntimeError(err)
 
-        if self.giver == self.receiver:
+        if self.giver_id == self.receiver_id:
             raise ValueError('Sorry, cannot give karma to self')
 
         points = self._calc_final_score(points)
 
-        karmas[self.receiver] += points
+        session = db_session.create_session()
+        receiver = session.query(SlackUser).get(self.receiver_id)
 
-        if self.receiver == KARMABOT:
+        receiver.karma_points += points
+        session.commit()
+
+        if self.receiver_name == KARMABOT:
             return self._create_msg_bot_self_karma(points)
         else:
             return self._create_msg(points)
