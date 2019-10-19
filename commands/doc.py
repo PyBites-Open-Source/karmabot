@@ -4,6 +4,7 @@
 import pydoc
 import contextlib
 import io
+import bot.slack
 
 MSG_APOLOGY = """Sorry {username}, I got nothing for "{text}".
 
@@ -68,9 +69,7 @@ def doc_command(**kwargs) -> str:
             help(text)
     result = output.getvalue()
 
-    from bot.slack import lookup_username
-
-    username = lookup_username(user_id)
+    username = bot.slack.lookup_username(user_id)
 
     if result.startswith("No"):
         return MSG_APOLOGY.format(username=username, text=text)

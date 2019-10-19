@@ -1,5 +1,6 @@
 """ private command, not callable """
 from random import choice
+import bot.slack
 
 # thanks Erik!
 WELCOME_MSG = """Welcome {user}++!
@@ -44,9 +45,7 @@ def welcome_user(user_id: str) -> str:
     questions = WELCOME_QUESTIONS.split("\n")
     random_question = choice(questions)
 
-    from bot.slack import lookup_username
-
     slack_id = user_id.strip("<>@")
-    username = lookup_username(slack_id)
+    username = bot.slack.lookup_username(slack_id)
 
     return WELCOME_MSG.format(user=username, welcome_question=random_question)

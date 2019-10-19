@@ -1,3 +1,5 @@
+import bot.slack
+
 MSG = """Hey {username}, so you want to propose a new command eh?
 
 Awesome! Here are the steps:
@@ -19,7 +21,6 @@ def add_command(**kwargs):
     user_id = kwargs.get("user_id")
     if not user_id:
         return None
-    from slack import lookup_username
 
-    username = lookup_username(user_id)
+    username = bot.slack.lookup_username(user_id)
     return MSG.format(username=username)
