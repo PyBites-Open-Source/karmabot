@@ -1,43 +1,54 @@
-from . import IS_USER, MAX_POINTS, karmas
+from . import IS_USER, MAX_POINTS, KARMABOT_ID
 from .slack import lookup_username, post_msg
 
 from .db import db_session
 from .db.slack_user import SlackUser
 
-KARMABOT = 'karmabot'
+
+def get_user_karma(user_id: str) -> int:
+    """
+    Retrieve karma points from database
+    :param user_id: slack_id like ABC1234XYZ
+    :return: number of user karma points
+    """
+    slack_id = user_id.strip("<>@")
+
+    session = db_session.create_session()
+    user: SlackUser = session.query(SlackUser).get(slack_id)
+
+    try:
+        return user.karma_points
+    finally:
+        session.close()
 
 
 def _parse_karma_change(karma_change):
-    userid, voting = karma_change
+    user_id, voting = karma_change
 
-    if IS_USER.match(userid):
-        receiver = userid.strip("<>@")
+    if IS_USER.match(user_id):
+        receiver = user_id.strip("<>@")
     else:
-        receiver = userid.strip(' #').lower()  # ?
+        receiver = user_id.strip(" #").lower()  # ?
 
-    points = voting.count('+') - voting.count('-')
+    points = voting.count("+") - voting.count("-")
 
     return receiver, points
 
 
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
-        channel = message.channel
-
-        receiverid, points = _parse_karma_change(karma_change)
-
-        karma = Karma(message.giverid, receiverid)
+        receiver_id, points = _parse_karma_change(karma_change)
+        karma = Karma(giver_id=message.user_id, receiver_id=receiver_id)
 
         try:
-            msg = karma.change_karma(points)
+            text = karma.change_karma(points)
         except Exception as exc:
-            msg = str(exc)
+            text = str(exc)
 
-        post_msg(channel, msg)
+        post_msg(message.channel_id, text)
 
 
 class Karma:
-
     def __init__(self, giver_id, receiver_id):
         self.giver_id = giver_id
         self.receiver_id = receiver_id
@@ -53,42 +64,43 @@ class Karma:
             self.last_score_maxed_out = False
             return points
 
-    def _create_msg_bot_self_karma(self, points):
-        receiver_karma = karmas.get(self.receiver, 0)
+    def _create_msg_bot_self_karma(self, points) -> str:
+        receiver_karma = get_user_karma(self.receiver_id)
         if points > 0:
-            msg = 'Thanks @{} for the extra karma'.format(self.giver_name)
-            msg += ', my karma is {} now'.format(receiver_karma)  # TODO: let karmabot get his points from db
+            text = (
+                f"Thanks @{self.giver_name} for the extra karma"
+                f", my karma is {receiver_karma} now."
+            )
         else:
-            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver_name,
-                                                                receiver_karma)
-            msg += ', but you are probably right'
-            msg += ', I will work harder next time'
-        return msg
+            text = (
+                f"Not cool @{self.giver_name} lowering my karma to {receiver_karma},"
+                f" but you are probably right, I will work harder next time."
+            )
+        return text
 
     def _create_msg(self, points):
-        poses = "'" if self.receiver_name.endswith('s') else "'s"
-        action = 'increase' if points > 0 else 'decrease'
-        receiver_karma = karmas.get(self.receiver_id, 0)  # TODO: let points from db
+        poses = "'" if self.receiver_name.endswith("s") else "'s"
+        action = "increase" if points > 0 else "decrease"
+        receiver_karma = get_user_karma(self.receiver_id)
 
-        msg = '{}{} karma {}d to {}'.format(self.receiver_name,
-                                            poses,
-                                            action,
-                                            receiver_karma)
+        text = f"{self.receiver_name}{poses} karma {action}d to {receiver_karma}"
         if self.last_score_maxed_out:
-            msg += ' (= max {} of {})'.format(action, MAX_POINTS)
+            text += f" (= max {action} of {MAX_POINTS})"
 
-        return msg
+        return text
 
     def change_karma(self, points):
         """ Updates Karma in the database """
         if not isinstance(points, int):
-            err = ('Program bug: change_karma should '
-                   'not be called with a non int for '
-                   'points arg!')
+            err = (
+                "Program bug: change_karma should "
+                "not be called with a non int for "
+                "points arg!"
+            )
             raise RuntimeError(err)
 
         if self.giver_id == self.receiver_id:
-            raise ValueError('Sorry, cannot give karma to self')
+            raise ValueError("Sorry, cannot give karma to self")
 
         points = self._calc_final_score(points)
 
@@ -97,8 +109,9 @@ class Karma:
 
         receiver.karma_points += points
         session.commit()
+        session.close()
 
-        if self.receiver_name == KARMABOT:
+        if self.receiver_id == KARMABOT_ID:
             return self._create_msg_bot_self_karma(points)
         else:
             return self._create_msg(points)
