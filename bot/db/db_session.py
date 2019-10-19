@@ -1,47 +1,49 @@
-import os
+import logging
 import sys
+import os
 
 import sqlalchemy as sa
-import sqlalchemy.ext.declarative as dec
 import sqlalchemy.orm as orm
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from bot.db.modelbase import SqlAlchemyBase
 
 __factory = None
 
+# Credentials
+SLACK_KARMADB_USER = os.environ.get("SLACK_KARMADB_USER")
+SLACK_KARMADB_PASSWORD = os.environ.get("SLACK_KARMADB_PASSWORD")
+SLACK_KARMADB_HOST = os.environ.get("SLACK_KARMADB_HOST")
+SLACK_KARMADB_PORT = os.environ.get("SLACK_KARMADB_PORT")
+SLACK_KARMADB_NAME = os.environ.get("SLACK_KARMADB_NAME")
+
 
 def global_init():
+    """ Sets up connection to DB and initializes models """
     global __factory
 
     if __factory:
         return
 
-    db_user = "karmabot"
-    db_password = "pwd1234"
-    db_host = "localhost"
-    db_port = 5432
-    db_name = "karmabot"
-
-    # db_user = os.environ.get("SLACK_KARMA_DB_USER")
-    # db_password = os.environ.get("SLACK_KARMA_DB_PW")
-    # db_host = os.environ.get("SLACK_KARMA_DB_HOST")
-    # db_port = os.environ.get("SLACK_KARMA_DB_PORT")
-    # db_name = os.environ.get("SLACK_KARMA_DB_NAME")
-
-    conn_str = f"postgres://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-
-    print("Connecting to DB with {}".format(conn_str))
+    conn_str = (
+        f"postgres://{SLACK_KARMADB_USER}:{SLACK_KARMADB_PASSWORD}@"
+        f"{SLACK_KARMADB_HOST}:{SLACK_KARMADB_PORT}/{SLACK_KARMADB_NAME}"
+    )
+    print(f"Connecting to DB with {conn_str}")
 
     engine = sa.create_engine(conn_str, echo=False)
     try:
         engine.connect()
-    except sa.exc.OperationalError:
-        raise Exception("DB connection failed.")
+    except OperationalError as exc:
+        logging.error("Database connection failed.")
+        sys.exit(1)
 
+    print(f"DB connection successful")
     __factory = orm.sessionmaker(bind=engine)
 
-    from bot.db.slack_user import SlackUser
+    # noinspection PyUnresolvedReferences
+    import bot.db.slack_user
 
     SqlAlchemyBase.metadata.create_all(engine)
 

@@ -3,6 +3,8 @@ from bot.db.modelbase import SqlAlchemyBase
 
 
 class SlackUser(SqlAlchemyBase):
+    """ Models a slack user with karma in the DB """
+
     __tablename__ = "slack_user"
 
     slack_id = sa.Column(sa.String, primary_key=True)
@@ -11,6 +13,6 @@ class SlackUser(SqlAlchemyBase):
 
     def __repr__(self):
         return (
-            f"<KarmaUser> ID: {self.slack_id} | Username: {self.username} "
+            f"<SlackUser> ID: {self.slack_id} | Username: {self.username} "
             f"| Points:{self.karma_points}"
         )
