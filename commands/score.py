@@ -1,37 +1,48 @@
-from bot import karmas
+from bot.db import db_session
+from bot.db.slack_user import SlackUser
 
-MSG = """Hey {user}, your current karma is {score}"""
 TOP_NUMBER = 10
 
 
 def get_karma(**kwargs):
     """Get your current karma score"""
-    user = kwargs.get('user')
-    if not user:
-        return 'User not found'
+    user_id = kwargs.get("user_id")
+    slack_id = user_id.strip("<>@")
 
-    score = karmas.get(user)
-    if score is None:
-        return "Sorry, you don't have any karma yet"
+    session = db_session.create_session()
+    su = session.query(SlackUser).get(slack_id)
 
-    return MSG.format(user=user, score=score)
+    try:
+        if not su:
+            return "User not found"
+
+        if su.karma_points == 0:
+            return "Sorry, you don't have any karma yet"
+
+        return f"Hey {su.username}, your current karma is {su.karma_points}"
+
+    finally:
+        session.close()
 
 
 def top_karma(**kwargs):
     """Get the PyBites members with most karma"""
-    output = ['PyBites members with most karma:']
-    for person, score in karmas.most_common(TOP_NUMBER):
-        output.append('{:<20} -> {}'.format(person, score))
-    ret = '\n'.join(output)
-    return '```{}```'.format(ret)
+    output = ["PyBites members with most karma:"]
 
+    session = db_session.create_session()
+    top_users = (
+        session.query(SlackUser)
+        .order_by(SlackUser.karma_points.desc())
+        .limit(TOP_NUMBER)
+    )
 
-if __name__ == '__main__':
-    user, channel, text = 'bob', '#general', 'some message'
-    kwargs = dict(user=user,
-                  channel=channel,
-                  text=text)
-    output = get_karma(**kwargs)
+    try:
+        for top_user in top_users:
+            output.append(
+                "{:<20} -> {}".format(top_user.username, top_user.karma_points)
+            )
+        ret = "\n".join(output)
+        return "```{}```".format(ret)
 
-    output = top_karma(**kwargs)
-    print(output)
+    finally:
+        session.close()

@@ -39,14 +39,14 @@ What is your favorite editor?
 What other programming languages do you know and/or use?"""
 
 
-def welcome_user(user):
+def welcome_user(user_id: str) -> str:
     """Welcome a new PyBites community member"""
-    questions = WELCOME_QUESTIONS.split('\n')
+    questions = WELCOME_QUESTIONS.split("\n")
     random_question = choice(questions)
-    return WELCOME_MSG.format(user=user['name'],
-                              welcome_question=random_question)
 
+    from bot.slack import lookup_username
 
-if __name__ == '__main__':
-    output = welcome_user(dict(name='bob'))
-    print(output)
+    slack_id = user_id.strip("<>@")
+    username = lookup_username(slack_id)
+
+    return WELCOME_MSG.format(user=username, welcome_question=random_question)

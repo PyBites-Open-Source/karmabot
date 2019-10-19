@@ -1,4 +1,4 @@
-MSG = """Hey {user}, so you want to propose a new command eh?
+MSG = """Hey {username}, so you want to propose a new command eh?
 
 Awesome! Here are the steps:
 1. Karmabot repo: https://github.com/pybites/karmabot
@@ -16,16 +16,10 @@ Thanks!
 
 def add_command(**kwargs):
     """Instructions how to propose a new bot command"""
-    user = kwargs.get('user')
-    if not user:
+    user_id = kwargs.get("user_id")
+    if not user_id:
         return None
-    return MSG.format(user=user)
+    from slack import lookup_username
 
-
-if __name__ == '__main__':
-    user, channel, text = 'bob', '#general', 'some message'
-    kwargs = dict(user=user,
-                  channel=channel,
-                  text=text)
-    output = add_command(**kwargs)
-    print(output)
+    username = lookup_username(user_id)
+    return MSG.format(username=username)
