@@ -3,10 +3,14 @@ import time
 
 from bot import KARMA_ACTION
 from bot.karma import process_karma_changes
-from bot.slack import parse_next_msg
+from bot.slack import parse_next_msg, check_connection
+from bot.db import db_session
 
 
 def main():
+    db_session.global_init()
+    check_connection()
+
     while True:
         time.sleep(1)
 
