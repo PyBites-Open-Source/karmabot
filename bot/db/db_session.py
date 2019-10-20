@@ -1,6 +1,6 @@
 import logging
-import sys
 import os
+import sys
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
