@@ -35,7 +35,7 @@ def process_karma_changes(message, karma_changes):
 
 class Karma:
     def __init__(self, giver_id, receiver_id):
-        self.session = session = db_session.create_session()
+        self.session = db_session.create_session()
         self.giver = self.session.query(KarmaUser).get(giver_id)
         self.receiver = self.session.query(KarmaUser).get(receiver_id)
         self.last_score_maxed_out = False
