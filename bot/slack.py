@@ -1,29 +1,28 @@
-from collections import namedtuple
 import logging
 import os
-
+import re
+import sys
+from collections import namedtuple
 from typing import Union
 
 from slackclient import SlackClient
 
-from . import KARMABOT_ID, SLACK_CLIENT
-from .db import db_session
-from .db.slack_user import SlackUser
-
 # bot commands
+from bot import KARMABOT_ID, SLACK_CLIENT
 from commands.add import add_command
 from commands.age import pybites_age
 from commands.doc import doc_command
-from commands.help import create_commands_table
 from commands.feed import get_pybites_last_entries
+from commands.help import create_commands_table
 from commands.score import get_karma, top_karma
 from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
+from commands.update_username import update_username, get_user_name
 from commands.welcome import welcome_user
-from commands.zen import import_this
-from commands.update_username import update_username
 
-Message = namedtuple("Message", "user_id channel_id text")
+# constants
+
+SLACK_ID_FORMAT = re.compile(r"^<@[\w]*>$")
 
 GENERAL_CHANNEL = "C4SFQJJ9Z"
 ADMINS = ("U4RTDPKUH", "U4TN52NG6", "U4SJVFMEG", "UKS45DGFQ")  # bob, julian, pybites
@@ -48,7 +47,17 @@ PRIVATE_BOT_COMMANDS = {
     "help": create_commands_table,
     "karma": get_karma,
     "updateusername": update_username,
+    "username": get_user_name,
 }
+
+Message = namedtuple("Message", "user_id channel_id text")
+
+
+def check_connection():
+    # Slack Real Time Messaging API - https://api.slack.com/rtm
+    if not SLACK_CLIENT.rtm_connect():
+        logging.error("Connection Failed, invalid token?")
+        sys.exit(1)
 
 
 def create_help_msg(is_admin):
@@ -62,6 +71,20 @@ def create_help_msg(is_admin):
         help_msg.append("\n3. Admin only commands")
         help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
     return "\n".join(help_msg)
+
+
+def format_user_id(user_id: str) -> str:
+    """
+    Formats a plain user_id (ABC123XYZ) to use slack identity
+    Slack API format <@ABC123XYZ>
+    https://api.slack.com/methods/users.identity
+    :param user_id: Plain user id
+    :return: Slack formatted user_id
+    """
+    if SLACK_ID_FORMAT.match(user_id):
+        return user_id
+
+    return f"<@{user_id}>"
 
 
 def get_available_username(user_info):
@@ -85,36 +108,6 @@ def get_available_username(user_info):
     # real_name is required and should always be there
     # defaulting to name for safety
     return user_info["user"]["name"]
-
-
-def lookup_username(user_slack_id: str) -> str:
-    """
-    Looks up the username from the database.
-    If not in database, the user is created from current slack info
-    :param user_slack_id: The users slack_id (ABC1234XYZ)
-    :return: The human-readable username from the database
-    """
-    slack_id = user_slack_id.strip("<>@")
-
-    session = db_session.create_session()
-    user = session.query(SlackUser).get(slack_id)
-
-    # If not in database, we get info from slack and create a new user
-    if not user:
-        user_info = SLACK_CLIENT.api_call("users.info", user=slack_id)
-        username = get_available_username(user_info)
-
-        new_user = SlackUser(slack_id=slack_id, username=username)
-        session.add(new_user)
-        session.commit()
-        session.close()
-
-        return username
-
-    try:
-        return user.username
-    finally:
-        session.close()
 
 
 def post_msg(channel_or_user_id: str, text) -> None:
@@ -143,19 +136,19 @@ def bot_joins_new_channel(channel_id: str) -> None:
     sc = SlackClient(grant_user_token)
     sc.api_call("channels.invite", channel=channel_id, user=KARMABOT_ID)
 
-    msg = (
+    text = (
         "Awesome, a new PyBites channel! Birds of a feather flock together! "
         "Keep doing your nerdy stuff, I will keep track of your karmas :)"
     )
 
-    post_msg(channel_id, msg)
+    post_msg(channel_id, text)
 
 
 def _get_cmd(text, private=True):
     if private:
         return text.split()[0].strip().lower()
 
-    # bot command needs to have bot fist in msg
+    # bot command needs to have bot first in msg
     if not text.strip("<>@").startswith((KARMABOT_ID, "karmabot")):
         return None
 
@@ -221,7 +214,7 @@ def perform_text_replacements(text: str) -> Union[str, None]:
 
 
 def parse_next_msg():
-    """Parse next message posted on slack for actions todo by bot"""
+    """Parse next message posted on slack for actions to do by bot"""
     msg = SLACK_CLIENT.rtm_read()
     if not msg:
         return None
