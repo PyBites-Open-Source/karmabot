@@ -3,7 +3,7 @@ from random import choice
 import bot.slack
 
 # thanks Erik!
-WELCOME_MSG = """Welcome {user}++!
+WELCOME_MSG = """Welcome {user} ++!
 
 Introduce yourself in #general if you like ...
 - What do you use Python for?
@@ -44,8 +44,6 @@ def welcome_user(user_id: str) -> str:
     """Welcome a new PyBites community member"""
     questions = WELCOME_QUESTIONS.split("\n")
     random_question = choice(questions)
+    slack_id = bot.slack.format_user_id(user_id)
 
-    slack_id = user_id.strip("<>@")
-    username = bot.slack.lookup_username(slack_id)
-
-    return WELCOME_MSG.format(user=username, welcome_question=random_question)
+    return WELCOME_MSG.format(user=slack_id, welcome_question=random_question)
