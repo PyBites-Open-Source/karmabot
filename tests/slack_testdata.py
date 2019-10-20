@@ -50,21 +50,25 @@ TEST_USERINFO = {
 }
 
 
-TEST_EVENT_MSG = [
-    {
-        "client_msg_id": "123e4dd-88bb-1234-aa12-8fbf66c1234a",
-        "suppress_notification": False,
-        "type": "message",
-        "text": "Test message 123",
-        "user": "ABC123",
-        "team": "TKRQZ0DN3",
-        "user_team": "TKRQZ0DN3",
-        "source_team": "TKRQZ0DN3",
-        "channel": "GP5TCC5V1",
-        "event_ts": "1571TKRQZ0DN3",
-        "ts": "1571341892.003000",
-    }
-]
+TEST_EVENT_MSG = {
+    "channel_simple": [
+        {
+            "client_msg_id": "123e4dd-88bb-1234-aa12-8fbf66c1234a",
+            "suppress_notification": False,
+            "type": "message",
+            "text": "Test message 123",
+            "user": "ABC123",
+            "team": "TKRQZ0DN3",
+            "user_team": "TKRQZ0DN3",
+            "source_team": "TKRQZ0DN3",
+            "channel": "GP5TCC5V1",
+            "event_ts": "1571TKRQZ0DN3",
+            "ts": "1571341892.003000",
+        }
+    ],
+    "channel_karma": [],
+    "channel_command": [],
+}
 
 # TODO
-TEST_EVENT_TEAMJOIN = None
+TEST_EVENT_TEAMJOIN = [{"type": "team_join"}]
