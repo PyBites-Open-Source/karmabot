@@ -69,13 +69,13 @@ class Karma:
         if points > 0:
             text = (
                 f"Thanks {self.giver.username} for the extra karma"
-                f", my karma is {self.receiver.karma_points} now."
+                f", my karma is {self.receiver.karma_points} now"
             )
         else:
             text = (
-                f"Not cool {self.giver.user_id} lowering my karma "
+                f"Not cool {self.giver.username} lowering my karma "
                 f"to {self.receiver.karma_points}, but you are probably right, "
-                f"I will work harder next time."
+                f"I will work harder next time"
             )
         return text
 
