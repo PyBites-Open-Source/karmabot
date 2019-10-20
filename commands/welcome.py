@@ -1,5 +1,6 @@
 """ private command, not callable """
 from random import choice
+
 import bot.slack
 
 # thanks Erik!

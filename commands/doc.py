@@ -1,9 +1,10 @@
 """A Karmabot pydoc interface.
 """
 
-import pydoc
 import contextlib
 import io
+import pydoc
+
 import bot.slack
 
 MSG_APOLOGY = """Sorry {username}, I got nothing for "{text}".

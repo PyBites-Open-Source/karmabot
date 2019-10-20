@@ -1,5 +1,6 @@
-import feedparser
 import ssl
+
+import feedparser
 
 # https://stackoverflow.com/a/28296087
 if hasattr(ssl, "_create_unverified_context"):
