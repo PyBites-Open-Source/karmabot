@@ -22,5 +22,5 @@ def add_command(**kwargs):
     if not user_id:
         return None
 
-    username = bot.slack.lookup_username(user_id)
-    return MSG.format(username=username)
+    slack_id = bot.slack.format_user_id(user_id)
+    return MSG.format(username=slack_id)
