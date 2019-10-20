@@ -1,25 +1,26 @@
 from bot.db import db_session
-from bot.db.slack_user import SlackUser
+from bot.db.karma_user import KarmaUser
 
 TOP_NUMBER = 10
 
 
 def get_karma(**kwargs):
     """Get your current karma score"""
-    user_id = kwargs.get("user_id")
-    slack_id = user_id.strip("<>@")
+    user_id = kwargs.get("user_id").strip("<>@")
 
     session = db_session.create_session()
-    su = session.query(SlackUser).get(slack_id)
+    kama_user = session.query(KarmaUser).get(user_id)
 
     try:
-        if not su:
+        if not kama_user:
             return "User not found"
 
-        if su.karma_points == 0:
+        if kama_user.karma_points == 0:
             return "Sorry, you don't have any karma yet"
 
-        return f"Hey {su.username}, your current karma is {su.karma_points}"
+        return (
+            f"Hey {kama_user.username}, your current karma is {kama_user.karma_points}"
+        )
 
     finally:
         session.close()
@@ -31,8 +32,8 @@ def top_karma(**kwargs):
 
     session = db_session.create_session()
     top_users = (
-        session.query(SlackUser)
-        .order_by(SlackUser.karma_points.desc())
+        session.query(KarmaUser)
+        .order_by(KarmaUser.karma_points.desc())
         .limit(TOP_NUMBER)
     )
 
