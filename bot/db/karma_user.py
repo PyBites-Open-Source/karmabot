@@ -18,6 +18,6 @@ class KarmaUser(SqlAlchemyBase):
 
     def __repr__(self):
         return (
-            f"<KarmaUser> ID: {self.user_id} Display_Name: {self.username}| "
-            f"Points: {self.karma_points}"
+            f"<KarmaUser> ID: {self.user_id} Username: {self.username} | "
+            f"Karma-Points: {self.karma_points}"
         )
