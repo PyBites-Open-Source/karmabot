@@ -43,7 +43,7 @@ def global_init():
     __factory = orm.sessionmaker(bind=engine)
 
     # noinspection PyUnresolvedReferences
-    import bot.db.slack_user
+    import bot.db.karma_user
 
     SqlAlchemyBase.metadata.create_all(engine)
 
