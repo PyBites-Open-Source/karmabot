@@ -69,12 +69,12 @@ def doc_command(**kwargs) -> str:
             help(text)
     result = output.getvalue()
 
-    username = bot.slack.lookup_username(user_id)
+    slack_id = bot.slack.format_user_id(user_id)
 
     if result.startswith("No"):
-        return MSG_APOLOGY.format(username=username, text=text)
+        return MSG_APOLOGY.format(username=slack_id, text=text)
 
-    return MSG_FOUNDIT.format(username=username, text=text, result=result)
+    return MSG_FOUNDIT.format(username=slack_id, text=text, result=result)
 
 
 if __name__ == "__main__":
