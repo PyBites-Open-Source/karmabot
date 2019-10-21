@@ -7,8 +7,13 @@ from sqlalchemy.orm import Session
 from bot import SLACK_CLIENT, KARMABOT_ID
 from bot.db import db_session
 from bot.db.karma_user import KarmaUser
-from bot.karma import _parse_karma_change, Karma
-from bot.slack import format_user_id, get_available_username, perform_text_replacements
+from bot.karma import _parse_karma_change, Karma, process_karma_changes
+from bot.slack import (
+    format_user_id,
+    get_available_username,
+    perform_text_replacements,
+    Message,
+)
 from tests.slack_testdata import TEST_USERINFO
 
 
@@ -79,9 +84,17 @@ def filled_db_session(engine, tables, karma_users):
 
 
 @pytest.fixture
-def mock_db_session(monkeypatch, filled_db_session):
+def mock_filled_db_session(monkeypatch, filled_db_session):
     def mock_create_session(*args, **kwargs):
         return filled_db_session
+
+    monkeypatch.setattr(db_session, "create_session", mock_create_session)
+
+
+@pytest.fixture
+def mock_empty_db_session(monkeypatch, empty_db_session):
+    def mock_create_session(*args, **kwargs):
+        return empty_db_session
 
     monkeypatch.setattr(db_session, "create_session", mock_create_session)
 
@@ -137,12 +150,32 @@ def test_lookup_username(filled_db_session, test_user_id, expected):
     assert karma_user.username == expected
 
 
-def test_create_karma_user():
+def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
+    karma = Karma("ABC123", "XYZ123")
+    assert karma.giver.username == "pybob"
+    assert karma.receiver.username == "clamytoe"
+
+    first = db_session.create_session().query(KarmaUser).get("ABC123")
+    second = db_session.create_session().query(KarmaUser).get("XYZ123")
+
+    assert first.username == "pybob"
+    assert second.username == "clamytoe"
+
+
+# Messages / Slack
+def test_get_cmd():
     pass
 
 
-# Messages
+def test_perform_bot_cmd():
+    pass
+
+
 def test_parse_next_msg():
+    pass
+
+
+def test_create_help_msg():
     pass
 
 
@@ -166,7 +199,7 @@ def test_parse_karma_change(test_change, expected):
     "test_changes",
     [("ABC123", "XYZ123", 2), ("XYZ123", "ABC123", 5), ("EFG123", "ABC123", -3)],
 )
-def test_change_karma(mock_db_session, test_changes):
+def test_change_karma(mock_filled_db_session, test_changes):
     session = db_session.create_session()
     pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
 
@@ -178,7 +211,7 @@ def test_change_karma(mock_db_session, test_changes):
     assert post_change == (pre_change_karma + test_changes[2])
 
 
-def test_change_karma_msg(mock_db_session):
+def test_change_karma_msg(mock_filled_db_session):
     karma = Karma("ABC123", "XYZ123")
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
 
@@ -186,7 +219,7 @@ def test_change_karma_msg(mock_db_session):
     assert karma.change_karma(-3) == "pybob's karma decreased to 389"
 
 
-def test_change_karma_exceptions(mock_db_session):
+def test_change_karma_exceptions(mock_filled_db_session):
     with pytest.raises(RuntimeError):
         karma = Karma("ABC123", "XYZ123")
         karma.change_karma("ABC")
@@ -196,7 +229,7 @@ def test_change_karma_exceptions(mock_db_session):
         karma.change_karma(2)
 
 
-def test_change_karma_bot_self(mock_db_session):
+def test_change_karma_bot_self(mock_filled_db_session):
     karma = Karma("ABC123", KARMABOT_ID)
     assert (
         karma.change_karma(2) == "Thanks pybob for the extra karma, my karma is 12 now"
