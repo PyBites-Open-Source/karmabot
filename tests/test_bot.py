@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -7,12 +5,11 @@ from sqlalchemy.orm import Session
 from bot import SLACK_CLIENT, KARMABOT_ID
 from bot.db import db_session
 from bot.db.karma_user import KarmaUser
-from bot.karma import _parse_karma_change, Karma, process_karma_changes
+from bot.karma import _parse_karma_change, Karma
 from bot.slack import (
     format_user_id,
     get_available_username,
     perform_text_replacements,
-    Message,
 )
 from tests.slack_testdata import TEST_USERINFO
 
@@ -20,7 +17,7 @@ from tests.slack_testdata import TEST_USERINFO
 # Database mocks
 @pytest.fixture(scope="session")
 def engine():
-    return create_engine(f"sqlite:///{Path().absolute() / 'karma_test.db'}")
+    return create_engine("sqlite://")
 
 
 @pytest.fixture(scope="session")
