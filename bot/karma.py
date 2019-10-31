@@ -7,6 +7,10 @@ from .db.karma_user import KarmaUser
 from .slack import post_msg, get_available_username
 
 
+class GetUserInfoException(Exception):
+    pass
+
+
 def _parse_karma_change(karma_change):
     user_id, voting = karma_change
 
@@ -23,7 +27,10 @@ def _parse_karma_change(karma_change):
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
         receiver_id, points = _parse_karma_change(karma_change)
-        karma = Karma(giver_id=message.user_id, receiver_id=receiver_id)
+        try:
+            karma = Karma(giver_id=message.user_id, receiver_id=receiver_id)
+        except GetUserInfoException:
+            return
 
         try:
             text = karma.change_karma(points)
@@ -47,6 +54,14 @@ class Karma:
 
     def _create_karma_user(self, user_id):
         user_info = SLACK_CLIENT.api_call("users.info", user=user_id)
+
+        error = user_info.get("error")
+        if error is not None:
+            logging.info(
+                f"Cannot get user info for {user_id} - error: {error}"
+            )
+            raise GetUserInfoException
+
         slack_id = user_info["user"]["id"]
         username = get_available_username(user_info)
 
@@ -74,8 +89,8 @@ class Karma:
         else:
             text = (
                 f"Not cool {self.giver.username} lowering my karma "
-                f"to {self.receiver.karma_points}, but you are probably right, "
-                f"I will work harder next time"
+                f"to {self.receiver.karma_points}, but you are probably"
+                f" right, I will work harder next time"
             )
         return text
 
@@ -85,7 +100,8 @@ class Karma:
         poses = "'" if receiver_name.endswith("s") else "'s"
         action = "increase" if points > 0 else "decrease"
 
-        text = f"{receiver_name}{poses} karma {action}d to {self.receiver.karma_points}"
+        text = (f"{receiver_name}{poses} karma {action}d to "
+                f"{self.receiver.karma_points}")
         if self.last_score_maxed_out:
             text += f" (= max {action} of {MAX_POINTS})"
 
@@ -116,6 +132,7 @@ class Karma:
 
         finally:
             logging.debug(
-                f"[Karmachange] {self.giver.user_id} to {self.receiver.user_id}: {points}"
+                (f"[Karmachange] {self.giver.user_id} to "
+                 f"{self.receiver.user_id}: {points}")
             )
             self.session.close()
