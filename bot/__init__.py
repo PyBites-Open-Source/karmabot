@@ -9,7 +9,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(name)-12s %(levelname)-8s %(message)s",  # noqa E501
     datefmt="%m-%d %H:%M",
-    filename="bot.log",
+    handlers=[logging.StreamHandler()]
 )
 
 botuser_id = os.environ.get("SLACK_KARMA_BOTUSER")
