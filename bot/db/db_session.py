@@ -12,11 +12,7 @@ from bot.db.modelbase import SqlAlchemyBase
 __factory = None
 
 # Credentials
-SLACK_KARMADB_USER = os.environ.get("SLACK_KARMADB_USER")
-SLACK_KARMADB_PASSWORD = os.environ.get("SLACK_KARMADB_PASSWORD")
-SLACK_KARMADB_HOST = os.environ.get("SLACK_KARMADB_HOST")
-SLACK_KARMADB_PORT = os.environ.get("SLACK_KARMADB_PORT")
-SLACK_KARMADB_NAME = os.environ.get("SLACK_KARMADB_NAME")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 def global_init():
@@ -26,13 +22,9 @@ def global_init():
     if __factory:
         return
 
-    conn_str = (
-        f"postgres://{SLACK_KARMADB_USER}:{SLACK_KARMADB_PASSWORD}@"
-        f"{SLACK_KARMADB_HOST}:{SLACK_KARMADB_PORT}/{SLACK_KARMADB_NAME}"
-    )
-    print(f"Connecting to DB with {conn_str}")
+    print(f"Connecting to DB with {DATABASE_URL}")
 
-    engine = sa.create_engine(conn_str, echo=False)
+    engine = sa.create_engine(DATABASE_URL, echo=False)
     try:
         engine.connect()
     except OperationalError as exc:
