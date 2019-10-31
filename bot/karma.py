@@ -1,45 +1,61 @@
-from . import IS_USER, MAX_POINTS, karmas
-from .slack import lookup_username, post_msg
+import logging
 
-KARMABOT = 'karmabot'
+from bot import SLACK_CLIENT, KARMABOT_ID
+from . import IS_USER, MAX_POINTS
+from .db import db_session
+from .db.karma_user import KarmaUser
+from .slack import post_msg, get_available_username
 
 
 def _parse_karma_change(karma_change):
-    userid, voting = karma_change
+    user_id, voting = karma_change
 
-    if IS_USER.match(userid):
-        receiver = lookup_username(userid)
+    if IS_USER.match(user_id):
+        receiver = user_id.strip("<>@")
     else:
-        receiver = userid.strip(' #').lower()
+        receiver = user_id.strip(" #").lower()  # ?
 
-    points = voting.count('+') - voting.count('-')
+    points = voting.count("+") - voting.count("-")
 
     return receiver, points
 
 
 def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
-        giver = lookup_username(message.giverid)
-        channel = message.channel
-
-        receiver, points = _parse_karma_change(karma_change)
-
-        karma = Karma(giver, receiver)
+        receiver_id, points = _parse_karma_change(karma_change)
+        karma = Karma(giver_id=message.user_id, receiver_id=receiver_id)
 
         try:
-            msg = karma.change_karma(points)
+            text = karma.change_karma(points)
         except Exception as exc:
-            msg = str(exc)
+            text = str(exc)
 
-        post_msg(channel, msg)
+        post_msg(message.channel_id, text)
 
 
 class Karma:
-
-    def __init__(self, giver, receiver):
-        self.giver = giver
-        self.receiver = receiver
+    def __init__(self, giver_id, receiver_id):
+        self.session = db_session.create_session()
+        self.giver = self.session.query(KarmaUser).get(giver_id)
+        self.receiver = self.session.query(KarmaUser).get(receiver_id)
         self.last_score_maxed_out = False
+
+        if not self.giver:
+            self.giver = self._create_karma_user(giver_id)
+        if not self.receiver:
+            self.receiver = self._create_karma_user(receiver_id)
+
+    def _create_karma_user(self, user_id):
+        user_info = SLACK_CLIENT.api_call("users.info", user=user_id)
+        slack_id = user_info["user"]["id"]
+        username = get_available_username(user_info)
+
+        new_user = KarmaUser(user_id=slack_id, username=username)
+        self.session.add(new_user)
+        self.session.commit()
+
+        logging.debug(f"Created new KarmaUser: {repr(new_user)}")
+        return new_user
 
     def _calc_final_score(self, points):
         if abs(points) > MAX_POINTS:
@@ -49,48 +65,57 @@ class Karma:
             self.last_score_maxed_out = False
             return points
 
-    def _create_msg_bot_self_karma(self, points):
-        receiver_karma = karmas.get(self.receiver, 0)
+    def _create_msg_bot_self_karma(self, points) -> str:
         if points > 0:
-            msg = 'Thanks @{} for the extra karma'.format(self.giver)
-            msg += ', my karma is {} now'.format(receiver_karma)
+            text = (
+                f"Thanks {self.giver.username} for the extra karma"
+                f", my karma is {self.receiver.karma_points} now"
+            )
         else:
-            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver,
-                                                                receiver_karma)
-            msg += ', but you are probably right'
-            msg += ', I will work harder next time'
-        return msg
+            text = (
+                f"Not cool {self.giver.username} lowering my karma "
+                f"to {self.receiver.karma_points}, but you are probably right, "
+                f"I will work harder next time"
+            )
+        return text
 
     def _create_msg(self, points):
-        poses = "'" if self.receiver.endswith('s') else "'s"
-        action = 'increase' if points > 0 else 'decrease'
-        receiver_karma = karmas.get(self.receiver, 0)
+        receiver_name = self.receiver.username
 
-        msg = '{}{} karma {}d to {}'.format(self.receiver,
-                                            poses,
-                                            action,
-                                            receiver_karma)
+        poses = "'" if receiver_name.endswith("s") else "'s"
+        action = "increase" if points > 0 else "decrease"
+
+        text = f"{receiver_name}{poses} karma {action}d to {self.receiver.karma_points}"
         if self.last_score_maxed_out:
-            msg += ' (= max {} of {})'.format(action, MAX_POINTS)
+            text += f" (= max {action} of {MAX_POINTS})"
 
-        return msg
+        return text
 
     def change_karma(self, points):
-        '''updates karmas dict and returns message string'''
+        """ Updates Karma in the database """
         if not isinstance(points, int):
-            err = ('Program bug: change_karma should '
-                   'not be called with a non int for '
-                   'points arg!')
+            err = (
+                "Program bug: change_karma should "
+                "not be called with a non int for "
+                "points arg!"
+            )
             raise RuntimeError(err)
 
-        if self.giver == self.receiver:
-            raise ValueError('Sorry, cannot give karma to self')
+        try:
+            if self.receiver.user_id == self.giver.user_id:
+                raise ValueError("Sorry, cannot give karma to self")
 
-        points = self._calc_final_score(points)
+            points = self._calc_final_score(points)
+            self.receiver.karma_points += points
+            self.session.commit()
 
-        karmas[self.receiver] += points
+            if self.receiver.user_id == KARMABOT_ID:
+                return self._create_msg_bot_self_karma(points)
+            else:
+                return self._create_msg(points)
 
-        if self.receiver == KARMABOT:
-            return self._create_msg_bot_self_karma(points)
-        else:
-            return self._create_msg(points)
+        finally:
+            logging.debug(
+                f"[Karmachange] {self.giver.user_id} to {self.receiver.user_id}: {points}"
+            )
+            self.session.close()
