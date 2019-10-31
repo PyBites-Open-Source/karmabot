@@ -69,7 +69,7 @@ class Karma:
         self.session.add(new_user)
         self.session.commit()
 
-        logging.debug(f"Created new KarmaUser: {repr(new_user)}")
+        logging.info(f"Created new KarmaUser: {repr(new_user)}")
         return new_user
 
     def _calc_final_score(self, points):
@@ -131,7 +131,7 @@ class Karma:
                 return self._create_msg(points)
 
         finally:
-            logging.debug(
+            logging.info(
                 (f"[Karmachange] {self.giver.user_id} to "
                  f"{self.receiver.user_id}: {points}")
             )

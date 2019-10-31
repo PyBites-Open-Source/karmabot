@@ -24,7 +24,7 @@ def main():
         if not karma_changes:
             continue
 
-        logging.debug(f"Karma changes: {str(karma_changes)}")
+        logging.info(f"Karma changes: {str(karma_changes)}")
         process_karma_changes(message, karma_changes)
 
 

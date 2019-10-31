@@ -111,8 +111,7 @@ def get_available_username(user_info):
 
 
 def post_msg(channel_or_user_id: str, text) -> None:
-    logging.debug(f"Posting to {channel_or_user_id}")
-    logging.debug(text)
+    logging.info(f"Posting to {channel_or_user_id}: {text}")
     SLACK_CLIENT.api_call(
         "chat.postMessage",
         channel=channel_or_user_id,
