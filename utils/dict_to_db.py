@@ -1,10 +1,19 @@
 import pickle
 from collections import Counter, defaultdict
+import os
 from pathlib import Path
+import sys
 
-import slack
-from db import db_session
-from db.karma_user import KarmaUser
+from slackclient import SlackClient
+
+token = os.environ.get("SLACK_KARMA_TOKEN")
+client = SlackClient(token)
+
+# had to append cwd to PYTHONPATH to get this to work
+sys.path.append(os.getcwd())
+
+from bot.db import db_session  # noqa E402
+from bot.db.karma_user import KarmaUser  # noqa E402
 
 KARMA_CACHE = Path("change_me")
 
@@ -19,7 +28,9 @@ def _load_karma():
 
 def _get_slack_user_list():
     # https://api.slack.com/methods/users.list
-    return slack.SLACK_CLIENT.users_list()["members"]
+    members = client.api_call("users.list")['members']
+    print(f'Retrieved {len(members)} members from slack api')
+    return members
 
 
 def _get_available_name(user_info):
@@ -35,21 +46,29 @@ def extract_old_karma():
     user_list = _get_slack_user_list()
 
     new_karma = defaultdict(dict)
+    print('migrating users ...')
+
     for user in user_list:
         name = user["name"]
         if name not in old_karma or user["deleted"]:
             continue
 
         slack_id = user["id"]
+        username = _get_available_name(user)
+        points = old_karma[name]
+        print(f'- {username}: {points}')
+
         new_karma[slack_id]["id"] = slack_id
-        new_karma[slack_id]["username"] = _get_available_name(user)
-        new_karma[slack_id]["karma_points"] = old_karma[name]
+        new_karma[slack_id]["username"] = username
+        new_karma[slack_id]["karma_points"] = points
 
     return new_karma
 
 
 def upload_karma_to_db(new_karma):
     session = db_session.create_session()
+    session.execute('''TRUNCATE TABLE karma_user''')
+    session.commit()
 
     new_users = [
         KarmaUser(
@@ -60,6 +79,7 @@ def upload_karma_to_db(new_karma):
         for user in new_karma.values()
     ]
 
+    print(f'Inserting {len(new_users)} users in DB')
     session.bulk_save_objects(new_users)
     session.commit()
     session.close()
@@ -67,7 +87,6 @@ def upload_karma_to_db(new_karma):
 
 def main():
     db_session.global_init()
-    slack.check_connection()
 
     new_karma = extract_old_karma()
     upload_karma_to_db(new_karma)
