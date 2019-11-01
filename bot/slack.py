@@ -64,7 +64,7 @@ def create_help_msg(is_admin):
     help_msg = [
         "\n1. Channel commands (format: `@karmabot command`)",
         create_commands_table(PUBLIC_BOT_COMMANDS),
-        "\n2. Message commands (DM `@karmabot` typing `command`)",
+        "\n2. Message commands (type `command` in a DM to bot)",
         create_commands_table(PRIVATE_BOT_COMMANDS),
     ]
     if is_admin:
