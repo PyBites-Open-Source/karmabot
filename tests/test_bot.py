@@ -10,11 +10,17 @@ from bot.slack import (
     format_user_id,
     get_available_username,
     perform_text_replacements,
+    parse_next_msg,
+    Message,
+    GENERAL_CHANNEL,
 )
 from tests.slack_testdata import TEST_USERINFO
 
 
 # Database mocks
+from welcome import welcome_user
+
+
 @pytest.fixture(scope="session")
 def engine():
     return create_engine("sqlite://")
@@ -99,9 +105,17 @@ def mock_empty_db_session(monkeypatch, empty_db_session):
 # Slack API mocks
 # TODO: needs to consider multiple messages / types
 @pytest.fixture
-def mock_slack_rtm_read(monkeypatch):
+def mock_slack_rtm_read_msg(monkeypatch):
     def mock_rtm_read(*args, **kwargs):
-        return {"type": "message", "user": "ABC123", "text": "Hi everybody"}
+        return [{"type": "message", "user": "ABC123", "text": "Hi everybody"}]
+
+    monkeypatch.setattr(SLACK_CLIENT, "rtm_read", mock_rtm_read)
+
+
+@pytest.fixture
+def mock_slack_rtm_read_team_join(monkeypatch):
+    def mock_rtm_read(*args, **kwargs):
+        return [{"type": "team_join", "user": {"id": "ABC123", "name": "bob"}}]
 
     monkeypatch.setattr(SLACK_CLIENT, "rtm_read", mock_rtm_read)
 
@@ -112,16 +126,30 @@ def mock_slack_api_call(monkeypatch):
         if args[0] == "users.info":
             user_id = kwargs.get("user")
             return TEST_USERINFO[user_id]
+        if args[0] == "chat.postMessage":
+            return None
 
     monkeypatch.setattr(SLACK_CLIENT, "api_call", mock_api_call)
 
 
 # Testing
-def test_slack_rtm_read(mock_slack_rtm_read):
+def test_slack_team_join(mock_slack_rtm_read_team_join, mock_slack_api_call):
+    user_id = SLACK_CLIENT.rtm_read()[0].get("user")["id"]
+    welcome_text = welcome_user(user_id)
+
+    actual = parse_next_msg()
+
+    assert actual.user_id == KARMABOT_ID
+    assert actual.channel_id == GENERAL_CHANNEL
+    assert user_id in actual.text
+    assert "Introduce yourself in #general if you like" in actual.text
+
+
+def test_slack_rtm_read(mock_slack_rtm_read_msg):
     event = SLACK_CLIENT.rtm_read()
-    assert event["type"] == "message"
-    assert event["user"] == "ABC123"
-    assert event["text"] == "Hi everybody"
+    assert event[0]["type"] == "message"
+    assert event[0]["user"] == "ABC123"
+    assert event[0]["text"] == "Hi everybody"
 
 
 # KarmaUser
