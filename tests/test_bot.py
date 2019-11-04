@@ -18,7 +18,7 @@ from tests.slack_testdata import TEST_USERINFO
 
 
 # Database mocks
-from welcome import welcome_user
+from commands.welcome import welcome_user
 
 
 @pytest.fixture(scope="session")
