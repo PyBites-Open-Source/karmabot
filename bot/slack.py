@@ -234,7 +234,7 @@ def parse_next_msg():
     if event_type == "team_join":
         # return the message to apply the karma change
         # https://api.slack.com/methods/users.info
-        welcome_msg = AUTOMATED_COMMANDS["welcome"](user_id)  # new user joining
+        welcome_msg = AUTOMATED_COMMANDS["welcome"](user_id["id"])  # new user joining
         post_msg(user_id["id"], welcome_msg)
         # return Message object to handle karma in main
         return Message(
