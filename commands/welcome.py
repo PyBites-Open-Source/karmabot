@@ -16,7 +16,7 @@ Although you will meet some awesome folks here, you can also talk to me :)
 Type `help` here to get started ...
 
 Enjoy PyBites Slack and keep calm and code in Python!
-@bbelderbos and @julian.sequeira
+@pybob and @julian.sequeira
 """
 # some Pythonic welcome questions
 WELCOME_QUESTIONS = """How did you use Python for the first time?

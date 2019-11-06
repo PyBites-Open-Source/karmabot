@@ -15,7 +15,7 @@ from bot.db.karma_user import KarmaUser
 from bot.karma import _parse_karma_change, Karma
 from tests.slack_testdata import TEST_USERINFO
 # Database mocks
-from welcome import welcome_user
+from commands.welcome import welcome_user
 
 
 @pytest.fixture(scope="session")
