@@ -1,14 +1,11 @@
 import logging
 import os
-import re
 import sys
 from collections import namedtuple
 from typing import Union
 
 from slackclient import SlackClient
 
-# bot commands
-from bot import KARMABOT_ID, SLACK_CLIENT
 from commands.add import add_command
 from commands.age import pybites_age
 from commands.doc import doc_command
@@ -19,11 +16,10 @@ from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
 from commands.update_username import update_username, get_user_name
 from commands.welcome import welcome_user
+# bot commands
+from settings import KARMABOT_ID, SLACK_ID_FORMAT, SLACK_CLIENT
 
 # constants
-
-SLACK_ID_FORMAT = re.compile(r"^<@[\w]*>$")
-
 GENERAL_CHANNEL = "C4SFQJJ9Z"
 ADMINS = ("U4RTDPKUH", "U4TN52NG6", "U4SJVFMEG", "UKS45DGFQ")  # bob, julian, pybites
 TEXT_FILTER_REPLIES = {

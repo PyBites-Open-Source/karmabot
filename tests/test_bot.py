@@ -1,4 +1,11 @@
 import pytest
+from bot.bot import (
+    format_user_id,
+    get_available_username,
+    perform_text_replacements,
+    parse_next_msg,
+    GENERAL_CHANNEL,
+)
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -6,17 +13,7 @@ from bot import SLACK_CLIENT, KARMABOT_ID
 from bot.db import db_session
 from bot.db.karma_user import KarmaUser
 from bot.karma import _parse_karma_change, Karma
-from bot.slack import (
-    format_user_id,
-    get_available_username,
-    perform_text_replacements,
-    parse_next_msg,
-    Message,
-    GENERAL_CHANNEL,
-)
 from tests.slack_testdata import TEST_USERINFO
-
-
 # Database mocks
 from welcome import welcome_user
 

@@ -1,5 +1,6 @@
 import bot
 import bot.slack
+import settings
 from bot.db.db_session import create_session
 from bot.db.karma_user import KarmaUser
 
@@ -15,7 +16,7 @@ def update_username(**kwargs):
         return "User not found"
 
     old_username = karma_user.username
-    user_info = bot.SLACK_CLIENT.api_call("users.info", user=user_id)
+    user_info = settings.SLACK_CLIENT.api_call("users.info", user=user_id)
     new_username = bot.slack.get_available_username(user_info)
 
     if old_username == new_username:

@@ -1,7 +1,6 @@
 import logging
 
-from bot import SLACK_CLIENT, KARMABOT_ID
-from . import IS_USER, MAX_POINTS
+from settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
 from .db import db_session
 from .db.karma_user import KarmaUser
 from .slack import post_msg, get_available_username
@@ -14,7 +13,7 @@ class GetUserInfoException(Exception):
 def _parse_karma_change(karma_change):
     user_id, voting = karma_change
 
-    if IS_USER.match(user_id):
+    if SLACK_ID_FORMAT.match(user_id):
         receiver = user_id.strip("<>@")
     else:
         receiver = user_id.strip(" #").lower()  # ?
