@@ -1,0 +1,34 @@
+{
+  "addons": [
+    "papertrail",
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "PAPERTRAIL_API_TOKEN": {
+      "required": true
+    },
+    "SLACK_KARMA_BOTUSER": {
+      "required": true
+    },
+    "SLACK_KARMA_INVITE_USER_TOKEN": {
+      "required": true
+    },
+    "SLACK_KARMA_TOKEN": {
+      "required": true
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1
+    }
+  },
+  "name": "karmabot",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
