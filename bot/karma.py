@@ -2,8 +2,9 @@ import logging
 
 from settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
 from .db import db_session
+from .db.karma_transaction import KarmaTransaction
 from .db.karma_user import KarmaUser
-from .slack import post_msg, get_available_username
+from .slack import post_msg, get_available_username, get_channel_name
 
 
 class GetUserInfoException(Exception):
@@ -27,7 +28,11 @@ def process_karma_changes(message, karma_changes):
     for karma_change in karma_changes:
         receiver_id, points = _parse_karma_change(karma_change)
         try:
-            karma = Karma(giver_id=message.user_id, receiver_id=receiver_id)
+            karma = Karma(
+                giver_id=message.user_id,
+                receiver_id=receiver_id,
+                channel_id=message.channel_id,
+            )
         except GetUserInfoException:
             return
 
@@ -40,10 +45,11 @@ def process_karma_changes(message, karma_changes):
 
 
 class Karma:
-    def __init__(self, giver_id, receiver_id):
+    def __init__(self, giver_id, receiver_id, channel_id):
         self.session = db_session.create_session()
         self.giver = self.session.query(KarmaUser).get(giver_id)
         self.receiver = self.session.query(KarmaUser).get(receiver_id)
+        self.channel_id = channel_id
         self.last_score_maxed_out = False
 
         if not self.giver:
@@ -56,9 +62,7 @@ class Karma:
 
         error = user_info.get("error")
         if error is not None:
-            logging.info(
-                f"Cannot get user info for {user_id} - error: {error}"
-            )
+            logging.info(f"Cannot get user info for {user_id} - error: {error}")
             raise GetUserInfoException
 
         slack_id = user_info["user"]["id"]
@@ -99,12 +103,25 @@ class Karma:
         poses = "'" if receiver_name.endswith("s") else "'s"
         action = "increase" if points > 0 else "decrease"
 
-        text = (f"{receiver_name}{poses} karma {action}d to "
-                f"{self.receiver.karma_points}")
+        text = (
+            f"{receiver_name}{poses} karma {action}d to "
+            f"{self.receiver.karma_points}"
+        )
         if self.last_score_maxed_out:
             text += f" (= max {action} of {MAX_POINTS})"
 
         return text
+
+    def _save_transaction(self, points):
+        transaction = KarmaTransaction(
+            giver_id=self.giver.user_id,
+            receiver_id=self.receiver.user_id,
+            channel=get_channel_name(self.channel_id),
+            karma=points,
+        )
+        self.session.add(transaction)
+        self.session.commit()
+        logging.info(transaction.__repr__())
 
     def change_karma(self, points):
         """ Updates Karma in the database """
@@ -124,6 +141,8 @@ class Karma:
             self.receiver.karma_points += points
             self.session.commit()
 
+            self._save_transaction(points)
+
             if self.receiver.user_id == KARMABOT_ID:
                 return self._create_msg_bot_self_karma(points)
             else:
@@ -131,7 +150,9 @@ class Karma:
 
         finally:
             logging.info(
-                (f"[Karmachange] {self.giver.user_id} to "
-                 f"{self.receiver.user_id}: {points}")
+                (
+                    f"[Karmachange] {self.giver.user_id} to "
+                    f"{self.receiver.user_id}: {points}"
+                )
             )
             self.session.close()
