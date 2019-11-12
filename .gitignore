@@ -8,3 +8,4 @@ data
 .coverage
 *.db
 change_me
+.env
