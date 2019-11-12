@@ -5,7 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from slackclient import SlackClient
 
-dotenv_path = Path(".").parents[0] / ".env"
+dotenv_path = Path(__file__).resolve().parents[1] / ".env"
 load_dotenv(dotenv_path)
 
 # Environment variables
@@ -18,7 +18,7 @@ SLACK_INVITE_TOKEN = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
 GENERAL_CHANNEL = "C4SFQJJ9Z"
 ADMINS = ("U4RTDPKUH", "U4TN52NG6", "U4SJVFMEG", "UKS45DGFQ")  # bob, julian, pybites
 SLACK_ID_FORMAT = re.compile(r"^<@[^>]+>$")
-SLACK_CLIENT = SlackClient(SLACK_INVITE_TOKEN)
+SLACK_CLIENT = SlackClient(SLACK_TOKEN)
 
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)
