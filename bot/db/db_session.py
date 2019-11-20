@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 
 import sqlalchemy as sa
@@ -7,12 +6,10 @@ import sqlalchemy.orm as orm
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
+import settings
 from bot.db.modelbase import SqlAlchemyBase
 
 __factory = None
-
-# Credentials
-DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 def global_init():
@@ -22,9 +19,9 @@ def global_init():
     if __factory:
         return
 
-    print(f"Connecting to DB with {DATABASE_URL}")
+    print(f"Connecting to DB with {settings.DATABASE_URL}")
 
-    engine = sa.create_engine(DATABASE_URL, echo=False)
+    engine = sa.create_engine(settings.DATABASE_URL, echo=False)
     try:
         engine.connect()
     except OperationalError as exc:

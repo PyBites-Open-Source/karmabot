@@ -1,6 +1,6 @@
 import sys
 
-from bot import SLACK_CLIENT
+from settings import SLACK_CLIENT
 
 BOT_NAME = "karmabot"
 
