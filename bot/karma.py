@@ -1,6 +1,6 @@
 import logging
 
-from settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
+from bot.settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
 from .db import db_session
 from .db.karma_transaction import KarmaTransaction
 from .db.karma_user import KarmaUser
@@ -121,7 +121,13 @@ class Karma:
         )
         self.session.add(transaction)
         self.session.commit()
-        logging.info(transaction.__repr__())
+
+        finished_transaction = (
+            self.session.query(KarmaTransaction)
+            .order_by(KarmaTransaction.id.desc())
+            .first()
+        )
+        logging.info(repr(finished_transaction))
 
     def change_karma(self, points):
         """ Updates Karma in the database """
