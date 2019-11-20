@@ -24,6 +24,9 @@
   },
   "environments": {
     "test": {
+      "scripts": {
+        "test": "pytest"
+      },
       "env": {
         "PAPERTRAIL_API_TOKEN": "papertrial_token",
         "SLACK_KARMA_BOTUSER": "slack_botuser",
