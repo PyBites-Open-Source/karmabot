@@ -1,6 +1,7 @@
 import datetime
 
 import sqlalchemy as sa
+from sqlalchemy import Integer
 
 from bot.db.modelbase import SqlAlchemyBase
 
@@ -10,7 +11,11 @@ class KarmaTransaction(SqlAlchemyBase):
 
     __tablename__ = "karma_transaction"
 
-    id: int = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    id: int = sa.Column(
+        sa.BigInteger().with_variant(Integer, "sqlite"),
+        primary_key=True,
+        autoincrement=True,
+    )
     giver_id = sa.Column(sa.String, sa.ForeignKey("karma_user.user_id"), nullable=False)
     receiver_id = sa.Column(
         sa.String, sa.ForeignKey("karma_user.user_id"), nullable=False
