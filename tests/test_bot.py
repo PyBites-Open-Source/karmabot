@@ -16,6 +16,7 @@ from bot.slack import (
 # Database mocks
 from commands.welcome import welcome_user
 from settings import SLACK_CLIENT, KARMABOT_ID
+from slackclient import SlackClient as RealSlackClient
 from tests.slack_testdata import TEST_USERINFO, TEST_CHANNEL_INFO
 
 
@@ -109,7 +110,7 @@ def mock_slack_rtm_read_msg(monkeypatch):
     def mock_rtm_read(*args, **kwargs):
         return [{"type": "message", "user": "ABC123", "text": "Hi everybody"}]
 
-    monkeypatch.setattr(SLACK_CLIENT, "rtm_read", mock_rtm_read)
+    monkeypatch.setattr(RealSlackClient, "rtm_read", mock_rtm_read)
 
 
 @pytest.fixture
@@ -117,13 +118,13 @@ def mock_slack_rtm_read_team_join(monkeypatch):
     def mock_rtm_read(*args, **kwargs):
         return [{"type": "team_join", "user": {"id": "ABC123", "name": "bob"}}]
 
-    monkeypatch.setattr(SLACK_CLIENT, "rtm_read", mock_rtm_read)
+    monkeypatch.setattr(RealSlackClient, "rtm_read", mock_rtm_read)
 
 
 @pytest.fixture
 def mock_slack_api_call(monkeypatch):
     def mock_api_call(*args, **kwargs):
-        call_type = args[0]
+        call_type = args[1]
 
         if call_type == "users.info":
             user_id = kwargs.get("user")
@@ -136,7 +137,7 @@ def mock_slack_api_call(monkeypatch):
         if call_type == "chat.postMessage":
             return None
 
-    monkeypatch.setattr(SLACK_CLIENT, "api_call", mock_api_call)
+    monkeypatch.setattr(RealSlackClient, "api_call", mock_api_call)
 
 
 # Testing
