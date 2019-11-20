@@ -1,6 +1,6 @@
 import bot
 import bot.slack
-import settings
+from bot import settings
 from bot.db.db_session import create_session
 from bot.db.karma_user import KarmaUser
 

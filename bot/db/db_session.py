@@ -6,7 +6,7 @@ import sqlalchemy.orm as orm
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
-import settings
+from bot import settings
 from bot.db.modelbase import SqlAlchemyBase
 
 __factory = None

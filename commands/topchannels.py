@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from math import exp
 from typing import List, Dict
 
-from settings import SLACK_CLIENT
+from bot.settings import SLACK_CLIENT
 
 TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommends:
 - #100daysofcode: share your 100 days journey and/or feedback on our course
