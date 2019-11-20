@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from math import exp
 from typing import List, Dict
 
-from settings import SLACK_CLIENT
+from bot.settings import SLACK_CLIENT
 
 TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommends:
 - #100daysofcode: share your 100 days journey and/or feedback on our course
@@ -41,9 +41,9 @@ def get_recommended_channels(**kwargs):
     if not response['ok']:
         logging.error(f'Error for API call "channels.list": {response["error"]}')
         return "I am truly sorry but something went wrong ;("
-    
+
     channels: List[Dict] = response['channels']
-    
+
     # retrieve channel info for each channel in channel list
     # only consider channels that are not the general channel, that are not private and that have at least one message
     for channel in channels:
@@ -59,7 +59,7 @@ def get_recommended_channels(**kwargs):
             if not response['ok']:
                 logging.error(f'Error for API call "channel.info": {response["error"]}')
                 return "I am truly sorry but something went wrong ;("
-            
+
             channel_info: Dict = response['channel']
 
             if channel_info.get('latest', None):

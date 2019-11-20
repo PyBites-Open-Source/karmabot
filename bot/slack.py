@@ -17,7 +17,7 @@ from commands.topchannels import get_recommended_channels
 from commands.update_username import update_username, get_user_name
 from commands.welcome import welcome_user
 # bot commands
-from settings import KARMABOT_ID, SLACK_ID_FORMAT, SLACK_CLIENT
+from bot.settings import KARMABOT_ID, SLACK_ID_FORMAT, SLACK_CLIENT
 
 # constants
 GENERAL_CHANNEL = "C4SFQJJ9Z"

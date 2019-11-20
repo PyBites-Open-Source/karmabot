@@ -1,6 +1,6 @@
 import logging
 
-from settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
+from bot.settings import SLACK_CLIENT, KARMABOT_ID, SLACK_ID_FORMAT, MAX_POINTS
 from .db import db_session
 from .db.karma_transaction import KarmaTransaction
 from .db.karma_user import KarmaUser

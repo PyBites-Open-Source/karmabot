@@ -14,7 +14,7 @@ from bot.slack import (
 )
 # Database mocks
 from commands.welcome import welcome_user
-from settings import SLACK_CLIENT, KARMABOT_ID
+from bot.settings import SLACK_CLIENT, KARMABOT_ID
 from tests.slack_testdata import TEST_USERINFO
 
 
