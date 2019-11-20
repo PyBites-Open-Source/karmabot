@@ -1,0 +1,47 @@
+{
+  "addons": [
+    "papertrail",
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "PAPERTRAIL_API_TOKEN": {
+      "required": true
+    },
+    "SLACK_KARMA_BOTUSER": {
+      "required": true
+    },
+    "SLACK_KARMA_INVITE_USER_TOKEN": {
+      "required": true
+    },
+    "SLACK_KARMA_TOKEN": {
+      "required": true
+    }
+  },
+  "environments": {
+    "test": {
+      "scripts": {
+        "test": "pytest"
+      },
+      "env": {
+        "PAPERTRAIL_API_TOKEN": "papertrial_token",
+        "SLACK_KARMA_BOTUSER": "slack_botuser",
+        "SLACK_KARMA_INVITE_USER_TOKEN": "slack_invite_token",
+        "SLACK_KARMA_TOKEN": "slack_token"
+      }
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1
+    }
+  },
+  "name": "karmabot",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
