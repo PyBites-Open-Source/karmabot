@@ -106,6 +106,17 @@ def get_available_username(user_info):
     return user_info["user"]["name"]
 
 
+def get_channel_name(channel_id: str) -> str:
+    channel_info: dict = SLACK_CLIENT.api_call("channels.info", channel=channel_id)
+
+    # Private channels and direct messages cannot be resolved via api
+    if not channel_info["ok"]:
+        return "Unknown or Private"
+
+    channel_name = channel_info["channel"]["name"]
+    return channel_name
+
+
 def post_msg(channel_or_user_id: str, text) -> None:
     logging.info(f"Posting to {channel_or_user_id}: {text}")
     SLACK_CLIENT.api_call(
