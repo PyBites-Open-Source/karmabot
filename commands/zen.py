@@ -12,10 +12,8 @@ def import_this(**kwargs):
     return zen.getvalue()
 
 
-if __name__ == '__main__':
-    user, channel, text = 'bob', '#general', 'some message'
-    kwargs = dict(user=user,
-                  channel=channel,
-                  text=text)
+if __name__ == "__main__":
+    user, channel, text = "bob", "#general", "some message"
+    kwargs = dict(user=user, channel=channel, text=text)
     output = import_this(**kwargs)
     print(output)

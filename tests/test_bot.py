@@ -15,6 +15,7 @@ from bot.slack import (
     parse_next_msg,
     GENERAL_CHANNEL,
 )
+
 # Database mocks
 from commands.welcome import welcome_user
 from bot.settings import SLACK_CLIENT, KARMABOT_ID
@@ -222,7 +223,7 @@ def test_parse_karma_change(test_change, expected):
     assert _parse_karma_change(test_change) == expected
 
 
-@patch('bot.karma.Karma._save_transaction')
+@patch("bot.karma.Karma._save_transaction")
 @pytest.mark.parametrize(
     "test_changes",
     [("ABC123", "XYZ123", 2), ("XYZ123", "ABC123", 5), ("EFG123", "ABC123", -3)],
@@ -239,7 +240,7 @@ def test_change_karma(transaction_mock, mock_filled_db_session, test_changes):
     assert post_change == (pre_change_karma + test_changes[2])
 
 
-@patch('bot.karma.Karma._save_transaction')
+@patch("bot.karma.Karma._save_transaction")
 def test_change_karma_msg(transaction_mock, mock_filled_db_session):
     karma = Karma("ABC123", "XYZ123", GENERAL_CHANNEL)
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
@@ -248,7 +249,7 @@ def test_change_karma_msg(transaction_mock, mock_filled_db_session):
     assert karma.change_karma(-3) == "pybob's karma decreased to 389"
 
 
-@patch('bot.karma.Karma._save_transaction')
+@patch("bot.karma.Karma._save_transaction")
 def test_change_karma_exceptions(transaction_mock, mock_filled_db_session):
     with pytest.raises(RuntimeError):
         karma = Karma("ABC123", "XYZ123", GENERAL_CHANNEL)
@@ -259,7 +260,7 @@ def test_change_karma_exceptions(transaction_mock, mock_filled_db_session):
         karma.change_karma(2)
 
 
-@patch('bot.karma.Karma._save_transaction')
+@patch("bot.karma.Karma._save_transaction")
 def test_change_karma_bot_self(transaction_mock, mock_filled_db_session):
     karma = Karma("ABC123", KARMABOT_ID, GENERAL_CHANNEL)
     assert (

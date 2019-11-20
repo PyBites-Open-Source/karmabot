@@ -62,9 +62,7 @@ class Karma:
 
         error = user_info.get("error")
         if error is not None:
-            logging.info(
-                f"Cannot get user info for {user_id} - error: {error}"
-            )
+            logging.info(f"Cannot get user info for {user_id} - error: {error}")
             raise GetUserInfoException
 
         slack_id = user_info["user"]["id"]

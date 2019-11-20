@@ -16,6 +16,7 @@ from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
 from commands.update_username import update_username, get_user_name
 from commands.welcome import welcome_user
+
 # bot commands
 from bot.settings import KARMABOT_ID, SLACK_ID_FORMAT, SLACK_CLIENT, ADMINS
 

@@ -17,25 +17,24 @@
 6. PR your work. Thanks
 """
 
+
 def my_command(**kwargs: dict) -> str:
     """Text that will appear in the help section"""
     # kwargs will hold user, channel, text (from a Slack message object)
-    
+
     # use them like this, or just delete these line:
-    user = kwargs.get('user')
-    channel = kwargs.get('channel')
-    msg_text = kwargs.get('text')
-    
+    user = kwargs.get("user")
+    channel = kwargs.get("channel")
+    msg_text = kwargs.get("text")
+
     # return a message string
-    # msg = ...
+    #  msg = ...
     return msg
 
 
-if __name__ == '__main__':
-    # standalone test
-    user, channel, text = 'bob', '#general', 'some message'
-    kwargs = dict(user=user,
-                  channel=channel,
-                  text=text)
+if __name__ == "__main__":
+    #  standalone test
+    user, channel, text = "bob", "#general", "some message"
+    kwargs = dict(user=user, channel=channel, text=text)
     output = my_command(**kwargs)
     print(output)

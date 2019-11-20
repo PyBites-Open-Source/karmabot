@@ -28,8 +28,8 @@ def _load_karma():
 
 def _get_slack_user_list():
     # https://api.slack.com/methods/users.list
-    members = client.api_call("users.list")['members']
-    print(f'Retrieved {len(members)} members from slack api')
+    members = client.api_call("users.list")["members"]
+    print(f"Retrieved {len(members)} members from slack api")
     return members
 
 
@@ -46,7 +46,7 @@ def extract_old_karma():
     user_list = _get_slack_user_list()
 
     new_karma = defaultdict(dict)
-    print('migrating users ...')
+    print("migrating users ...")
 
     for user in user_list:
         name = user["name"]
@@ -56,7 +56,7 @@ def extract_old_karma():
         slack_id = user["id"]
         username = _get_available_name(user)
         points = old_karma[name]
-        print(f'- {username}: {points}')
+        print(f"- {username}: {points}")
 
         new_karma[slack_id]["id"] = slack_id
         new_karma[slack_id]["username"] = username
@@ -67,7 +67,7 @@ def extract_old_karma():
 
 def upload_karma_to_db(new_karma):
     session = db_session.create_session()
-    session.execute('''TRUNCATE TABLE karma_user''')
+    session.execute("""TRUNCATE TABLE karma_user""")
     session.commit()
 
     new_users = [
@@ -79,7 +79,7 @@ def upload_karma_to_db(new_karma):
         for user in new_karma.values()
     ]
 
-    print(f'Inserting {len(new_users)} users in DB')
+    print(f"Inserting {len(new_users)} users in DB")
     session.bulk_save_objects(new_users)
     session.commit()
     session.close()
