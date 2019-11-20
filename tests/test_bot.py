@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from bot.db import db_session
+from bot.db.karma_transaction import KarmaTransaction
 from bot.db.karma_user import KarmaUser
 from bot.karma import _parse_karma_change, Karma
 from bot.slack import (
@@ -15,7 +16,7 @@ from bot.slack import (
 # Database mocks
 from commands.welcome import welcome_user
 from settings import SLACK_CLIENT, KARMABOT_ID
-from tests.slack_testdata import TEST_USERINFO
+from tests.slack_testdata import TEST_USERINFO, TEST_CHANNEL_INFO
 
 
 @pytest.fixture(scope="session")
@@ -26,8 +27,10 @@ def engine():
 @pytest.fixture(scope="session")
 def tables(engine):
     KarmaUser.metadata.create_all(engine)
+    KarmaTransaction.metadata.create_all(engine)
     yield
     KarmaUser.metadata.drop_all(engine)
+    KarmaTransaction.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -120,10 +123,17 @@ def mock_slack_rtm_read_team_join(monkeypatch):
 @pytest.fixture
 def mock_slack_api_call(monkeypatch):
     def mock_api_call(*args, **kwargs):
-        if args[0] == "users.info":
+        call_type = args[0]
+
+        if call_type == "users.info":
             user_id = kwargs.get("user")
             return TEST_USERINFO[user_id]
-        if args[0] == "chat.postMessage":
+
+        if call_type == "channels.info":
+            channel_id = kwargs.get("channel")
+            return TEST_CHANNEL_INFO[channel_id]
+
+        if call_type == "chat.postMessage":
             return None
 
     monkeypatch.setattr(SLACK_CLIENT, "api_call", mock_api_call)
@@ -173,7 +183,7 @@ def test_lookup_username(filled_db_session, test_user_id, expected):
 
 
 def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
-    karma = Karma("ABC123", "XYZ123")
+    karma = Karma("ABC123", "XYZ123", "CHANNEL42")
     assert karma.giver.username == "pybob"
     assert karma.receiver.username == "clamytoe"
 
@@ -219,51 +229,55 @@ def test_parse_karma_change(test_change, expected):
 
 @pytest.mark.parametrize(
     "test_changes",
-    [("ABC123", "XYZ123", 2), ("XYZ123", "ABC123", 5), ("EFG123", "ABC123", -3)],
+    [
+        ("ABC123", "XYZ123", "CHANNEL42", 2),
+        ("XYZ123", "ABC123", "CHANNEL42", 5),
+        ("EFG123", "ABC123", "CHANNEL42", -3),
+    ],
 )
-def test_change_karma(mock_filled_db_session, test_changes):
+def test_change_karma(mock_filled_db_session, test_changes, mock_slack_api_call):
     session = db_session.create_session()
     pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
 
-    karma = Karma(test_changes[0], test_changes[1])
-    karma.change_karma(test_changes[2])
+    karma = Karma(test_changes[0], test_changes[1], test_changes[2])
+    karma.change_karma(test_changes[3])
 
-    session.commit()
     post_change = session.query(KarmaUser).get(test_changes[1]).karma_points
-    assert post_change == (pre_change_karma + test_changes[2])
+    assert post_change == (pre_change_karma + test_changes[3])
+    session.close()
 
 
 def test_change_karma_msg(mock_filled_db_session):
-    karma = Karma("ABC123", "XYZ123")
+    karma = Karma("ABC123", "XYZ123", "CHANNEL42")
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
 
-    karma = Karma("EFG123", "ABC123")
+    karma = Karma("EFG123", "ABC123", "CHANNEL42")
     assert karma.change_karma(-3) == "pybob's karma decreased to 389"
 
 
 def test_change_karma_exceptions(mock_filled_db_session):
     with pytest.raises(RuntimeError):
-        karma = Karma("ABC123", "XYZ123")
+        karma = Karma("ABC123", "XYZ123", "CHANNEL42")
         karma.change_karma("ABC")
 
     with pytest.raises(ValueError):
-        karma = Karma("ABC123", "ABC123")
+        karma = Karma("ABC123", "ABC123", "CHANNEL42")
         karma.change_karma(2)
 
 
 def test_change_karma_bot_self(mock_filled_db_session):
-    karma = Karma("ABC123", KARMABOT_ID)
+    karma = Karma("ABC123", KARMABOT_ID, "CHANNEL42")
     assert (
         karma.change_karma(2) == "Thanks pybob for the extra karma, my karma is 12 now"
     )
 
-    karma = Karma("EFG123", KARMABOT_ID)
+    karma = Karma("EFG123", KARMABOT_ID, "CHANNEL42")
     assert (
         karma.change_karma(3)
         == "Thanks Julian Sequeira for the extra karma, my karma is 15 now"
     )
 
-    karma = Karma("ABC123", KARMABOT_ID)
+    karma = Karma("ABC123", KARMABOT_ID, "CHANNEL42")
     assert (
         karma.change_karma(-3)
         == "Not cool pybob lowering my karma to 12, but you are probably right, I will work harder next time"
