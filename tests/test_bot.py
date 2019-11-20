@@ -1,9 +1,12 @@
+from unittest.mock import patch
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from bot.db import db_session
 from bot.db.karma_user import KarmaUser
+from bot.db.karma_transaction import KarmaTransaction
 from bot.karma import _parse_karma_change, Karma
 from bot.slack import (
     format_user_id,
@@ -26,8 +29,10 @@ def engine():
 @pytest.fixture(scope="session")
 def tables(engine):
     KarmaUser.metadata.create_all(engine)
+    KarmaTransaction.metadata.create_all(engine)
     yield
     KarmaUser.metadata.drop_all(engine)
+    KarmaTransaction.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -173,7 +178,7 @@ def test_lookup_username(filled_db_session, test_user_id, expected):
 
 
 def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
-    karma = Karma("ABC123", "XYZ123")
+    karma = Karma("ABC123", "XYZ123", GENERAL_CHANNEL)
     assert karma.giver.username == "pybob"
     assert karma.receiver.username == "clamytoe"
 
@@ -217,15 +222,16 @@ def test_parse_karma_change(test_change, expected):
     assert _parse_karma_change(test_change) == expected
 
 
+@patch('bot.karma.Karma._save_transaction')
 @pytest.mark.parametrize(
     "test_changes",
     [("ABC123", "XYZ123", 2), ("XYZ123", "ABC123", 5), ("EFG123", "ABC123", -3)],
 )
-def test_change_karma(mock_filled_db_session, test_changes):
+def test_change_karma(transaction_mock, mock_filled_db_session, test_changes):
     session = db_session.create_session()
     pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
 
-    karma = Karma(test_changes[0], test_changes[1])
+    karma = Karma(test_changes[0], test_changes[1], GENERAL_CHANNEL)
     karma.change_karma(test_changes[2])
 
     session.commit()
@@ -233,37 +239,40 @@ def test_change_karma(mock_filled_db_session, test_changes):
     assert post_change == (pre_change_karma + test_changes[2])
 
 
-def test_change_karma_msg(mock_filled_db_session):
-    karma = Karma("ABC123", "XYZ123")
+@patch('bot.karma.Karma._save_transaction')
+def test_change_karma_msg(transaction_mock, mock_filled_db_session):
+    karma = Karma("ABC123", "XYZ123", GENERAL_CHANNEL)
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
 
-    karma = Karma("EFG123", "ABC123")
+    karma = Karma("EFG123", "ABC123", GENERAL_CHANNEL)
     assert karma.change_karma(-3) == "pybob's karma decreased to 389"
 
 
-def test_change_karma_exceptions(mock_filled_db_session):
+@patch('bot.karma.Karma._save_transaction')
+def test_change_karma_exceptions(transaction_mock, mock_filled_db_session):
     with pytest.raises(RuntimeError):
-        karma = Karma("ABC123", "XYZ123")
+        karma = Karma("ABC123", "XYZ123", GENERAL_CHANNEL)
         karma.change_karma("ABC")
 
     with pytest.raises(ValueError):
-        karma = Karma("ABC123", "ABC123")
+        karma = Karma("ABC123", "ABC123", GENERAL_CHANNEL)
         karma.change_karma(2)
 
 
-def test_change_karma_bot_self(mock_filled_db_session):
-    karma = Karma("ABC123", KARMABOT_ID)
+@patch('bot.karma.Karma._save_transaction')
+def test_change_karma_bot_self(transaction_mock, mock_filled_db_session):
+    karma = Karma("ABC123", KARMABOT_ID, GENERAL_CHANNEL)
     assert (
         karma.change_karma(2) == "Thanks pybob for the extra karma, my karma is 12 now"
     )
 
-    karma = Karma("EFG123", KARMABOT_ID)
+    karma = Karma("EFG123", KARMABOT_ID, GENERAL_CHANNEL)
     assert (
         karma.change_karma(3)
         == "Thanks Julian Sequeira for the extra karma, my karma is 15 now"
     )
 
-    karma = Karma("ABC123", KARMABOT_ID)
+    karma = Karma("ABC123", KARMABOT_ID, GENERAL_CHANNEL)
     assert (
         karma.change_karma(-3)
         == "Not cool pybob lowering my karma to 12, but you are probably right, I will work harder next time"
