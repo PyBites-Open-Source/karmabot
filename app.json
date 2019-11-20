@@ -22,6 +22,16 @@
       "required": true
     }
   },
+  "environments": {
+    "test": {
+      "env": {
+        "PAPERTRAIL_API_TOKEN": "papertrial_token",
+        "SLACK_KARMA_BOTUSER": "slack_botuser",
+        "SLACK_KARMA_INVITE_USER_TOKEN": "slack_invite_token",
+        "SLACK_KARMA_TOKEN": "slack_token"
+      }
+    }
+  },
   "formation": {
     "worker": {
       "quantity": 1
