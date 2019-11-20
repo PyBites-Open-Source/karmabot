@@ -9,3 +9,4 @@ data
 *.db
 change_me
 .env
+.tox
