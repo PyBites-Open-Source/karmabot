@@ -8,8 +8,5 @@ data
 .coverage
 *.db
 change_me
-<<<<<<< HEAD
-.env
-=======
 .env
 .tox
