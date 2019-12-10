@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -13,11 +15,26 @@ from bot.slack import (
     parse_next_msg,
     GENERAL_CHANNEL,
 )
+
 # Database mocks
+import commands.topchannels
+from commands.topchannels import Channel, calc_channel_score
 from commands.welcome import welcome_user
 from bot.settings import SLACK_CLIENT, KARMABOT_ID
 from slackclient import SlackClient as RealSlackClient
 from tests.slack_testdata import TEST_USERINFO, TEST_CHANNEL_INFO
+
+FAKE_NOW = datetime(2017, 8, 23)
+
+
+@pytest.fixture
+def frozen_now(monkeypatch):
+    class patched_datetime(datetime):
+        @classmethod
+        def now(cls):
+            return FAKE_NOW
+
+    monkeypatch.setattr(commands.topchannels, "dt", patched_datetime)
 
 
 @pytest.fixture(scope="session")
@@ -303,3 +320,21 @@ def test_format_user_id(test_user_id, expected):
 def test_get_available_username(mock_slack_api_call, test_user_id, expected):
     user_info = SLACK_CLIENT.api_call("users.info", user=test_user_id)
     assert get_available_username(user_info) == expected
+
+
+def test_channel_score(mock_slack_api_call, frozen_now):
+    def _channel_score(channel):
+        channel_info = channel["channel"]
+        return calc_channel_score(
+            Channel(
+                channel_info["id"],
+                channel_info["name"],
+                channel_info["purpose"]["value"],
+                len(channel_info["members"]),
+                float(channel_info["latest"]["ts"]),
+            )
+        )
+
+    most_recent = SLACK_CLIENT.api_call("channels.info", channel="CHANNEL42")
+    less_recent = SLACK_CLIENT.api_call("channels.info", channel="CHANNEL43")
+    assert _channel_score(most_recent) > _channel_score(less_recent)

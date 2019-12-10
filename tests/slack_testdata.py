@@ -116,5 +116,40 @@ TEST_CHANNEL_INFO = {
             },
             "previous_names": ["dusting"],
         },
+    },
+    "CHANNEL43": {
+        "ok": True,
+        "channel": {
+            "id": "CHANNEL43",
+            "name": "Slightly Less Awesome Test Channel",
+            "is_channel": True,
+            "created": 1466025154,
+            "creator": "ABC123",
+            "name_normalized": "Slightly Less Awesome Test Channel",
+            "last_read": "1503435939.000101",
+            "latest": {
+                "text": "Hamsters are small but fast",
+                "username": "karmabot",
+                "bot_id": KARMABOT_ID,
+                "attachments": [],
+                "type": "message",
+                "subtype": "bot_message",
+                "ts": "1503353156.000247",
+            },
+            "unread_count": 1,
+            "unread_count_display": 1,
+            "members": ["ABC123", "EFG123"],
+            "topic": {
+                "value": "Having less active discussions",
+                "creator": "ABC123",
+                "last_set": 1503435128,
+            },
+            "purpose": {
+                "value": "Do things and talk about stuff",
+                "creator": "ABC123",
+                "last_set": 1503435128,
+            },
+            "previous_names": ["pancakes"],
+        }
     }
 }

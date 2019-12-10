@@ -106,7 +106,7 @@ def calc_channel_score(channel: Channel):
 def seconds_since_last_post(channel: Channel) -> float:
     """return the fraction of days since the last post in a channel
     """
-    return (dt.now() - dt.fromtimestamp(channel.latest_ts)).seconds
+    return (dt.now() - dt.fromtimestamp(channel.latest_ts)).total_seconds()
 
 
 if __name__ == "__main__":
