@@ -332,6 +332,7 @@ def test_channel_score(mock_slack_api_call, frozen_now):
                 channel_info["purpose"]["value"],
                 len(channel_info["members"]),
                 float(channel_info["latest"]["ts"]),
+                channel_info["latest"].get("subtype"),
             )
         )
 
