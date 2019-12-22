@@ -109,6 +109,38 @@ def get_recommended_channels(**kwargs):
     return msg
 
 
+def get_messages(
+    channel: Channel, ignore_message_types: set = {"channel_join"}
+) -> List[Dict]:
+    """Return a list of the most recent messages in a given channel, filtering
+    out certain message types.
+    
+    Similar to invite permissions, this requires a user token.
+   
+    "New" bot tokens will be both more granular and more flexible, so should
+    be able to replace the need for user tokens going forward:
+   
+    Ref: https://api.slack.com/docs/token-types#bot_new
+    """
+
+    grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
+    karmabot_id = os.environ.get("SLACK_KARMA_BOTUSER")
+    if not grant_user_token:
+        logging.info(
+            "Cannot search channel history, no env SLACK_KARMA_INVITE_USER_TOKEN"
+        )
+        return None
+
+    sc = SlackClient(grant_user_token)
+    response = sc.api_call("channels.history", channel=channel.id, user=karmabot_id)
+
+    return [
+        msg
+        for msg in response["messages"]
+        if msg.get("subtype") not in ignore_message_types
+    ]
+
+
 def calc_channel_score(channel: Channel):
     """simple calculation of a channels value
     the higher the number of members and the less the number of seconds since the last post the higher the channels score
@@ -126,36 +158,13 @@ def seconds_since_last_post(channel: Channel) -> Optional[float]:
     """return the fraction of days since the last post in a channel, or None if
     all messages are of filtered/ignored subtypes
     """
+
     ignore_message_types = {"channel_join"}
 
     if channel.latest_subtype not in ignore_message_types:
         latest_ts = channel.latest_ts
     else:
-        # The latest message in this channel has an ignored subtype, so we need
-        # to dig through history to find the most recent non-ignored message.
-        # Similar to invite permissions, this requires a user token.
-        #
-        # "New" bot tokens will be both more granular and more flexible, so should
-        # be able to replace the need for user tokens going forward:
-        #
-        # Ref: https://api.slack.com/docs/token-types#bot_new
-
-        grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
-        karmabot_id = os.environ.get("SLACK_KARMA_BOTUSER")
-        if not grant_user_token:
-            logging.info(
-                "Cannot search channel history, no env SLACK_KARMA_INVITE_USER_TOKEN"
-            )
-            return None
-
-        sc = SlackClient(grant_user_token)
-        response = sc.api_call("channels.history", channel=channel.id, user=karmabot_id)
-
-        msgs = [
-            msg
-            for msg in response["messages"]
-            if msg.get("subtype") not in ignore_message_types
-        ]
+        msgs = get_messages(channel, ignore_message_types)
         if not msgs:
             return None
         latest_ts = float(max(msgs, key=itemgetter("ts"))["ts"])
