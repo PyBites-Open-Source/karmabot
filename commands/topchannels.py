@@ -21,7 +21,7 @@ TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommend
 """
 
 MSG_BEGIN = "Glad you asked, here are some channels our Communtiy recommends (based on member count and activity):\n"
-LIST_ICON = "-"
+MSG_LINE = "- #{channel} ({member_count} members, {hours_since_last_post:.0f} hour(s) since last post): {purpose}"
 DEFAULT_NR_CHANNELS = 7
 
 Channel = namedtuple("Channel", "id name purpose num_members latest_ts latest_subtype")
@@ -94,7 +94,13 @@ def get_recommended_channels(**kwargs):
 
     msg = MSG_BEGIN + "\n".join(
         (
-            f'{LIST_ICON} #{channel.name} ({channel.num_members} members, {seconds_since_last_post(channel) / 3600:.0f} hour(s) since last post): {channel.purpose if channel.purpose else "<Invest today and get an awesome description!>"}'
+            MSG_LINE.format(
+                channel=channel.name,
+                member_count=channel.num_members,
+                hours_since_last_post=seconds_since_last_post(channel) / 3600,
+                purpose=channel.purpose
+                or "<Invest today and get an awesome description!>",
+            )
             for score, channel in potential_channels[:nr_channels]
             if score > 0
         )

@@ -150,6 +150,118 @@ TEST_CHANNEL_INFO = {
                 "last_set": 1503435128,
             },
             "previous_names": ["pancakes"],
-        }
-    }
+        },
+    },
+    "SOMEJOINS": {
+        "ok": True,
+        "channel": {
+            "id": "SOMEJOINS",
+            "name": "Some joiny bits with a dash of chatter",
+            "is_channel": True,
+            "created": 1466025154,
+            "creator": "ABC123",
+            "name_normalized": "Some joiny bits with a dash of chatter",
+            "last_read": "1503435939.000101",
+            "latest": {
+                "type": "message",
+                "subtype": "channel_join",
+                "ts": "1503353156.000247",
+                "user": "URVU20YHL",
+                "text": "<@URVU20YHL> has joined the channel",
+            },
+            "members": ["ABC123", "EFG123"],
+            "purpose": {
+                "value": "Drink milk loudly through a straw",
+                "creator": "ABC123",
+                "last_set": 1503435128,
+            },
+        },
+    },
+    "ONLYJOINS": {
+        "ok": True,
+        "channel": {
+            "id": "ONLYJOINS",
+            "name": "Nothing but join messages in here",
+            "is_channel": True,
+            "created": 1466025154,
+            "creator": "ABC123",
+            "name_normalized": "Nothing but join messages in here",
+            "last_read": "1503435939.000101",
+            "latest": {
+                "type": "message",
+                "subtype": "channel_join",
+                "ts": "1503353156.000247",
+                "user": "URVU20YHL",
+                "text": "<@URVU20YHL> has joined the channel",
+            },
+            "members": ["ABC123", "EFG123"],
+            "purpose": {
+                "value": "Watch people walk through the door",
+                "creator": "ABC123",
+                "last_set": 1503435128,
+            },
+        },
+    },
+}
+
+TEST_CHANNEL_HISTORY = {
+    "SOMEJOINS": {
+        "ok": True,
+        "messages": [
+            {
+                "type": "message",
+                "subtype": "channel_join",
+                "ts": "1503353156.000247",
+                "user": "URW2VDFK6",
+                "text": "<@URW2VDFK6> has joined the channel",
+                "inviter": "URVU20YHL",
+            },
+            {
+                "client_msg_id": "4858ae10-a803-4e01-80ff-28eb23776a60",
+                "type": "message",
+                "text": "test",
+                "user": "URVU20YHL",
+                "ts": "1503353087.000247",
+                "team": "TRTMY06HW",
+                "blocks": [
+                    {
+                        "type": "rich_text",
+                        "block_id": "gqY",
+                        "elements": [
+                            {
+                                "type": "rich_text_section",
+                                "elements": [{"type": "text", "text": "test"}],
+                            }
+                        ],
+                    }
+                ],
+            },
+        ],
+        "has_more": False,
+        "channel_actions_ts": None,
+        "channel_actions_count": 0,
+    },
+    "ONLYJOINS": {
+        "ok": True,
+        "messages": [
+            {
+                "type": "message",
+                "subtype": "channel_join",
+                "ts": "1503353156.000247",
+                "user": "URW2VDFK6",
+                "text": "<@URW2VDFK6> has joined the channel",
+                "inviter": "URVU20YHL",
+            },
+            {
+                "type": "message",
+                "subtype": "channel_join",
+                "ts": "1503353087.000247",
+                "user": "URVU20YHL",
+                "text": "<@URVU20YHL> has joined the channel",
+            },
+        ],
+        "has_more": False,
+        "channel_actions_ts": None,
+        "channel_actions_count": 0,
+    },
 }
