@@ -114,12 +114,12 @@ def get_messages(
 ) -> List[Dict]:
     """Return a list of the most recent messages in a given channel, filtering
     out certain message types.
-    
+
     Similar to invite permissions, this requires a user token.
-   
+
     "New" bot tokens will be both more granular and more flexible, so should
     be able to replace the need for user tokens going forward:
-   
+
     Ref: https://api.slack.com/docs/token-types#bot_new
     """
 

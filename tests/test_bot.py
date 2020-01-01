@@ -1,4 +1,6 @@
 from datetime import datetime
+import os
+from unittest.mock import patch
 
 import pytest
 from sqlalchemy import create_engine
@@ -18,7 +20,7 @@ from bot.slack import (
 
 # Database mocks
 import commands.topchannels
-from commands.topchannels import Channel, calc_channel_score, seconds_since_last_post
+from commands.topchannels import Channel, calc_channel_score
 from commands.welcome import welcome_user
 from bot.settings import SLACK_CLIENT, KARMABOT_ID
 from slackclient import SlackClient as RealSlackClient
@@ -164,7 +166,7 @@ def mock_slack_api_call(monkeypatch):
 # Testing
 def test_slack_team_join(mock_slack_rtm_read_team_join, mock_slack_api_call):
     user_id = SLACK_CLIENT.rtm_read()[0].get("user")["id"]
-    welcome_text = welcome_user(user_id)
+    welcome_user(user_id)
 
     actual = parse_next_msg()
 
@@ -346,6 +348,8 @@ def test_channel_score(mock_slack_api_call, frozen_now):
     assert _channel_score(most_recent) > _channel_score(less_recent)
 
 
+@patch.dict(os.environ, {'SLACK_KARMA_INVITE_USER_TOKEN': 'xoxp-162...'})
+@patch.dict(os.environ, {'SLACK_KARMA_BOTUSER': 'U5Z6KGX4L'})
 def test_ignore_message_subtypes(mock_slack_api_call, frozen_now):
     latest_ignored = SLACK_CLIENT.api_call("channels.info", channel="SOMEJOINS")
     all_ignored = SLACK_CLIENT.api_call("channels.info", channel="ONLYJOINS")
