@@ -6,6 +6,7 @@ from math import exp
 from operator import itemgetter
 from typing import Dict, List, Optional
 
+import humanize
 from slackclient import SlackClient
 
 from bot.settings import SLACK_CLIENT
@@ -21,7 +22,9 @@ TOP_CHANNELS = """Glad you asked, here are some channels our Communtiy recommend
 """
 
 MSG_BEGIN = "Glad you asked, here are some channels our Communtiy recommends (based on member count and activity):\n"
-MSG_LINE = "- #{channel} ({member_count} members, {hours_since_last_post:.0f} hour(s) since last post): {purpose}"
+MSG_LINE = (
+    "- #{channel} ({member_count} members, last post {time_since_last_post}): {purpose}"
+)
 DEFAULT_NR_CHANNELS = 7
 
 Channel = namedtuple("Channel", "id name purpose num_members latest_ts latest_subtype")
@@ -97,7 +100,9 @@ def get_recommended_channels(**kwargs):
             MSG_LINE.format(
                 channel=channel.name,
                 member_count=channel.num_members,
-                hours_since_last_post=seconds_since_last_post(channel) / 3600,
+                time_since_last_post=humanize.naturaltime(
+                    seconds_since_last_post(channel)
+                ),
                 purpose=channel.purpose
                 or "<Invest today and get an awesome description!>",
             )
