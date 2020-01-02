@@ -3,6 +3,7 @@ attrs==19.3.0
 certifi==2019.9.11
 chardet==3.0.4
 feedparser==5.2.1
+humanize==0.5.1
 idna==2.8
 importlib-metadata==0.23
 more-itertools==7.2.0
