@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 from collections import namedtuple
+from string import punctuation
 from typing import Union
 
 from slackclient import SlackClient
@@ -45,6 +46,8 @@ PRIVATE_BOT_COMMANDS = {
     "updateusername": update_username,
     "username": get_user_name,
 }
+
+_PUNCTUATION_TO_SPACE = str.maketrans({p:" " for p in punctuation})
 
 Message = namedtuple("Message", "user_id channel_id text")
 
@@ -203,20 +206,17 @@ def perform_bot_cmd(msg, private=True):
 
 def perform_text_replacements(text: str) -> Union[str, None]:
     """Replace first matching word in text with a little easter egg"""
-    words = text.lower().split()
-    strip_chars = "?!"
-    matching_words = [
-        word.strip(strip_chars)
-        for word in words
-        if word.strip(strip_chars) in TEXT_FILTER_REPLIES
-    ]
 
-    if not matching_words:
-        return None
+    words = text.translate(_PUNCTUATION_TO_SPACE).casefold().split()
+    
+    for word in words:
+        try:
+            return f"To _{word}_ I say: {TEXT_FILTER_REPLIES[word]}"
+        except KeyError:
+            continue
+            
+    return None
 
-    match_word = matching_words[0]
-    replace_word = TEXT_FILTER_REPLIES.get(match_word)
-    return f"To _{match_word}_ I say: {replace_word}"
 
 
 def parse_next_msg():
