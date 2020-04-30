@@ -31,12 +31,12 @@ FAKE_NOW = datetime(2017, 8, 23)
 
 @pytest.fixture
 def frozen_now(monkeypatch):
-    class patched_datetime(datetime):
+    class PatchedDatetime(datetime):
         @classmethod
-        def now(cls):
+        def now(cls, **kwargs):
             return FAKE_NOW
 
-    monkeypatch.setattr(commands.topchannels, "dt", patched_datetime)
+    monkeypatch.setattr(commands.topchannels, "dt", PatchedDatetime)
 
 
 @pytest.fixture(scope="session")
@@ -201,8 +201,8 @@ def test_karma_user_repr(karma_users):
     "test_user_id, expected",
     [("ABC123", "pybob"), ("EFG123", "Julian Sequeira"), ("XYZ123", "clamytoe")],
 )
-def test_lookup_username(filled_db_session, test_user_id, expected):
-    karma_user = filled_db_session.query(KarmaUser).get(test_user_id)
+def test_lookup_username(mock_filled_db_session, test_user_id, expected):
+    karma_user = db_session.create_session().query(KarmaUser).get(test_user_id)
     assert karma_user.username == expected
 
 
@@ -348,8 +348,8 @@ def test_channel_score(mock_slack_api_call, frozen_now):
     assert _channel_score(most_recent) > _channel_score(less_recent)
 
 
-@patch.dict(os.environ, {'SLACK_KARMA_INVITE_USER_TOKEN': 'xoxp-162...'})
-@patch.dict(os.environ, {'SLACK_KARMA_BOTUSER': 'U5Z6KGX4L'})
+@patch.dict(os.environ, {"SLACK_KARMA_INVITE_USER_TOKEN": "xoxp-162..."})
+@patch.dict(os.environ, {"SLACK_KARMA_BOTUSER": "U5Z6KGX4L"})
 def test_ignore_message_subtypes(mock_slack_api_call, frozen_now):
     latest_ignored = SLACK_CLIENT.api_call("channels.info", channel="SOMEJOINS")
     all_ignored = SLACK_CLIENT.api_call("channels.info", channel="ONLYJOINS")
