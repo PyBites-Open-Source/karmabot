@@ -16,6 +16,7 @@ from commands.tip import get_random_tip
 from commands.topchannels import get_recommended_channels
 from commands.update_username import update_username, get_user_name
 from commands.welcome import welcome_user
+from commands.joke import joke
 
 # bot commands
 from bot.settings import KARMABOT_ID, SLACK_ID_FORMAT, SLACK_CLIENT, ADMINS
@@ -36,6 +37,7 @@ PUBLIC_BOT_COMMANDS = {
     "help": create_commands_table,
     "tip": get_random_tip,
     "topchannels": get_recommended_channels,
+    "joke": joke,
 }
 PRIVATE_BOT_COMMANDS = {
     "feed": get_pybites_last_entries,
@@ -44,6 +46,7 @@ PRIVATE_BOT_COMMANDS = {
     "karma": get_karma,
     "updateusername": update_username,
     "username": get_user_name,
+    "joke": joke,
 }
 
 Message = namedtuple("Message", "user_id channel_id text")
