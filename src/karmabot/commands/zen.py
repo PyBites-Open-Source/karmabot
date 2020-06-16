@@ -7,7 +7,7 @@ def import_this(**kwargs):
     # https://stackoverflow.com/a/23794519
     zen = io.StringIO()
     with contextlib.redirect_stdout(zen):
-        import this
+        import this  # noqa: F401
 
     return zen.getvalue()
 

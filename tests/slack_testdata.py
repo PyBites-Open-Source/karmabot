@@ -1,4 +1,4 @@
-from bot.settings import KARMABOT_ID
+from karmabot.settings import KARMABOT_ID
 
 TEST_USERINFO = {
     "ABC123": {

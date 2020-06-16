@@ -1,13 +1,14 @@
 import logging
 import time
 
-from bot.db import db_session
-from bot.karma import process_karma_changes
-from bot.slack import parse_next_msg, check_connection
-from bot.settings import KARMA_ACTION
+from karmabot.db import db_session
+from karmabot.karma import process_karma_changes
+from karmabot.settings import KARMA_ACTION
+from karmabot.slack import check_connection, parse_next_msg
 
 
 def main():
+
     db_session.global_init()
     check_connection()
 

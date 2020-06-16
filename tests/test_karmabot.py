@@ -1,30 +1,28 @@
-from datetime import datetime
 import os
+from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+from slackclient import SlackClient as RealSlackClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from bot.db import db_session
-from bot.db.karma_transaction import KarmaTransaction
-from bot.db.karma_user import KarmaUser
-from bot.karma import _parse_karma_change, Karma
-from bot.slack import (
+import karmabot.commands.topchannels
+from karmabot.commands.topchannels import Channel, calc_channel_score
+from karmabot.commands.welcome import welcome_user
+from karmabot.db import db_session
+from karmabot.db.karma_transaction import KarmaTransaction
+from karmabot.db.karma_user import KarmaUser
+from karmabot.karma import Karma, _parse_karma_change
+from karmabot.settings import KARMABOT_ID, SLACK_CLIENT
+from karmabot.slack import (
+    GENERAL_CHANNEL,
     format_user_id,
     get_available_username,
-    perform_text_replacements,
     parse_next_msg,
-    GENERAL_CHANNEL,
+    perform_text_replacements,
 )
-
-# Database mocks
-import commands.topchannels
-from commands.topchannels import Channel, calc_channel_score
-from commands.welcome import welcome_user
-from bot.settings import SLACK_CLIENT, KARMABOT_ID
-from slackclient import SlackClient as RealSlackClient
-from tests.slack_testdata import TEST_USERINFO, TEST_CHANNEL_INFO, TEST_CHANNEL_HISTORY
+from tests.slack_testdata import TEST_CHANNEL_HISTORY, TEST_CHANNEL_INFO, TEST_USERINFO
 
 FAKE_NOW = datetime(2017, 8, 23)
 
@@ -36,7 +34,7 @@ def frozen_now(monkeypatch):
         def now(cls, **kwargs):
             return FAKE_NOW
 
-    monkeypatch.setattr(commands.topchannels, "dt", PatchedDatetime)
+    monkeypatch.setattr(karmabot.commands.topchannels, "dt", PatchedDatetime)
 
 
 @pytest.fixture(scope="session")

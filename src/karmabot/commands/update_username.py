@@ -1,8 +1,7 @@
-import bot
-import bot.slack
-from bot import settings
-from bot.db.db_session import create_session
-from bot.db.karma_user import KarmaUser
+import karmabot.slack
+from karmabot import settings
+from karmabot.db.db_session import create_session
+from karmabot.db.karma_user import KarmaUser
 
 
 def update_username(**kwargs):
@@ -17,7 +16,7 @@ def update_username(**kwargs):
 
     old_username = karma_user.username
     user_info = settings.SLACK_CLIENT.api_call("users.info", user=user_id)
-    new_username = bot.slack.get_available_username(user_info)
+    new_username = karmabot.slack.get_available_username(user_info)
 
     if old_username == new_username:
         return (

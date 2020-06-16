@@ -1,5 +1,5 @@
-from bot.db import db_session
-from bot.db.karma_user import KarmaUser
+from karmabot.db import db_session
+from karmabot.db.karma_user import KarmaUser
 
 TOP_NUMBER = 10
 

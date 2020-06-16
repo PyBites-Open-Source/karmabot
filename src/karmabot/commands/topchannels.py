@@ -4,12 +4,12 @@ from collections import namedtuple
 from datetime import datetime as dt
 from math import exp
 from operator import itemgetter
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import humanize
 from slackclient import SlackClient
 
-from bot.settings import SLACK_CLIENT
+from karmabot.settings import SLACK_CLIENT
 
 MSG_BEGIN = "Glad you asked, here are some channels our Community recommends (based on member count and activity):\n"
 MSG_LINE = (
@@ -105,8 +105,8 @@ def get_recommended_channels(**kwargs):
 
 
 def get_messages(
-    channel: Channel, ignore_message_types: set = {"channel_join"}
-) -> List[Dict]:
+    channel: Channel, ignore_message_types: Union[set, None] = None
+) -> Union[List[Dict], None]:
     """Return a list of the most recent messages in a given channel, filtering
     out certain message types.
 
@@ -117,6 +117,8 @@ def get_messages(
 
     Ref: https://api.slack.com/docs/token-types#bot_new
     """
+    if ignore_message_types is None:
+        ignore_message_types = {"channel_join"}
 
     grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
     karmabot_id = os.environ.get("SLACK_KARMA_BOTUSER")

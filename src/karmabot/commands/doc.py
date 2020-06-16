@@ -1,11 +1,10 @@
 """A Karmabot pydoc interface.
 """
-
 import contextlib
 import io
 import pydoc
 
-import bot.slack
+import karmabot.slack
 
 MSG_APOLOGY = """Sorry {username}, I got nothing for "{text}".
 
@@ -51,8 +50,8 @@ And information about the specific listed topics:
 
 def doc_command(**kwargs) -> str:
     """Browse and search python documentation, "pydoc help" """
-    user_id = kwargs.get("user_id")
-    text = kwargs.get("text")
+    user_id = str(kwargs.get("user_id"))
+    text = str(kwargs.get("text"))
 
     if len(text) == 0 or text.lower() == "help":
         return MSG_HELP
@@ -70,7 +69,7 @@ def doc_command(**kwargs) -> str:
             help(text)
     result = output.getvalue()
 
-    slack_id = bot.slack.format_user_id(user_id)
+    slack_id = karmabot.slack.format_user_id(user_id)
 
     if result.startswith("No"):
         return MSG_APOLOGY.format(username=slack_id, text=text)

@@ -1,4 +1,4 @@
-import bot.slack
+from karmabot import slack
 
 MSG = """Hey {username}, so you want to propose a new command eh?
 
@@ -22,5 +22,5 @@ def add_command(**kwargs):
     if not user_id:
         return None
 
-    slack_id = bot.slack.format_user_id(user_id)
+    slack_id = slack.format_user_id(user_id)
     return MSG.format(username=slack_id)
