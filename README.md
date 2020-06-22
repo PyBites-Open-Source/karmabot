@@ -1,15 +1,48 @@
-# Building a Karma Bot with Python and the Slack API 
+# PyBites Karmabot - A Python based Slack Chatbot
 
-![karma avatar](https://user-images.githubusercontent.com/24620154/56662126-952d7f00-66a3-11e9-99b4-924dc6313b2e.png)
-
+[![Tests](https://github.com/pogross/karmabot/workflows/Tests/badge.svg)](https://github.com/pogross/karmabot/actions?workflow=Tests)
+[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![BCH compliance](https://bettercodehub.com/edge/badge/pybites/karmabot?branch=master)](https://bettercodehub.com/)
 
-Inspiration: [hipchat](https://blog.hipchat.com/2016/05/02/meet-karma-bot/)
+...
 
 PyBites Article: [From Script to Project part 1. - Building a Karma Bot with Python and the Slack API](https://pybit.es/slack-karma-bot.html)
 
+## Features
+
+Karmabots main features is the management of Karma within the slack community server.
+
 ![karma example](https://pybit.es/images/karma_example.png)
 
-__Update 06.09.2018__: karmabot now supports commands, add them to the `commands/` subdirectory, then import it to `bot/slack.py` and add it to `BOT_COMMANDS`. More info: https://www.youtube.com/watch?v=Yx9qYl6lmzM&amp;t=2s
+https://www.youtube.com/watch?v=Yx9qYl6lmzM&amp;t=2s
 
-__Update 01.11.2018__: depending the type of commands you contribute, we merge it into master (= @karmabot revision used on our Slack). For more general purpose commands, not directly relevant to our @karmabot / Slack community, we made a [_utils_ branch](https://github.com/pybites/karmabot/tree/utils). We will merge those type of commands into that branch. 
+Additional features are:
+
+- Jokes
+- ...
+
+## Installation
+
+`pip install karmabot`
+
+## Basic Usage
+
+...
+
+### Settings
+
+`.karmabot` file
+
+```env
+KARMABOT_SLACK_USER=
+KARMABOT_SLACK_TOKEN=
+KARMABOT_SLACK_INVITE_USER_TOKEN=
+KARMABOT_DATABASE_URL=
+KARMABOT_GENERAL_CHANNEL=
+KARMABOT_ADMINS=
+```
+
+## Development pattern for contributors
+
+...
