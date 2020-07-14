@@ -1,0 +1,7 @@
+[flake8]
+exclude = .git,__pycache__,old,build,dist
+max-line-length = 88
+max-complexity = 10
+ignore = E203,E501,W503,S311
+application-import-names = karmabot,tests
+per-file-ignores = tests/*:S101
