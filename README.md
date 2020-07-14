@@ -6,7 +6,7 @@
 
 ## Features
 
-Karmabots main features is the management of Karma within the slack community server. You can give karma, reduce karma, check your current karma points and manage your karma related username.
+Karmabot's main features is the management of Karma within the slack community server. You can give karma, reduce karma, check your current karma points and manage your karma related username.
 
 ![karma example](https://www.pogross.de/uploads/karmabot.png)
 
@@ -62,28 +62,28 @@ KARMABOT_ADMINS=
   The channel id of your main channel slack
 
 - KARMABOT_ADMINS
-  The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access seperated by commas.
+  The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access separated by commas.
 
-If you do not want to use a file you have to provide enviroment variables with the above names. If no file is present we default to enviroment variables.
+If you do not want to use a file you have to provide environment variables with the above names. If no file is present we default to environment variables.
 
 ## Development pattern for contributors
 
 We use [poetry](https://github.com/python-poetry/poetry) and `pyproject.toml` for managing packages, dependencies and some settings.
 
-### Setup virtual enviroment for development
+### Setup virtual environment for development
 
 You should follow the [instructions](https://github.com/python-poetry/poetry) to get poetry up and running for your system. We recommend to use a UNIX-based development system (Linux, Mac, WSL). After setting up poetry you can use `poetry install` within the project folder to install all dependencies.
 
-You can use `poetry config settings.virtualenvs.in-project true` such that your virtual enviroment is created in the project folder as `.venv` folder. This helps with `.venv` detection in IDEs.
+You can use `poetry config settings.virtualenvs.in-project true` such that your virtual environment is created in the project folder as `.venv` folder. This helps with `.venv` detection in IDEs.
 
 ### Testing and linting
 
-For testing you need to install [nox](https://nox.thea.codes/en/stable/) seperatly from the project venv created by poetry. For testing just use the `nox` command within the project folder. You can run all the nox sessions seperatly if need, e.g.,
+For testing you need to install [nox](https://nox.thea.codes/en/stable/) separately from the project venv created by poetry. For testing just use the `nox` command within the project folder. You can run all the nox sessions separately if need, e.g.,
 
 - only linting `nox -rs lint`
 - only testing `nox -rs test`
 
-For diffrent sessions see the `nox.py` file. Please make sure all tests and checks pass before opening pull requests!
+For different sessions see the `nox.py` file. Please make sure all tests and checks pass before opening pull requests!
 
 ### [pre-commit](https://pre-commit.com/)
 
