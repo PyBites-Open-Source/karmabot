@@ -1,1 +1,1 @@
-worker: karmabot
+worker: pip install . && karmabot
