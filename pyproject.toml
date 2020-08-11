@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "karmabot"
-version = "0.1.0"
+version = "1.0"
 description = "A bot for Slack"
 authors = ["PyBites <info@pybit.es>"]
 license = "MIT"
