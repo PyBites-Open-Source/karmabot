@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 from slackclient import SlackClient
 
 dotenv_path = Path(".").resolve() / ".karmabot"
-load_dotenv(dotenv_path)
+if dotenv_path.exists():
+    load_dotenv(dotenv_path)
 
 # Environment variables
 KARMABOT_ID = os.environ.get("KARMABOT_SLACK_USER")

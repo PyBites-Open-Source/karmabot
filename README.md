@@ -74,7 +74,7 @@ We use [poetry](https://github.com/python-poetry/poetry) and `pyproject.toml` fo
 
 You should follow the [instructions](https://github.com/python-poetry/poetry) to get poetry up and running for your system. We recommend to use a UNIX-based development system (Linux, Mac, WSL). After setting up poetry you can use `poetry install` within the project folder to install all dependencies.
 
-You can use `poetry config settings.virtualenvs.in-project true` such that your virtual environment is created in the project folder as `.venv` folder. This helps with `.venv` detection in IDEs.
+The poetry virtual environment should be available in the the project folder as `.venv` folder as specified in `poetry.toml`. This helps with `.venv` detection in IDEs.
 
 ### Testing and linting
 
