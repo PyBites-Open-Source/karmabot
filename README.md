@@ -87,4 +87,6 @@ For different sessions see the `nox.py` file. Please make sure all tests and che
 
 ### [pre-commit](https://pre-commit.com/)
 
-To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder. This will enable pre-commit hooks for checking before every commit.
+To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder.
+
+This will enable pre-commit hooks for checking before every commit.
