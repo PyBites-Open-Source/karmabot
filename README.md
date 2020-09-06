@@ -47,16 +47,22 @@ KARMABOT_ADMINS=
 ```
 
 - KARMABOT_SLACK_USER
-  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace).
+  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace). Once you've created your own Karmabot app, you can find this value as the App ID under [My Apps](https://api.slack.com/apps/).
+
+![Slack App User ID](images/karmabot-slack-user.png)
 
 - KARMABOT_SLACK_TOKEN
-  The [auth toke](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot
+  The [auth token](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot. To find the user token for your Karmabot app, look in the **OAuth & Permissions** section under [My Apps](https://api.slack.com/apps/).
+
+![Slack App Token](images/karmabot-slack-token.png)
 
 - KARMABOT_SLACK_INVITE_USER_TOKEN
   An invite token to invite the bot to new channels. Bots cannot autojoin channels, but we implemented an invite procedure for this.
 
 - KARMABOT_DATABASE_URL
-  The database url which should be compatible with SqlAlchemy. For the provided docker file use postgres://user42:pw42@localhost:5432/karmabot
+  The database url which should be compatible with SqlAlchemy. For the provided docker file use postgres://user42:pw42@localhost:5432/karmabot.
+
+  - **Note:** To start the provided Docker-based Postgres server, be sure you have Docker Compose [installed](https://docs.docker.com/compose/install/) and run `docker-compose up` from the karmabot directory.
 
 - KARMABOT_GENERAL_CHANNEL
   The channel id of your main channel slack
