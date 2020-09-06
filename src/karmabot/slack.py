@@ -42,6 +42,7 @@ PRIVATE_BOT_COMMANDS = {
     "doc": doc_command,
     "help": create_commands_table,
     "karma": get_karma,
+    "topchannels": get_recommended_channels,
     "updateusername": update_username,
     "username": get_user_name,
     "joke": joke,
