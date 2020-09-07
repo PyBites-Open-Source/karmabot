@@ -47,14 +47,10 @@ KARMABOT_ADMINS=
 ```
 
 - KARMABOT_SLACK_USER
-  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace). Once you've created your own Karmabot app, you can find this value as the App ID under [My Apps](https://api.slack.com/apps/).
-
-![Slack App User ID](images/karmabot-slack-user.png)
+  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace). Once you've created your own Karmabot app, you can view its configuration details from the [My Apps](https://api.slack.com/apps/) page. The user ID shows up under **Basic Information --> App Credentials --> App ID**.
 
 - KARMABOT_SLACK_TOKEN
-  The [auth token](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot. To find the user token for your Karmabot app, look in the **OAuth & Permissions** section under [My Apps](https://api.slack.com/apps/).
-
-![Slack App Token](images/karmabot-slack-token.png)
+  The [auth token](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot. You can find the token from the [My Apps](https://api.slack.com/apps/) page for your Karmabot under **OAuth & Permissions --> Tokens for Your Workspace --> Bot User OAuth Access Token**. It starts with `xoxb-`.
 
 - KARMABOT_SLACK_INVITE_USER_TOKEN
   An invite token to invite the bot to new channels. Bots cannot autojoin channels, but we implemented an invite procedure for this.
