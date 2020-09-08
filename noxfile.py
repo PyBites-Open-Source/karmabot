@@ -13,6 +13,7 @@ env = {
     "KARMABOT_SLACK_INVITE_USER_TOKEN": "FAKE_INVITE_USER_TOKEN",
     "KARMABOT_GENERAL_CHANNEL": "GENERAL",
     "KARMABOT_ADMINS": "FAKE_ADMIN",
+    "KARMABOT_DATABASE_URL": "FAKE_URL",
 }
 
 nox.options.sessions = "lint", "mypy", "safety", "tests"
