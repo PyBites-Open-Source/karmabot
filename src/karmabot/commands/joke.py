@@ -1,3 +1,4 @@
+import difflib
 from typing import Union
 
 import pyjokes
@@ -5,6 +6,7 @@ import pyjokes
 import karmabot
 
 PYJOKE_HREF = "<https://pyjok.es/|PyJoke>"
+CATEGORIES = list(pyjokes.jokes_en.jokes_en.keys())
 
 
 def joke(**kwargs) -> Union[str, None]:
@@ -17,17 +19,15 @@ def joke(**kwargs) -> Union[str, None]:
 
     if id_arg is not None and text_arg is not None:
         user_id = karmabot.slack.format_user_id(str(id_arg))
-        user_text = str(text_arg)
+        user_text = str(text_arg).lower()
+
+        user_category = user_text.split()[-1] if len(user_text.split()) > 3 else "all"
+        category = difflib.get_close_matches(user_category, CATEGORIES)[0]
+
     else:
         return None
 
-    choice = "all"
-    if "chuck" in user_text.lower():
-        choice = "chuck"
-    if "neutral" in user_text.lower():
-        choice = "neutral"
-
-    joke_text = pyjokes.get_joke(category=choice)
+    joke_text = pyjokes.get_joke(category=category)
 
     return f"Hey {user_id}, here is a {PYJOKE_HREF} for you: _{joke_text}_"
 
