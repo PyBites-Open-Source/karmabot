@@ -21,8 +21,8 @@ def joke(**kwargs) -> Union[str, None]:
         user_id = karmabot.slack.format_user_id(str(id_arg))
         user_text = str(text_arg).lower()
 
-        user_category = user_text.split()[-1] if len(user_text.split()) > 3 else "all"
-        category = difflib.get_close_matches(user_category, CATEGORIES)[0]
+        user_category = user_text.split()[-1] if len(user_text.split()) > 3 else ""
+        category = _get_closest_category(user_category)
 
     else:
         return None
@@ -32,13 +32,8 @@ def joke(**kwargs) -> Union[str, None]:
     return f"Hey {user_id}, here is a {PYJOKE_HREF} for you: _{joke_text}_"
 
 
-if __name__ == "__main__":
+def _get_closest_category(input: str):
+    category = difflib.get_close_matches(input, CATEGORIES)
+    category = category[0] if category else "all"
 
-    output = joke(user_id=123, text="42")
-    print(output)
-
-    output = joke(user_id=123, text="chuck")
-    print(output)
-
-    output = joke(user_id=123, text="neutral")
-    print(output)
+    return category

@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 import karmabot.commands.topchannels
+from karmabot.commands.joke import _get_closest_category
 from karmabot.commands.topchannels import Channel, calc_channel_score
 from karmabot.commands.welcome import welcome_user
 from karmabot.db import db_session
@@ -63,7 +64,7 @@ def karma_users():
 
 @pytest.fixture
 def empty_db_session(engine, tables):
-    """ Returns an SQLAlchemy session, and after the tests
+    """Returns an SQLAlchemy session, and after the tests
     tears down everything properly.
     """
     connection = engine.connect()
@@ -83,7 +84,7 @@ def empty_db_session(engine, tables):
 
 @pytest.fixture
 def filled_db_session(engine, tables, karma_users):
-    """ Returns an SQLAlchemy session, and after the tests
+    """Returns an SQLAlchemy session, and after the tests
     tears down everything properly.
     """
     connection = engine.connect()
@@ -353,3 +354,20 @@ def test_ignore_message_subtypes(mock_slack_api_call, frozen_now):
     all_ignored = SLACK_CLIENT.api_call("channels.info", channel="ONLYJOINS")
     assert _channel_score(latest_ignored) > 0
     assert _channel_score(all_ignored) == 0
+
+
+@pytest.mark.parametrize(
+    "user_category, expected",
+    [
+        ("all", "all"),
+        ("neutral", "neutral"),
+        ("chuck", "chuck"),
+        ("", "all"),
+        ("al", "all"),
+        ("neutr", "neutral"),
+        ("chuk", "chuck"),
+        ("help", "all"),
+    ],
+)
+def test_get_closest_category(user_category, expected):
+    assert _get_closest_category(user_category) == expected
