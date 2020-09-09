@@ -150,8 +150,8 @@ def post_msg(channel_or_user_id: str, text) -> None:
 
 def bot_joins_new_channel(channel_id: str) -> None:
     """Bots cannot autojoin channels, but there is a hack: create a user token:
-       https://stackoverflow.com/a/44107313/1128469 and
-       https://api.slack.com/custom-integrations/legacy-tokens"""
+    https://stackoverflow.com/a/44107313/1128469 and
+    https://api.slack.com/custom-integrations/legacy-tokens"""
     grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
     if not grant_user_token:
         logging.info("Cannot invite bot, no env SLACK_KARMA_INVITE_USER_TOKEN")
@@ -247,6 +247,8 @@ def parse_next_msg():
     user_id = msg.get("user")
     channel_id = msg.get("channel")
     text = msg.get("text")
+
+    logging.info(f"Parsing message {text} in channel {channel_id} from user {user_id}.")
 
     # handle events first
     event_type = msg.get("type")
