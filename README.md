@@ -47,16 +47,18 @@ KARMABOT_ADMINS=
 ```
 
 - KARMABOT_SLACK_USER
-  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace).
+  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace). Once you've created your own Karmabot app, you can view its configuration details from the [My Apps](https://api.slack.com/apps/) page. The user ID shows up under **Basic Information --> App Credentials --> App ID**.
 
 - KARMABOT_SLACK_TOKEN
-  The [auth toke](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot
+  The [auth token](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot. You can find the token from the [My Apps](https://api.slack.com/apps/) page for your Karmabot under **OAuth & Permissions --> Tokens for Your Workspace --> Bot User OAuth Access Token**. It starts with `xoxb-`.
 
 - KARMABOT_SLACK_INVITE_USER_TOKEN
   An invite token to invite the bot to new channels. Bots cannot autojoin channels, but we implemented an invite procedure for this.
 
 - KARMABOT_DATABASE_URL
-  The database url which should be compatible with SqlAlchemy. For the provided docker file use postgres://user42:pw42@localhost:5432/karmabot
+  The database url which should be compatible with SqlAlchemy. For the provided docker file use postgres://user42:pw42@localhost:5432/karmabot.
+
+  - **Note:** To start the provided Docker-based Postgres server, be sure you have Docker Compose [installed](https://docs.docker.com/compose/install/) and run `docker-compose up` from the karmabot directory.
 
 - KARMABOT_GENERAL_CHANNEL
   The channel id of your main channel slack
@@ -81,10 +83,14 @@ The poetry virtual environment should be available in the the project folder as 
 For testing you need to install [nox](https://nox.thea.codes/en/stable/) separately from the project venv created by poetry. For testing just use the `nox` command within the project folder. You can run all the nox sessions separately if need, e.g.,
 
 - only linting `nox -rs lint`
-- only testing `nox -rs test`
+- only testing `nox -rs tests`
 
-For different sessions see the `nox.py` file. Please make sure all tests and checks pass before opening pull requests!
+For different sessions see the `nox.py` file. You can run `nox --list` to see a list of all available sessions.
+
+Please make sure all tests and checks pass before opening pull requests!
 
 ### [pre-commit](https://pre-commit.com/)
 
-To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder. This will enable pre-commit hooks for checking before every commit.
+To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder.
+
+This will enable pre-commit hooks for checking before every commit.
