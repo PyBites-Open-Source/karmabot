@@ -7,11 +7,13 @@ from slackclient import SlackClient as RealSlackClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+import karmabot.commands.note
 import karmabot.commands.topchannels
 from karmabot.commands.joke import _get_closest_category
 from karmabot.commands.topchannels import Channel, calc_channel_score
 from karmabot.commands.welcome import welcome_user
 from karmabot.db import db_session
+from karmabot.db.karma_note import KarmaNote
 from karmabot.db.karma_transaction import KarmaTransaction
 from karmabot.db.karma_user import KarmaUser
 from karmabot.karma import Karma, _parse_karma_change
@@ -47,9 +49,11 @@ def engine():
 def tables(engine):
     KarmaUser.metadata.create_all(engine)
     KarmaTransaction.metadata.create_all(engine)
+    KarmaNote.metadata.create_all(engine)
     yield
     KarmaUser.metadata.drop_all(engine)
     KarmaTransaction.metadata.drop_all(engine)
+    KarmaNote.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -215,6 +219,66 @@ def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
 
     assert first.username == "pybob"
     assert second.username == "clamytoe"
+
+
+# KarmaNote
+def test_karma_note_add(mock_filled_db_session):
+    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 1
+
+    note = notes[0]
+
+    assert note.id == 1
+    assert note.user_id == "ABC123"
+    assert note.timestamp is not None
+    assert note.note == "my first note"
+
+    karmabot.commands.note.note(user_id="ABC123", text="note add 'my second note'")
+
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 2
+
+    note = notes[-1]
+
+    assert note.note == "my second note"
+
+
+def test_karma_note_list(mock_filled_db_session):
+    output = karmabot.commands.note.note(user_id="ABC123", text="note list")
+
+    assert isinstance(output, str)
+    assert output.startswith("Sorry")
+
+    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+
+    output = karmabot.commands.note.note(user_id="ABC123", text="note list")
+    note = db_session.create_session().query(KarmaNote).all()[0]
+
+    assert isinstance(output, str)
+    assert output.startswith(f"{note.id}. note")
+
+
+def test_karma_note_del(mock_filled_db_session):
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 0
+
+    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+
+    notes = db_session.create_session().query(KarmaNote).all()
+    note = notes[0]
+
+    assert len(notes) == 1
+
+    karmabot.commands.note.note(user_id="ABC123", text=f"note del {note.id}")
+
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 0
 
 
 # Messages / Slack
