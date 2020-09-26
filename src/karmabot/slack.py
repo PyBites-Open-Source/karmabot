@@ -12,6 +12,7 @@ from karmabot.commands.doc import doc_command
 from karmabot.commands.feed import get_pybites_last_entries
 from karmabot.commands.help import create_commands_table
 from karmabot.commands.joke import joke
+from karmabot.commands.note import note
 from karmabot.commands.score import get_karma, top_karma
 from karmabot.commands.tip import get_random_tip
 from karmabot.commands.topchannels import get_recommended_channels
@@ -30,22 +31,24 @@ TEXT_FILTER_REPLIES = {
 AUTOMATED_COMMANDS = {"welcome": welcome_user}  # not manual
 ADMIN_BOT_COMMANDS = {"top_karma": top_karma}
 PUBLIC_BOT_COMMANDS = {
-    "age": pybites_age,
     "add": add_command,
+    "age": pybites_age,
     "help": create_commands_table,
+    "joke": joke,
+    "note:": note,
     "tip": get_random_tip,
     "topchannels": get_recommended_channels,
-    "joke": joke,
 }
 PRIVATE_BOT_COMMANDS = {
-    "feed": get_pybites_last_entries,
     "doc": doc_command,
+    "feed": get_pybites_last_entries,
     "help": create_commands_table,
+    "joke": joke,
     "karma": get_karma,
+    "note": note,
     "topchannels": get_recommended_channels,
     "updateusername": update_username,
     "username": get_user_name,
-    "joke": joke,
 }
 
 Message = namedtuple("Message", "user_id channel_id text")
