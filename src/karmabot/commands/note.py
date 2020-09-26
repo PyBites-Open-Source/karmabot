@@ -7,12 +7,6 @@ from karmabot.db.karma_note import KarmaNote
 from karmabot.db.karma_user import KarmaUser
 
 NOTE_CMD_PATTERN = re.compile(r"note\s(\w+)\s?(.*)")
-NOTE_COMMANDS: Dict[str, Callable] = {
-    "add": lambda text_arg, user: _add_note(text_arg, user),
-    "del": lambda text_arg, user: _del_note(text_arg, user),
-    "list": lambda text_arg, user: _list_notes(text_arg, user),
-    "default": lambda text_arg, user: f"Sorry {user.username}, your note command was not recognized. You can use {', '.join(NOTE_COMMANDS.keys())}.",
-}
 
 
 def note(**kwargs) -> Union[None, str]:
@@ -21,6 +15,8 @@ def note(**kwargs) -> Union[None, str]:
     - Syntax for adding a note: @karmabot note add <">my note<"> (note message can be in quotes)
     - Syntax for listing notes: @karmabot note list
     - Syntax for removing a note: @karmabote note del 1
+
+    Each note is stored for the current user only. A user can only list and delete her own notes.
     """
 
     id_arg = str(kwargs.get("user_id"))
@@ -29,21 +25,21 @@ def note(**kwargs) -> Union[None, str]:
 
     # retrieve current user
     user = db_session.create_session().query(KarmaUser).get(user_id)
-    note_cmd = _parse_note_cmd(text_arg)
+    cmd, _ = _parse_note_cmd(text_arg)
 
-    note_cmd_fnc = NOTE_COMMANDS.get(note_cmd, NOTE_COMMANDS["default"])
+    note_cmd_fnc = NOTE_COMMANDS.get(cmd, _command_not_found)
 
     return note_cmd_fnc(text_arg, user)
 
 
 def _add_note(text_arg: str, user: KarmaUser) -> str:
-    """ Adds a new note to the database for the given user """
-    note_msg = _parse_note_cmd_argument(text_arg)
+    """Adds a new note to the database for the given user."""
+    _, note_msg = _parse_note_cmd(text_arg)
     if not note_msg:
-        return (
-            f"Sorry {user.username}, could not find a note in your message. "
-            f"Please make sure you have surrounded your note with double or single quotes."
-        )
+        return f"Sorry {user.username}, could not find a note in your message."
+
+    if _note_exists(note_msg, user):
+        return f"Sorry {user.username}, you already have an identical note."
 
     note = KarmaNote(
         user_id=user.user_id, timestamp=datetime.datetime.now(), note=note_msg
@@ -57,57 +53,77 @@ def _add_note(text_arg: str, user: KarmaUser) -> str:
 
 
 def _del_note(text_arg: str, user: KarmaUser) -> str:
-    """ Deletes the note with the given note id """
-    note_id = _parse_note_cmd_argument(text_arg)
+    """Deletes the note with the given note id."""
+    _, note_id = _parse_note_cmd(text_arg)
 
     if not note_id:
-        return f"Sorry {user.username}, it seems you did not provide a correct note id."
+        return f"Sorry {user.username}, it seems you did not provide a valid id."
 
     session = db_session.create_session()
-    row_count = session.query(KarmaNote).filter(KarmaNote.id == note_id).delete()
+    query = session.query(KarmaNote).filter_by(id=note_id, user_id=user.user_id)
+
+    row_count = query.delete()
     session.commit()  # otherwise, the deletion is not performed
 
     if row_count:
         return f"Hey {user.username}, your note was successfully deleted."
 
-    return f"Hey {user.username}, something went wrong, no record was deleted. Please ask an admin..."
+    return (
+        f"Sorry {user.username}, something went wrong, no record was deleted. "
+        f"Please ask an admin..."
+    )
 
 
 def _list_notes(text_arg: str, user: KarmaUser) -> str:
-    """ """
-    notes = (
-        db_session.create_session()
-        .query(KarmaNote)
-        .filter(KarmaNote.user_id == user.user_id)
-        .all()
-    )
+    """List all notes for a given user."""
+    notes = _get_notes_for_user(user)
 
     if not notes:
-        return f"Sorry {user.username}, you don't have any notes so far! Just start adding notes via the 'note add' command."
+        return (
+            f"Sorry {user.username}, you don't have any notes so far! "
+            f"Just start adding notes via the 'note add' command."
+        )
 
-    msg = ""
-    for note in notes:
-        msg += f"{note.id}. note from {note.timestamp.strftime('%Y-%m-%d, %H:%M')}: {note.note}.\n"
+    msg = "\n".join(f"{i+1}. note {str(note)}" for i, note in enumerate(notes))
 
     return msg
 
 
-def _parse_note_cmd(text_arg: str) -> str:
-    note_cmd = ""
+def _command_not_found(text_arg: str, user: KarmaUser) -> str:
+    return (
+        f"Sorry {user.username}, your note command was not recognized. "
+        f"You can use {', '.join(NOTE_COMMANDS.keys())}."
+    )
+
+
+def _parse_note_cmd(text_arg: str) -> (str, str):
+    note_cmd = ("", "")
 
     match = NOTE_CMD_PATTERN.search(text_arg)
     if match:
-        note_cmd = match.group(1).strip()
+        note_cmd = match.group(1).strip(), match.group(2).strip("\"'")
 
     return note_cmd
 
 
-def _parse_note_cmd_argument(text_arg: str) -> str:
-    """ Get note message from user input. """
-    note_cmd_argument = ""
+def _get_notes_for_user(user: KarmaUser) -> list:
+    return (
+        db_session.create_session()
+        .query(KarmaNote)
+        .filter_by(user_id=user.user_id)
+        .all()
+    )
 
-    match = NOTE_CMD_PATTERN.search(text_arg)
-    if match:
-        note_cmd_argument = match.group(2).strip("\"'")
 
-    return note_cmd_argument
+def _note_exists(msg: str, user:KarmaUser) -> bool:
+    session = db_session.create_session()
+    q = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
+
+    return session.query(q.exists()).scalar()  # returns True or False
+
+
+NOTE_COMMANDS: Dict[str, Callable] = {
+    "add": _add_note,
+    "del": _del_note,
+    "list": _list_notes,
+}

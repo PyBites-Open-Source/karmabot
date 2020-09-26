@@ -281,6 +281,31 @@ def test_karma_note_del(mock_filled_db_session):
     assert len(notes) == 0
 
 
+def test_karma_note_add_twice(mock_filled_db_session):
+    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 1
+    assert output.startswith("Sorry")
+
+
+def test_karma_note_del_other_users_note(mock_filled_db_session):
+    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    output = karmabot.commands.note.note(user_id="EFG123", text="note add my first note")
+    
+    notes = db_session.create_session().query(KarmaNote).all()
+
+    assert len(notes) == 2
+
+    for note in notes:
+        output = karmabot.commands.note.note(user_id="XYZ123", text=f"note del {note.id}")
+
+        assert output.startswith("Sorry")
+        assert len(notes) == 2
+
+
 # Messages / Slack
 def test_get_cmd():
     pass

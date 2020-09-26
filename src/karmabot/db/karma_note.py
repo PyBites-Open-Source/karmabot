@@ -24,3 +24,9 @@ class KarmaNote(SqlAlchemyBase):
             f"[KarmaNote] ID: {self.id} | {self.user_id} -> "
             f"{self.timestamp} | Note: {self.note}"
         )
+
+    def __str__(self):
+        return (
+            f"(ID: {self.id}) from {self.timestamp.strftime('%Y-%m-%d, %H:%M')}: "
+            f"{self.note}."
+        )
