@@ -7,7 +7,6 @@ from slackclient import SlackClient as RealSlackClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-import karmabot.commands.note
 import karmabot.commands.topchannels
 from karmabot.commands.joke import _get_closest_category
 from karmabot.commands.topchannels import Channel, calc_channel_score
@@ -49,11 +48,9 @@ def engine():
 def tables(engine):
     KarmaUser.metadata.create_all(engine)
     KarmaTransaction.metadata.create_all(engine)
-    KarmaNote.metadata.create_all(engine)
     yield
     KarmaUser.metadata.drop_all(engine)
     KarmaTransaction.metadata.drop_all(engine)
-    KarmaNote.metadata.drop_all(engine)
 
 
 @pytest.fixture
@@ -282,8 +279,12 @@ def test_karma_note_del(mock_filled_db_session):
 
 
 def test_karma_note_add_twice(mock_filled_db_session):
-    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
-    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    output = karmabot.commands.note.note(
+        user_id="ABC123", text="note add my first note"
+    )
+    output = karmabot.commands.note.note(
+        user_id="ABC123", text="note add my first note"
+    )
 
     notes = db_session.create_session().query(KarmaNote).all()
 
@@ -292,15 +293,21 @@ def test_karma_note_add_twice(mock_filled_db_session):
 
 
 def test_karma_note_del_other_users_note(mock_filled_db_session):
-    output = karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
-    output = karmabot.commands.note.note(user_id="EFG123", text="note add my first note")
-    
+    output = karmabot.commands.note.note(
+        user_id="ABC123", text="note add my first note"
+    )
+    output = karmabot.commands.note.note(
+        user_id="EFG123", text="note add my first note"
+    )
+
     notes = db_session.create_session().query(KarmaNote).all()
 
     assert len(notes) == 2
 
     for note in notes:
-        output = karmabot.commands.note.note(user_id="XYZ123", text=f"note del {note.id}")
+        output = karmabot.commands.note.note(
+            user_id="XYZ123", text=f"note del {note.id}"
+        )
 
         assert output.startswith("Sorry")
         assert len(notes) == 2
