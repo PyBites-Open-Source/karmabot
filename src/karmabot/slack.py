@@ -35,7 +35,7 @@ PUBLIC_BOT_COMMANDS = {
     "age": pybites_age,
     "help": create_commands_table,
     "joke": joke,
-    "note:": note,
+    "note": note,
     "tip": get_random_tip,
     "topchannels": get_recommended_channels,
 }

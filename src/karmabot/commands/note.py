@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Tuple, Union
 
 from karmabot.db import db_session
 from karmabot.db.karma_note import KarmaNote
@@ -96,7 +96,7 @@ def _command_not_found(text_arg: str, user: KarmaUser) -> str:
     )
 
 
-def _parse_note_cmd(text_arg: str) -> (str, str):
+def _parse_note_cmd(text_arg: str) -> Tuple[str, str]:
     note_cmd = ("", "")
 
     match = NOTE_CMD_PATTERN.search(text_arg)
@@ -115,7 +115,7 @@ def _get_notes_for_user(user: KarmaUser) -> list:
     )
 
 
-def _note_exists(msg: str, user:KarmaUser) -> bool:
+def _note_exists(msg: str, user: KarmaUser) -> bool:
     session = db_session.create_session()
     q = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
 
