@@ -220,7 +220,9 @@ def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
 
 # KarmaNote
 def test_karma_note_add(mock_filled_db_session):
-    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    karmabot.commands.note.note(
+        user_id="ABC123", channel="", text="note add my first note"
+    )
 
     notes = db_session.create_session().query(KarmaNote).all()
 
@@ -233,7 +235,9 @@ def test_karma_note_add(mock_filled_db_session):
     assert note.timestamp is not None
     assert note.note == "my first note"
 
-    karmabot.commands.note.note(user_id="ABC123", text="note add 'my second note'")
+    karmabot.commands.note.note(
+        user_id="ABC123", channel="", text="note add 'my second note'"
+    )
 
     notes = db_session.create_session().query(KarmaNote).all()
 
@@ -245,14 +249,16 @@ def test_karma_note_add(mock_filled_db_session):
 
 
 def test_karma_note_list(mock_filled_db_session):
-    output = karmabot.commands.note.note(user_id="ABC123", text="note list")
+    output = karmabot.commands.note.note(user_id="ABC123", channel="", text="note list")
 
     assert isinstance(output, str)
     assert output.startswith("Sorry")
 
-    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    karmabot.commands.note.note(
+        user_id="ABC123", channel="", text="note add my first note"
+    )
 
-    output = karmabot.commands.note.note(user_id="ABC123", text="note list")
+    output = karmabot.commands.note.note(user_id="ABC123", channel="", text="note list")
     note = db_session.create_session().query(KarmaNote).all()[0]
 
     assert isinstance(output, str)
@@ -264,14 +270,18 @@ def test_karma_note_del(mock_filled_db_session):
 
     assert len(notes) == 0
 
-    karmabot.commands.note.note(user_id="ABC123", text="note add my first note")
+    karmabot.commands.note.note(
+        user_id="ABC123", channel="", text="note add my first note"
+    )
 
     notes = db_session.create_session().query(KarmaNote).all()
     note = notes[0]
 
     assert len(notes) == 1
 
-    karmabot.commands.note.note(user_id="ABC123", text=f"note del {note.id}")
+    karmabot.commands.note.note(
+        user_id="ABC123", channel="", text=f"note del {note.id}"
+    )
 
     notes = db_session.create_session().query(KarmaNote).all()
 
@@ -280,10 +290,10 @@ def test_karma_note_del(mock_filled_db_session):
 
 def test_karma_note_add_twice(mock_filled_db_session):
     output = karmabot.commands.note.note(
-        user_id="ABC123", text="note add my first note"
+        user_id="ABC123", channel="", text="note add my first note"
     )
     output = karmabot.commands.note.note(
-        user_id="ABC123", text="note add my first note"
+        user_id="ABC123", channel="", text="note add my first note"
     )
 
     notes = db_session.create_session().query(KarmaNote).all()
@@ -294,10 +304,10 @@ def test_karma_note_add_twice(mock_filled_db_session):
 
 def test_karma_note_del_other_users_note(mock_filled_db_session):
     output = karmabot.commands.note.note(
-        user_id="ABC123", text="note add my first note"
+        user_id="ABC123", channel="", text="note add my first note"
     )
     output = karmabot.commands.note.note(
-        user_id="EFG123", text="note add my first note"
+        user_id="EFG123", channel="", text="note add my first note"
     )
 
     notes = db_session.create_session().query(KarmaNote).all()
@@ -306,7 +316,7 @@ def test_karma_note_del_other_users_note(mock_filled_db_session):
 
     for note in notes:
         output = karmabot.commands.note.note(
-            user_id="XYZ123", text=f"note del {note.id}"
+            user_id="XYZ123", channel="", text=f"note del {note.id}"
         )
 
         assert output.startswith("Sorry")
