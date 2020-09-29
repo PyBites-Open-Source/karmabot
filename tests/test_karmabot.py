@@ -323,23 +323,6 @@ def test_karma_note_del_other_users_note(mock_filled_db_session):
         assert len(notes) == 2
 
 
-# Messages / Slack
-def test_get_cmd():
-    pass
-
-
-def test_perform_bot_cmd():
-    pass
-
-
-def test_parse_next_msg():
-    pass
-
-
-def test_create_help_msg():
-    pass
-
-
 @pytest.mark.parametrize(
     "test_text, expected", [("Cheers everybody", "To _cheers_ I say: :beers:")]
 )
