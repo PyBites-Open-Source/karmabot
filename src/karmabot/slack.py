@@ -44,11 +44,11 @@ PRIVATE_BOT_COMMANDS = {
     "feed": get_pybites_last_entries,
     "help": create_commands_table,
     "joke": joke,
-    "karma": get_karma,
     "note": note,
+    "karma": get_karma,
     "topchannels": get_recommended_channels,
-    "updateusername": update_username,
     "username": get_user_name,
+    "updateusername": update_username,
 }
 
 Message = namedtuple("Message", "user_id channel_id text")

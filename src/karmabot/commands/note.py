@@ -9,7 +9,7 @@ from karmabot.db.karma_user import KarmaUser
 NOTE_CMD_PATTERN = re.compile(r"note\s(\w+)\s?(.*)")
 
 
-def note(**kwargs) -> Union[None, str]:
+def note(user_id: str, channel: str, text: str) -> Union[None, str]:
     """Allows the user to store and retrieve simple notes.
 
     - Syntax for adding a note: @karmabot note add <">my note<"> (note message can be in quotes)
@@ -18,23 +18,20 @@ def note(**kwargs) -> Union[None, str]:
 
     Each note is stored for the current user only. A user can only list and delete her own notes.
     """
-
-    id_arg = str(kwargs.get("user_id"))
-    text_arg = str(kwargs.get("text"))
-    user_id = id_arg.strip("<>@")
+    user_id = user_id.strip("<>@")
 
     # retrieve current user
     user = db_session.create_session().query(KarmaUser).get(user_id)
-    cmd, _ = _parse_note_cmd(text_arg)
+    cmd, _ = _parse_note_cmd(text)
 
     note_cmd_fnc = NOTE_COMMANDS.get(cmd, _command_not_found)
 
-    return note_cmd_fnc(text_arg, user)
+    return note_cmd_fnc(text, user)
 
 
-def _add_note(text_arg: str, user: KarmaUser) -> str:
+def _add_note(text: str, user: KarmaUser) -> str:
     """Adds a new note to the database for the given user."""
-    _, note_msg = _parse_note_cmd(text_arg)
+    _, note_msg = _parse_note_cmd(text)
     if not note_msg:
         return f"Sorry {user.username}, could not find a note in your message."
 
@@ -52,9 +49,9 @@ def _add_note(text_arg: str, user: KarmaUser) -> str:
     return f"Hey {user.username}, you've just stored a note."
 
 
-def _del_note(text_arg: str, user: KarmaUser) -> str:
+def _del_note(text: str, user: KarmaUser) -> str:
     """Deletes the note with the given note id."""
-    _, note_id = _parse_note_cmd(text_arg)
+    _, note_id = _parse_note_cmd(text)
 
     if not note_id:
         return f"Sorry {user.username}, it seems you did not provide a valid id."
@@ -74,7 +71,7 @@ def _del_note(text_arg: str, user: KarmaUser) -> str:
     )
 
 
-def _list_notes(text_arg: str, user: KarmaUser) -> str:
+def _list_notes(text: str, user: KarmaUser) -> str:
     """List all notes for a given user."""
     notes = _get_notes_for_user(user)
 
@@ -89,17 +86,17 @@ def _list_notes(text_arg: str, user: KarmaUser) -> str:
     return msg
 
 
-def _command_not_found(text_arg: str, user: KarmaUser) -> str:
+def _command_not_found(text: str, user: KarmaUser) -> str:
     return (
         f"Sorry {user.username}, your note command was not recognized. "
         f"You can use {', '.join(NOTE_COMMANDS.keys())}."
     )
 
 
-def _parse_note_cmd(text_arg: str) -> Tuple[str, str]:
+def _parse_note_cmd(text: str) -> Tuple[str, str]:
     note_cmd = ("", "")
 
-    match = NOTE_CMD_PATTERN.search(text_arg)
+    match = NOTE_CMD_PATTERN.search(text)
     if match:
         note_cmd = match.group(1).strip(), match.group(2).strip("\"'")
 
