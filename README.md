@@ -22,7 +22,7 @@ Additional commands / features are:
 ## Installation
 
 `pip install karmabot`
-
+##After Installation the further steps are
 ## Basic Usage
 
 After installing you can start karmabot by using the command
