@@ -6,7 +6,10 @@
 
 ## Features
 
-Karmabot's main features is the management of Karma within the slack community server. You can give karma, reduce karma, check your current karma points and manage your karma related username.
+~*"What goes around, comes around"*~ So with this in mind in order to maintain decorum of community interactions on Slack Channels you can use the Karmabot. 
+Karmabot's main feature is the management of Karma within the slack community server. Karma is basically indicated by points for individual users. You can give Karma to someone when they behave nicely or help someone, reduce karma on improper comments and behavior, check your current Karma points and manage your Karma related username.
+
+For giving Karma just tag the specific username along with plus(+) sign, to reduce karma similarly use a minus(-) sign, remember you cannot give karma points to yourself only others can assess your behavior in the channel.
 
 ![karma example](https://www.pogross.de/uploads/karmabot.png)
 
