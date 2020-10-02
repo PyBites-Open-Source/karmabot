@@ -99,7 +99,7 @@ Please make sure all tests and checks pass before opening pull requests!
 
 #### Using nox under Windows and Linux (WSL)
 
-Make sure to delete the `.nox` folder when you run `nox` under Windows and WSL, because the environments are not compatible.
+Make sure to delete the `.nox` folder when you switch from Windows to WSL and vice versa, because the environments are not compatible.
 
 ### [pre-commit](https://pre-commit.com/)
 
