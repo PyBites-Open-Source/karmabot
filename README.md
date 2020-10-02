@@ -95,6 +95,10 @@ For different sessions see the `nox.py` file. You can run `nox --list` to see a 
 
 Please make sure all tests and checks pass before opening pull requests!
 
+#### Using nox under Windows and Linux (WSL)
+
+Make sure to delete the `.nox` folder when you run `nox` under Windows and WSL, because the environments are not compatible.
+
 ### [pre-commit](https://pre-commit.com/)
 
 To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder.
