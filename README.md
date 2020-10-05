@@ -91,9 +91,15 @@ For testing you need to install [nox](https://nox.thea.codes/en/stable/) separat
 - only linting `nox -rs lint`
 - only testing `nox -rs tests`
 
+If `nox` cannot be found, use `python -m nox` instead.
+
 For different sessions see the `nox.py` file. You can run `nox --list` to see a list of all available sessions.
 
 Please make sure all tests and checks pass before opening pull requests!
+
+#### Using nox under Windows and Linux (WSL)
+
+Make sure to delete the `.nox` folder when you switch from Windows to WSL and vice versa, because the environments are not compatible.
 
 ### [pre-commit](https://pre-commit.com/)
 
