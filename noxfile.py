@@ -17,7 +17,7 @@ env = {
     "KARMABOT_DATABASE_URL": "FAKE_URL",
 }
 
-nox.options.sessions = "lint", "mypy", "safety", "tests"
+nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
 
 
 def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> None:
@@ -53,7 +53,7 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
     os.unlink(requirements.name)
 
 
-@nox.session(python="3.7")
+@nox.session(python=["3.7", "3.8"])
 def tests(session: Session) -> None:
     """Run the test suite."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
@@ -71,9 +71,7 @@ def lint(session: Session) -> None:
     install_with_constraints(
         session,
         "flake8",
-        "flake8-isort",
         "flake8-bandit",
-        "flake8-black",
         "flake8-bugbear",
     )
     session.run("flake8", *args)
@@ -95,7 +93,7 @@ def mypy(session: Session) -> None:
     session.run("mypy", *args)
 
 
-@nox.session(python="3.7")
+@nox.session(python=["3.7", "3.8"])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     with tempfile.NamedTemporaryFile(delete=False) as requirements:
