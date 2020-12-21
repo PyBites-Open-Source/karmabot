@@ -1,7 +1,0 @@
-exclude:
-  - /src/karmabot/__init__.py
-  - noxfile.py
-component_depth: 1
-languages:
-  - python
-  - script

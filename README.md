@@ -1,6 +1,6 @@
 # PyBites Karmabot - A Python based Slack Chatbot
 
-[![Tests](https://github.com/PyBites-Open-Source/karmabot/workflows/Tests/badge.svg)](https://github.com/PyBites-Open-Source/karmabot/actions?workflow=Tests) [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![BCH compliance](https://bettercodehub.com/edge/badge/pybites/karmabot?branch=master)](https://bettercodehub.com/) [![codecov.io](https://codecov.io/github/PyBites-Open-Source/karmabot/coverage.svg?branch=master)](https://codecov.io/github/PyBites-Open-Source/karmabot?branch=master)
+[![Tests](https://github.com/PyBites-Open-Source/karmabot/workflows/Tests/badge.svg)](https://github.com/PyBites-Open-Source/karmabot/actions?workflow=Tests) [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit) [![codecov.io](https://codecov.io/github/PyBites-Open-Source/karmabot/coverage.svg?branch=master)](https://codecov.io/github/PyBites-Open-Source/karmabot?branch=master)
 
 **A Python based Slack Chatbot for Community interaction**
 
