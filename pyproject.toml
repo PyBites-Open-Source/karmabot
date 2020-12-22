@@ -29,13 +29,11 @@ mutpy = "^0.6.1"
 flake8 = "^3.8.3"
 black = "^19.10b0"
 mypy = "^0.780"
-flake8-isort = "^3.0.0"
 flake8-bandit = "^2.1.2"
-flake8-black = "^0.2.0"
 flake8-bugbear = "^20.1.4"
 safety = "^1.9.0"
-isort = {version = "^4.3.21", extras = ["pyproject"]}
 codecov = "^2.1.7"
+isort = "^5.6.4"
 
 [tool.poetry.scripts]
 karmabot = "karmabot.main:main"
@@ -52,7 +50,7 @@ show_missing = true
 
 [tool.black]
 line-length = 88
-target-version = ['py37']
+target-version = ["py37", "py38"]
 include = '\.pyi?$'
 exclude = '''
 
@@ -73,11 +71,7 @@ exclude = '''
 '''
 
 [tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
+profile = "black"
 known_third_party = "dotenv,feedparser,humanize,pyjokes,pytest,requests,slackclient,sqlalchemy"
 
 [build-system]

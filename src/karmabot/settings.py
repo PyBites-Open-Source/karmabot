@@ -45,5 +45,5 @@ SLACK_CLIENT = SlackClient(SLACK_TOKEN)
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)
 # from second +/- onwards, so bob++ adds 1 point, bob+++ = +2, etc
-KARMA_ACTION = re.compile(r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)")
+KARMA_ACTION = re.compile(r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)", flags=re.MULTILINE)
 MAX_POINTS = 5

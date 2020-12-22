@@ -1,7 +1,7 @@
 name: Tests
-on: 
+on:
   push:
-    branches: 
+    branches:
       - master
       - develop
   pull_request:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.7, 3.8]
     name: Python ${{ matrix.python-version }}
     steps:
     - uses: actions/checkout@v2
@@ -21,5 +21,5 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
     - run: pip install nox==2020.8.22
-    - run: pip install poetry==1.0.10
+    - run: pip install poetry==1.1.4
     - run: nox
