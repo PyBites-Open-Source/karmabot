@@ -1,10 +1,7 @@
 import logging
 import os
-import sys
 from collections import namedtuple
 from typing import Union
-
-from slackclient import SlackClient
 
 from karmabot.commands.add import add_command
 from karmabot.commands.age import pybites_age
@@ -19,7 +16,7 @@ from karmabot.commands.topchannels import get_recommended_channels
 from karmabot.commands.update_username import get_user_name, update_username
 from karmabot.commands.welcome import welcome_user
 from karmabot.settings import SLACK_ID_FORMAT  # noqa: BLK100
-from karmabot.settings import ADMINS, GENERAL_CHANNEL, KARMABOT_ID, SLACK_CLIENT
+from karmabot.settings import ADMINS, GENERAL_CHANNEL, KARMABOT_ID
 
 # constants
 TEXT_FILTER_REPLIES = {
@@ -54,27 +51,21 @@ PRIVATE_BOT_COMMANDS = {
 Message = namedtuple("Message", "user_id channel_id text")
 
 
-def check_connection():
-    # Slack Real Time Messaging API - https://api.slack.com/rtm
-    if not SLACK_CLIENT.rtm_connect():
-        logging.error("Connection Failed, invalid token?")
-        sys.exit(1)
-
-
 def get_bot_id():
     BOT_NAME = "karmabot"
 
-    api_call = SLACK_CLIENT.api_call("users.list")
+    # TODO: use a private message command to ask for the id, only for admins
+    # api_call = SLACK_CLIENT.api_call("users.list")
 
-    if not api_call.get("ok"):
-        error = api_call.get("error", "none")
-        print(f"Could not get users.list, error: {error}")
-        sys.exit(1)
+    # if not api_call.get("ok"):
+    #     error = api_call.get("error", "none")
+    #     print(f"Could not get users.list, error: {error}")
+    #     sys.exit(1)
 
-    users = api_call.get("members")
-    for user in users:
-        if "name" in user and user.get("name") == BOT_NAME:
-            print(f"Bot ID for {user['name']} is {user.get('id')}")
+    # users = api_call.get("members")
+    # for user in users:
+    #     if "name" in user and user.get("name") == BOT_NAME:
+    #         print(f"Bot ID for {user['name']} is {user.get('id')}")
 
 
 def create_help_msg(is_admin):
@@ -128,7 +119,9 @@ def get_available_username(user_info):
 
 
 def get_channel_name(channel_id: str) -> str:
-    channel_info: dict = SLACK_CLIENT.api_call("channels.info", channel=channel_id)
+    channel_info: dict = (
+        {}
+    )  # TODO SLACK_CLIENT.api_call("channels.info", channel=channel_id)
 
     # Private channels and direct messages cannot be resolved via api
     if not channel_info["ok"]:
@@ -140,15 +133,16 @@ def get_channel_name(channel_id: str) -> str:
 
 def post_msg(channel_or_user_id: str, text) -> None:
     logging.info(f"Posting to {channel_or_user_id}: {text}")
-    SLACK_CLIENT.api_call(
-        "chat.postMessage",
-        channel=channel_or_user_id,
-        text=text,
-        link_names=True,  # convert # and @ in links
-        as_user=True,
-        unfurl_links=False,
-        unfurl_media=False,
-    )
+    # TODO
+    # SLACK_CLIENT.api_call(
+    #     "chat.postMessage",
+    #     channel=channel_or_user_id,
+    #     text=text,
+    #     link_names=True,  # convert # and @ in links
+    #     as_user=True,
+    #     unfurl_links=False,
+    #     unfurl_media=False,
+    # )
 
 
 def bot_joins_new_channel(channel_id: str) -> None:
@@ -160,8 +154,9 @@ def bot_joins_new_channel(channel_id: str) -> None:
         logging.info("Cannot invite bot, no env SLACK_KARMA_INVITE_USER_TOKEN")
         return None
 
-    sc = SlackClient(grant_user_token)
-    sc.api_call("channels.invite", channel=channel_id, user=KARMABOT_ID)
+    # TODO
+    # sc = SlackClient(grant_user_token)
+    # sc.api_call("channels.invite", channel=channel_id, user=KARMABOT_ID)
 
     text = (
         "Awesome, a new PyBites channel! Birds of a feather flock together! "
@@ -242,7 +237,7 @@ def perform_text_replacements(text: str) -> Union[str, None]:
 
 def parse_next_msg():
     """Parse next message posted on slack for actions to do by bot"""
-    msg = SLACK_CLIENT.rtm_read()
+    msg = "TODO"  # TODO SLACK_CLIENT.rtm_read()
     if not msg:
         return None
 

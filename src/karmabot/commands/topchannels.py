@@ -7,9 +7,6 @@ from operator import itemgetter
 from typing import Dict, List, Optional, Union
 
 import humanize
-from slackclient import SlackClient
-
-from karmabot.settings import SLACK_CLIENT
 
 MSG_BEGIN = "Glad you asked, here are some channels our Community recommends (based on member count and activity):\n"
 MSG_LINE = (
@@ -35,9 +32,11 @@ def get_recommended_channels(**kwargs):
         )
 
     # retrieve channel list
-    response: Dict = SLACK_CLIENT.api_call(
-        "channels.list", exclude_archived=True, exclude_members=True
-    )
+    response: Dict = {}
+    # TODO
+    # response: Dict = SLACK_CLIENT.api_call(
+    #     "channels.list", exclude_archived=True, exclude_members=True
+    # )
     if not response["ok"]:
         logging.error(f'Error for API call "channels.list": {response["error"]}')
         return "I am truly sorry but something went wrong ;("
@@ -59,9 +58,11 @@ def get_recommended_channels(**kwargs):
             # but channels.history is not allowed for bots.
             # However, it seems that in the future, Slack will update the bot permissions
             # see: https://api.slack.com/methods/channels.history
-            response: Dict = SLACK_CLIENT.api_call(
-                "channels.info", channel=channel["id"]
-            )
+            response: Dict = {}
+            # TODO
+            # response: Dict = SLACK_CLIENT.api_call(
+            #     "channels.info", channel=channel["id"]
+            # )
             if not response["ok"]:
                 logging.error(f'Error for API call "channel.info": {response["error"]}')
                 return "I am truly sorry but something went wrong ;("
@@ -128,8 +129,10 @@ def get_messages(
         )
         return None
 
-    sc = SlackClient(grant_user_token)
-    response = sc.api_call("channels.history", channel=channel.id, user=karmabot_id)
+    # TODO
+    # sc = SlackClient(grant_user_token)
+    # response = sc.api_call("channels.history", channel=channel.id, user=karmabot_id)
+    response = {}
 
     return [
         msg

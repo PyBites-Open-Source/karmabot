@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 
 from dotenv import load_dotenv
-from slackclient import SlackClient
 
 
 def _get_env_var(env_var: str):
@@ -26,21 +25,27 @@ def _get_env_var(env_var: str):
 
 dotenv_path = Path(".").resolve() / ".karmabot"
 if dotenv_path.exists():
-    logging.info("Loading environmental variables from .karmabot.")
+    logging.info(f"Loading environmental variables from: '{dotenv_path}'")
     load_dotenv(dotenv_path)
 
 # Environment variables
 KARMABOT_ID = _get_env_var("KARMABOT_SLACK_USER")
-SLACK_TOKEN = _get_env_var("KARMABOT_SLACK_TOKEN")
-SLACK_INVITE_TOKEN = _get_env_var("KARMABOT_SLACK_INVITE_USER_TOKEN")
 DATABASE_URL = _get_env_var("KARMABOT_DATABASE_URL")
+
+# new stuff
+SLACK_APP_TOKEN = _get_env_var("KARMABOT_SLACK_APP_TOKEN")
+SLACK_BOT_TOKEN = _get_env_var("KARMABOT_SLACK_BOT_TOKEN")
+
+# Old stuff
+SLACK_TOKEN = None
+SLACK_INVITE_TOKEN = None
+SLACK_CLIENT = None
 
 # Slack
 GENERAL_CHANNEL = _get_env_var("KARMABOT_GENERAL_CHANNEL")
 ADMINS = _get_env_var("KARMABOT_ADMINS")
 ADMINS = ADMINS.split(",")  # type: ignore
 SLACK_ID_FORMAT = re.compile(r"^<@[^>]+>$")
-SLACK_CLIENT = SlackClient(SLACK_TOKEN)
 
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)
