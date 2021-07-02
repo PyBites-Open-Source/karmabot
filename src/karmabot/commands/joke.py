@@ -3,7 +3,7 @@ from typing import Union
 
 import pyjokes
 
-import karmabot
+import karmabot.slack as slack
 
 PYJOKE_HREF = "<https://pyjok.es/|PyJoke>"
 CATEGORIES = list(pyjokes.jokes_en.jokes_en.keys())
@@ -18,7 +18,7 @@ def joke(**kwargs) -> Union[str, None]:
     id_arg, text_arg = kwargs.get("user_id"), kwargs.get("text")
 
     if id_arg is not None and text_arg is not None:
-        user_id = karmabot.slack.format_user_id(str(id_arg))
+        user_id = slack.format_user_id(str(id_arg))
         user_text = str(text_arg).lower()
 
         user_category = user_text.split()[-1] if len(user_text.split()) > 3 else ""

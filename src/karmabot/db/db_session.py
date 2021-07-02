@@ -1,5 +1,6 @@
 import logging
 import sys
+from contextlib import contextmanager
 
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
@@ -13,13 +14,13 @@ __factory = None
 
 
 def global_init():
-    """ Sets up connection to DB and initializes models """
+    """Sets up connection to DB and initializes models"""
     global __factory
 
     if __factory:
         return
 
-    print(f"Connecting to DB with {settings.DATABASE_URL}")
+    logging.debug(f"Connecting to DB with {settings.DATABASE_URL}")
 
     engine = sa.create_engine(settings.DATABASE_URL, echo=False)
     try:
@@ -28,7 +29,7 @@ def global_init():
         logging.error("Database connection failed.")
         sys.exit(1)
 
-    print("DB connection successful")
+    logging.info("DB connection successful")
     __factory = orm.sessionmaker(bind=engine)
 
     import karmabot.db.__all_models  # noqa: F401
@@ -39,3 +40,19 @@ def global_init():
 def create_session() -> Session:
     global __factory
     return __factory()  # type: ignore
+
+
+@contextmanager
+def session_manager():
+    global __factory
+    session = __factory()  # type: ignore
+
+    try:
+        yield session
+    except Exception as e:
+        logging.error("Rollback database transaction")
+        session.rollback()
+        raise
+    finally:
+        logging.debug("Closing database connection")
+        session.close()

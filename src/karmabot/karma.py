@@ -1,10 +1,10 @@
 import logging
 
+import karmabot.slack as slack
 from karmabot.db import db_session
 from karmabot.db.karma_transaction import KarmaTransaction
 from karmabot.db.karma_user import KarmaUser
-from karmabot.settings import KARMABOT_ID, MAX_POINTS, SLACK_CLIENT, SLACK_ID_FORMAT
-from karmabot.slack import get_available_username, get_channel_name, post_msg
+from karmabot.settings import KARMABOT_ID, MAX_POINTS, SLACK_ID_FORMAT
 
 
 class GetUserInfoException(Exception):
@@ -24,14 +24,14 @@ def _parse_karma_change(karma_change):
     return receiver, points
 
 
-def process_karma_changes(message, karma_changes):
+def process_karma_changes(karma_giver, channel_id, karma_changes):
     for karma_change in karma_changes:
         receiver_id, points = _parse_karma_change(karma_change)
         try:
             karma = Karma(
-                giver_id=message.user_id,
+                giver_id=karma_giver,
                 receiver_id=receiver_id,
-                channel_id=message.channel_id,
+                channel_id=channel_id,
             )
         except GetUserInfoException:
             return
@@ -41,7 +41,7 @@ def process_karma_changes(message, karma_changes):
         except Exception as exc:
             text = str(exc)
 
-        post_msg(message.channel_id, text)
+        slack.bot.client.chat_postMessage(channel=channel_id, text=text)
 
 
 class Karma:
@@ -58,17 +58,17 @@ class Karma:
             self.receiver = self._create_karma_user(receiver_id)
 
     def _create_karma_user(self, user_id):
-        user_info = SLACK_CLIENT.api_call("users.info", user=user_id)
+        response = slack.bot.client.users_profile_get(user=user_id)
+        status = response.status_code
 
-        error = user_info.get("error")
-        if error is not None:
-            logging.info(f"Cannot get user info for {user_id} - error: {error}")
+        if status != 200:
+            logging.info(f"Cannot get user info for {user_id} - API error: {status}")
             raise GetUserInfoException
 
-        slack_id = user_info["user"]["id"]
-        username = get_available_username(user_info)
+        user_profile = response.data["profile"]
+        username = slack.get_available_username(user_profile)
 
-        new_user = KarmaUser(user_id=slack_id, username=username)
+        new_user = KarmaUser(user_id=user_id, username=username)
         self.session.add(new_user)
         self.session.commit()
 
@@ -113,10 +113,18 @@ class Karma:
         return text
 
     def _save_transaction(self, points):
+
+        response = slack.bot.client.conversations_info(channel=self.channel_id)
+
+        if response.status_code != 200:
+            raise Exception(f"Slack API could not get Channel info - Status {response.status_code}")
+
+        channel_name = response.data["channel"]["name"]
+
         transaction = KarmaTransaction(
             giver_id=self.giver.user_id,
             receiver_id=self.receiver.user_id,
-            channel=get_channel_name(self.channel_id),
+            channel= channel_name,
             karma=points,
         )
         self.session.add(transaction)

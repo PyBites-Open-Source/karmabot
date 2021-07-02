@@ -1,8 +1,12 @@
 import logging
 import os
+import unicodedata
 from collections import namedtuple
 from typing import Union
 
+from slack_bolt import App
+
+# Commands
 from karmabot.commands.add import add_command
 from karmabot.commands.age import pybites_age
 from karmabot.commands.doc import doc_command
@@ -15,8 +19,17 @@ from karmabot.commands.tip import get_random_tip
 from karmabot.commands.topchannels import get_recommended_channels
 from karmabot.commands.update_username import get_user_name, update_username
 from karmabot.commands.welcome import welcome_user
-from karmabot.settings import SLACK_ID_FORMAT  # noqa: BLK100
-from karmabot.settings import ADMINS, GENERAL_CHANNEL, KARMABOT_ID
+from karmabot.karma import process_karma_changes
+
+# Settings
+from karmabot.settings import (
+    ADMINS,
+    GENERAL_CHANNEL,
+    KARMA_ACTION,
+    KARMABOT_ID,
+    SLACK_BOT_TOKEN,
+    SLACK_ID_FORMAT,
+)
 
 # constants
 TEXT_FILTER_REPLIES = {
@@ -48,24 +61,8 @@ PRIVATE_BOT_COMMANDS = {
     "updateusername": update_username,
 }
 
-Message = namedtuple("Message", "user_id channel_id text")
-
-
-def get_bot_id():
-    BOT_NAME = "karmabot"
-
-    # TODO: use a private message command to ask for the id, only for admins
-    # api_call = SLACK_CLIENT.api_call("users.list")
-
-    # if not api_call.get("ok"):
-    #     error = api_call.get("error", "none")
-    #     print(f"Could not get users.list, error: {error}")
-    #     sys.exit(1)
-
-    # users = api_call.get("members")
-    # for user in users:
-    #     if "name" in user and user.get("name") == BOT_NAME:
-    #         print(f"Bot ID for {user['name']} is {user.get('id')}")
+# Init
+bot = App(token=SLACK_BOT_TOKEN)  # type: ignore
 
 
 def create_help_msg(is_admin):
@@ -95,27 +92,22 @@ def format_user_id(user_id: str) -> str:
     return f"<@{user_id}>"
 
 
-def get_available_username(user_info):
+def get_available_username(user_profile):
     """
     Determines the username based on information available from slack.
     First information is used in the following order:
     1) display_name, 2) real_name, 3) name
-    See: https://api.slack.com/types/user
-    :param user_info: Slack user_info object
+    :param user_profile: Slack user_profile dict
     :return: human-readable username
     """
 
-    display_name = user_info["user"]["profile"]["display_name_normalized"]
+    display_name = user_profile["display_name_normalized"]
     if display_name:
         return display_name
 
-    real_name = user_info["user"]["profile"]["real_name_normalized"]
+    real_name = user_profile["real_name_normalized"]
     if real_name:
         return real_name
-
-    # real_name is required and should always be there
-    # defaulting to name for safety
-    return user_info["user"]["name"]
 
 
 def get_channel_name(channel_id: str) -> str:
@@ -131,39 +123,12 @@ def get_channel_name(channel_id: str) -> str:
     return channel_name
 
 
-def post_msg(channel_or_user_id: str, text) -> None:
-    logging.info(f"Posting to {channel_or_user_id}: {text}")
-    # TODO
-    # SLACK_CLIENT.api_call(
-    #     "chat.postMessage",
-    #     channel=channel_or_user_id,
-    #     text=text,
-    #     link_names=True,  # convert # and @ in links
-    #     as_user=True,
-    #     unfurl_links=False,
-    #     unfurl_media=False,
-    # )
-
-
+# Maybe https://api.slack.com/methods/conversations.join
 def bot_joins_new_channel(channel_id: str) -> None:
-    """Bots cannot autojoin channels, but there is a hack: create a user token:
-    https://stackoverflow.com/a/44107313/1128469 and
-    https://api.slack.com/custom-integrations/legacy-tokens"""
-    grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
-    if not grant_user_token:
-        logging.info("Cannot invite bot, no env SLACK_KARMA_INVITE_USER_TOKEN")
-        return None
-
-    # TODO
-    # sc = SlackClient(grant_user_token)
-    # sc.api_call("channels.invite", channel=channel_id, user=KARMABOT_ID)
-
     text = (
         "Awesome, a new PyBites channel! Birds of a feather flock together! "
         "Keep doing your nerdy stuff, I will keep track of your karmas :)"
     )
-
-    post_msg(channel_id, text)
 
 
 def _get_cmd(text, private=True):
@@ -234,8 +199,7 @@ def perform_text_replacements(text: str) -> Union[str, None]:
     replace_word = TEXT_FILTER_REPLIES.get(match_word)
     return f"To _{match_word}_ I say: {replace_word}"
 
-
-def parse_next_msg():
+    # def parse_next_msg():
     """Parse next message posted on slack for actions to do by bot"""
     msg = "TODO"  # TODO SLACK_CLIENT.rtm_read()
     if not msg:
@@ -298,3 +262,28 @@ def parse_next_msg():
 
     # Returns a message for karma processing
     return Message(user_id=user_id, channel_id=channel_id, text=text)
+
+
+@bot.message(KARMA_ACTION)  # type: ignore
+def karma_action(message):
+    msg = unicodedata.normalize("NFKD", message["text"])
+
+    karma_giver = message["user"]
+    channel_id = message["channel"]
+    karma_changes = KARMA_ACTION.findall(msg)
+
+    process_karma_changes(karma_giver, channel_id, karma_changes)
+
+
+@bot.message(f"<@{KARMABOT_ID}> joke")  # type: ignore
+def tell_joke(message, say):
+    text = message["text"]
+    user_id = message["user"]
+    response_text = joke(user_id=user_id, text=text)
+
+    say(response_text)
+
+
+@bot.event("message")  # type: ignore
+def handle_message_events(body, logger):
+    logger.info(body)
