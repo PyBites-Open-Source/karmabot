@@ -3,7 +3,7 @@ import pytest
 from karmabot.db import db_session
 from karmabot.db.karma_user import KarmaUser
 from karmabot.karma import Karma, _parse_karma_change
-from karmabot.settings import KARMA_ACTION, KARMABOT_ID
+from karmabot.settings import KARMA_ACTION_PATTERN, KARMABOT_ID
 
 
 # Karma
@@ -17,7 +17,7 @@ from karmabot.settings import KARMA_ACTION, KARMABOT_ID
     ],
 )
 def test_karma_regex(test_message, expected):
-    karma_changes = KARMA_ACTION.findall(test_message)
+    karma_changes = KARMA_ACTION_PATTERN.findall(test_message)
     user_id, voting = karma_changes[0]
 
     assert user_id == expected[0]

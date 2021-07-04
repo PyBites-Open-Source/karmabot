@@ -4,7 +4,7 @@ from karmabot.db import db_session
 from karmabot.db.karma_user import KarmaUser
 from karmabot.karma import Karma
 from karmabot.settings import SLACK_CLIENT
-from karmabot.slack import format_user_id, get_available_username
+from karmabot.slack import format_to_slack_id, get_available_username
 
 
 # KarmaUser
@@ -46,7 +46,7 @@ def test_create_karma_user(mock_empty_db_session, mock_slack_api_call):
     "test_user_id, expected", [("ABC123", "<@ABC123>"), ("<@ABC123>", "<@ABC123>")]
 )
 def test_format_user_id(test_user_id, expected):
-    assert format_user_id(test_user_id) == expected
+    assert format_to_slack_id(test_user_id) == expected
 
 
 @pytest.mark.parametrize(
