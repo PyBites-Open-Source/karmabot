@@ -1,12 +1,16 @@
+import logging
+
+import karmabot.bot as bot
 import karmabot.slack
-from karmabot import settings
 from karmabot.db.db_session import create_session
 from karmabot.db.karma_user import KarmaUser
 
 
 def update_username(**kwargs):
     """Changes the Username"""
-    user_id = kwargs.get("user_id").strip("<>@")
+    user_id = kwargs.get("user_id")
+    if user_id:
+        user_id = user_id.strip("<>@")
 
     session = create_session()
     karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
@@ -15,8 +19,16 @@ def update_username(**kwargs):
         return "User not found"
 
     old_username = karma_user.username
-    user_info = settings.SLACK_CLIENT.api_call("users.info", user=user_id)
-    new_username = karmabot.slack.get_available_username(user_info)
+
+    response = bot.app.client.users_profile_get(user=user_id)
+    status = response.status_code
+
+    if status != 200:
+        logging.info(f"Cannot get user info for {user_id} - API error: {status}")
+        return "Sorry, I could not retrieve your user information from the slack API :("
+
+    user_profile = response.data["profile"]
+    new_username = karmabot.slack.get_available_username(user_profile)
 
     if old_username == new_username:
         return (
@@ -37,7 +49,9 @@ def update_username(**kwargs):
 
 def get_user_name(**kwargs):
     """Shows the current Username"""
-    user_id = kwargs.get("user_id").strip("<>@")
+    user_id = kwargs.get("user_id")
+    if user_id:
+        user_id = user_id.strip("<>@")
 
     session = create_session()
     karma_user: KarmaUser = session.query(KarmaUser).get(user_id)

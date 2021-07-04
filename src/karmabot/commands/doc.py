@@ -69,7 +69,7 @@ def doc_command(**kwargs) -> str:
             help(text)
     result = output.getvalue()
 
-    slack_id = karmabot.slack.format_user_id(user_id)
+    slack_id = karmabot.slack.get_slack_id(user_id)
 
     if result.startswith("No"):
         return MSG_APOLOGY.format(username=slack_id, text=text)

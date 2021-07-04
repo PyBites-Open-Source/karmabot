@@ -7,6 +7,10 @@ from operator import itemgetter
 from typing import Dict, List, Optional, Union
 
 import humanize
+from slack_sdk.errors import SlackApiError
+
+import karmabot.bot as bot
+from karmabot.settings import KARMABOT_ID
 
 MSG_BEGIN = "Glad you asked, here are some channels our Community recommends (based on member count and activity):\n"
 MSG_LINE = (
@@ -18,25 +22,27 @@ Channel = namedtuple("Channel", "id name purpose num_members latest_ts latest_su
 
 
 def get_recommended_channels(**kwargs):
-    """Show some of our Community's favorite channels you can join
-    see https://api.slack.com/methods/channels.list as well as https://api.slack.com/methods/channels.info for API info
-    """
-    _, text = kwargs.get("user"), kwargs.get("text")
+    """Show some of our Community's favorite channels you can join"""
+    text = kwargs.get("text")
+
     potential_channels: Channel = []
     msg = MSG_BEGIN
 
-    nr_channels = text.split()[2] if len(text.split()) >= 3 else DEFAULT_NR_CHANNELS
+    if not text:
+        nr_channels = DEFAULT_NR_CHANNELS
+    else:
+        nr_channels = text.split()[2] if len(text.split()) >= 3 else DEFAULT_NR_CHANNELS
+
     if isinstance(nr_channels, str):
         nr_channels = (
             int(nr_channels) if nr_channels.isnumeric() else DEFAULT_NR_CHANNELS
         )
 
     # retrieve channel list
-    response: Dict = {}
-    # TODO
-    # response: Dict = SLACK_CLIENT.api_call(
-    #     "channels.list", exclude_archived=True, exclude_members=True
-    # )
+    response: Dict = bot.app.client.conversations_list(
+        exclude_archived=True, types="public_channel"
+    )
+
     if not response["ok"]:
         logging.error(f'Error for API call "channels.list": {response["error"]}')
         return "I am truly sorry but something went wrong ;("
@@ -48,6 +54,7 @@ def get_recommended_channels(**kwargs):
     for channel in channels:
         channel_is_potential = (
             channel["is_channel"]
+            and channel["is_member"]
             and not channel["is_general"]
             and not channel["is_private"]
         )
@@ -58,26 +65,38 @@ def get_recommended_channels(**kwargs):
             # but channels.history is not allowed for bots.
             # However, it seems that in the future, Slack will update the bot permissions
             # see: https://api.slack.com/methods/channels.history
-            response: Dict = {}
-            # TODO
-            # response: Dict = SLACK_CLIENT.api_call(
-            #     "channels.info", channel=channel["id"]
-            # )
-            if not response["ok"]:
-                logging.error(f'Error for API call "channel.info": {response["error"]}')
+            channel_id = channel["id"]
+            try:
+                info_response: Dict = bot.app.client.conversations_info(
+                    channel=channel_id, include_num_members=True
+                )
+                if not info_response["ok"]:
+                    raise SlackApiError("converstation.info error", info_response)
+
+                history_response: Dict = bot.app.client.conversations_history(
+                    channel=channel_id, limit=1
+                )
+                if not history_response["ok"]:
+                    raise SlackApiError("conversation.history error", history_response)
+
+            except SlackApiError as e:
+                logging.error(e)
                 return "I am truly sorry but something went wrong ;("
 
-            channel_info: Dict = response["channel"]
+            channel_info: Dict = info_response["channel"]
+            channel_history: Dict = history_response["messages"][0]
 
-            if channel_info.get("latest", None):
+            latest_ts = channel_history.get("ts")
+            latest_type = channel_history.get("type")
+            if latest_ts:
                 potential_channels.append(
                     Channel(
                         channel["id"],
                         channel["name"],
                         channel_info["purpose"]["value"],
-                        channel["num_members"],
-                        float(channel_info["latest"]["ts"]),
-                        channel_info["latest"].get("subtype"),
+                        channel_info["num_members"],
+                        float(latest_ts),
+                        latest_type,
                     )
                 )
 
@@ -121,24 +140,12 @@ def get_messages(
     if ignore_message_types is None:
         ignore_message_types = {"channel_join"}
 
-    grant_user_token = os.environ.get("SLACK_KARMA_INVITE_USER_TOKEN")
-    karmabot_id = os.environ.get("SLACK_KARMA_BOTUSER")
-    if not grant_user_token:
-        logging.info(
-            "Cannot search channel history, no env SLACK_KARMA_INVITE_USER_TOKEN"
-        )
-        return None
-
     # TODO
-    # sc = SlackClient(grant_user_token)
-    # response = sc.api_call("channels.history", channel=channel.id, user=karmabot_id)
-    response = {}
+    response = bot.app.client.conversations_history(
+        channel=channel.id, user=KARMABOT_ID
+    )
 
-    return [
-        msg
-        for msg in response["messages"]
-        if msg.get("subtype") not in ignore_message_types
-    ]
+    return [msg for msg in response["messages"]]
 
 
 def calc_channel_score(channel: Channel):

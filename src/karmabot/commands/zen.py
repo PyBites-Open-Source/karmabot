@@ -9,7 +9,8 @@ def import_this(**kwargs):
     with contextlib.redirect_stdout(zen):
         import this  # noqa: F401
 
-    return zen.getvalue()
+    text = f"```{zen.getvalue()}```"
+    return text
 
 
 if __name__ == "__main__":

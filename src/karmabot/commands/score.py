@@ -1,3 +1,4 @@
+import karmabot.slack
 from karmabot.db import db_session
 from karmabot.db.karma_user import KarmaUser
 
@@ -6,7 +7,8 @@ TOP_NUMBER = 10
 
 def get_karma(**kwargs):
     """Get your current karma score"""
-    user_id = kwargs.get("user_id").strip("<>@")
+    user_id = kwargs.get("user_id")
+    slack_id = karmabot.slack.get_slack_id(user_id)
 
     session = db_session.create_session()
     kama_user = session.query(KarmaUser).get(user_id)
@@ -18,9 +20,7 @@ def get_karma(**kwargs):
         if kama_user.karma_points == 0:
             return "Sorry, you don't have any karma yet"
 
-        return (
-            f"Hey {kama_user.username}, your current karma is {kama_user.karma_points}"
-        )
+        return f"Hey {slack_id}, your current karma is {kama_user.karma_points}"
 
     finally:
         session.close()
