@@ -37,6 +37,7 @@ flake8-bugbear = "^21.3"
 safety = "^1.10.3"
 codecov = "^2.1.11"
 isort = "^5.8.0"
+nox = "^2021.6.12"
 
 [tool.poetry.scripts]
 karmabot = "karmabot.main:main"
