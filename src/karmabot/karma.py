@@ -1,56 +1,23 @@
 import logging
 
+from sqlalchemy.orm.session import Session
+
+import karmabot.bot as bot
 import karmabot.slack as slack
 from karmabot.db import db_session
 from karmabot.db.karma_transaction import KarmaTransaction
 from karmabot.db.karma_user import KarmaUser
-from karmabot.settings import KARMABOT_ID, MAX_POINTS, SLACK_ID_FORMAT
-
-
-class GetUserInfoException(Exception):
-    pass
-
-
-def _parse_karma_change(karma_change):
-    user_id, voting = karma_change
-
-    if SLACK_ID_FORMAT.match(user_id):
-        receiver = user_id.strip("<>@")
-    else:
-        receiver = user_id.strip(" #").lower()  # ?
-
-    points = voting.count("+") - voting.count("-")
-
-    return receiver, points
-
-
-def process_karma_changes(karma_giver, channel_id, karma_changes):
-    for karma_change in karma_changes:
-        receiver_id, points = _parse_karma_change(karma_change)
-        try:
-            karma = Karma(
-                giver_id=karma_giver,
-                receiver_id=receiver_id,
-                channel_id=channel_id,
-            )
-        except GetUserInfoException:
-            return
-
-        try:
-            text = karma.change_karma(points)
-        except Exception as exc:
-            text = str(exc)
-
-        slack.bot.client.chat_postMessage(channel=channel_id, text=text)
+from karmabot.exceptions import GetUserInfoException
+from karmabot.settings import KARMABOT_ID, MAX_POINTS
 
 
 class Karma:
     def __init__(self, giver_id, receiver_id, channel_id):
-        self.session = db_session.create_session()
-        self.giver = self.session.query(KarmaUser).get(giver_id)
-        self.receiver = self.session.query(KarmaUser).get(receiver_id)
-        self.channel_id = channel_id
-        self.last_score_maxed_out = False
+        self.session: Session = db_session.create_session()
+        self.giver: KarmaUser = self.session.query(KarmaUser).get(giver_id)
+        self.receiver: KarmaUser = self.session.query(KarmaUser).get(receiver_id)
+        self.channel_id: str = channel_id
+        self.last_score_maxed_out: bool = False
 
         if not self.giver:
             self.giver = self._create_karma_user(giver_id)
@@ -58,7 +25,7 @@ class Karma:
             self.receiver = self._create_karma_user(receiver_id)
 
     def _create_karma_user(self, user_id):
-        response = slack.bot.client.users_profile_get(user=user_id)
+        response = bot.app.client.users_profile_get(user=user_id)
         status = response.status_code
 
         if status != 200:
@@ -114,17 +81,19 @@ class Karma:
 
     def _save_transaction(self, points):
 
-        response = slack.bot.client.conversations_info(channel=self.channel_id)
+        response = bot.app.client.conversations_info(channel=self.channel_id)
 
         if response.status_code != 200:
-            raise Exception(f"Slack API could not get Channel info - Status {response.status_code}")
+            raise Exception(
+                f"Slack API could not get Channel info - Status {response.status_code}"
+            )
 
         channel_name = response.data["channel"]["name"]
 
         transaction = KarmaTransaction(
             giver_id=self.giver.user_id,
             receiver_id=self.receiver.user_id,
-            channel= channel_name,
+            channel=channel_name,
             karma=points,
         )
         self.session.add(transaction)
@@ -170,3 +139,36 @@ class Karma:
                 )
             )
             self.session.close()
+
+
+def _parse_karma_change(karma_change):
+    user_id, voting = karma_change
+
+    if slack.SLACK_ID_PATTERN.match(user_id):
+        receiver = user_id.strip("<>@")
+    else:
+        receiver = user_id.strip(" #").lower()  # ?
+
+    points = voting.count("+") - voting.count("-")
+
+    return receiver, points
+
+
+def process_karma_changes(karma_giver, channel_id, karma_changes):
+    for karma_change in karma_changes:
+        receiver_id, points = _parse_karma_change(karma_change)
+        try:
+            karma = Karma(
+                giver_id=karma_giver,
+                receiver_id=receiver_id,
+                channel_id=channel_id,
+            )
+        except GetUserInfoException:
+            return
+
+        try:
+            text = karma.change_karma(points)
+        except Exception as exc:
+            text = str(exc)
+
+        bot.app.client.chat_postMessage(channel=channel_id, text=text)
