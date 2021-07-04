@@ -1,5 +1,4 @@
 import logging
-import os
 from collections import namedtuple
 from datetime import datetime as dt
 from math import exp

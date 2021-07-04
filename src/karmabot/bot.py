@@ -1,4 +1,3 @@
-import logging
 import re
 import unicodedata
 from typing import Callable, Dict
@@ -20,7 +19,7 @@ from karmabot.commands.update_username import get_user_name, update_username
 from karmabot.commands.welcome import welcome_user
 from karmabot.commands.zen import import_this
 from karmabot.exceptions import CommandExecutionException
-from karmabot.karma import Karma, process_karma_changes
+from karmabot.karma import process_karma_changes
 
 # Settings
 from karmabot.settings import (

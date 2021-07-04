@@ -1,5 +1,4 @@
 import difflib
-import logging
 from typing import Union
 
 import pyjokes

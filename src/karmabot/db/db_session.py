@@ -49,7 +49,7 @@ def session_manager():
 
     try:
         yield session
-    except Exception as e:
+    except Exception:
         logging.error("Rollback database transaction")
         session.rollback()
         raise

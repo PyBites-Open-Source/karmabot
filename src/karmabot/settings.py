@@ -43,5 +43,7 @@ ADMINS = ADMINS.split(",")  # type: ignore
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)
 # from second +/- onwards, so bob++ adds 1 point, bob+++ = +2, etc
-KARMA_ACTION_PATTERN = re.compile(r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)", flags=re.MULTILINE)
+KARMA_ACTION_PATTERN = re.compile(
+    r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)", flags=re.MULTILINE
+)
 MAX_POINTS = 5
