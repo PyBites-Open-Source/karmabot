@@ -8,6 +8,7 @@ from slack_bolt import App
 # Commands
 from karmabot.commands.add import add_command
 from karmabot.commands.age import pybites_age
+from karmabot.commands.control import join_public_channels
 from karmabot.commands.doc import doc_command
 from karmabot.commands.feed import get_pybites_last_entries
 from karmabot.commands.joke import joke
@@ -19,7 +20,7 @@ from karmabot.commands.update_username import get_user_name, update_username
 from karmabot.commands.welcome import welcome_user
 from karmabot.commands.zen import import_this
 from karmabot.exceptions import CommandExecutionException
-from karmabot.karma import process_karma_changes
+from karmabot.karma import Karma, process_karma_changes
 
 # Settings
 from karmabot.settings import (
@@ -31,7 +32,10 @@ from karmabot.settings import (
 )
 
 # command constants
-ADMIN_BOT_COMMANDS = {"top_karma": top_karma}
+ADMIN_BOT_COMMANDS = {
+    "top_karma": top_karma,
+    "join_public_channels": join_public_channels,
+}
 PUBLIC_BOT_COMMANDS = {
     "add": add_command,
     "age": pybites_age,
@@ -70,7 +74,7 @@ def compile_command_pattern(commands: Dict[str, Callable]) -> re.Pattern:
 
 
 def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
-    special_words = '|'.join(replies.keys())
+    special_words = "|".join(replies.keys())
     pattern = fr"(?<!<@{KARMABOT_ID}>\s)({special_words})"
     return re.compile(pattern, re.MULTILINE)
 
@@ -78,6 +82,7 @@ def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
 PUBLIC_COMMAND_PATTERN = compile_command_pattern(PUBLIC_BOT_COMMANDS)
 PRIVATE_COMMAND_PATTERN = compile_command_pattern(PRIVATE_BOT_COMMANDS)
+UNKNOWN_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(\w*)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 
@@ -141,7 +146,6 @@ def reply_help(message, say):
 # Message replies
 @app.message(SPECIAL_WORDS_PATTERN)  # type: ignore
 def reply_special_words(message, say):
-
     msg = message["text"]
     special_word = SPECIAL_WORDS_PATTERN.findall(msg)[0]
     special_reply = SPECIAL_REPLIES.get(special_word)
@@ -157,9 +161,10 @@ def reply_commands(message, say):
     """
     Handles all the commands in one place
 
-    Unfortunatly we cannot create one function for every category (admin, private public)
-    as some commands reside in multiple catagories and the first matching function
-    would "swallow" the message and not forwared it further down the line
+    Unfortunatly we cannot create sperate functions for every category
+    (admin, private public) as some commands fit in multiple catagories and the
+    first matching function would "swallow" the message and not forwared
+    it further down the line
     """
     user_id = message["user"]
     channel_id = message["channel"]
@@ -190,7 +195,13 @@ def reply_commands(message, say):
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
 
-    say(cmd_result)
+    if cmd_result:  # reply with result to a valid cmd
+        say(cmd_result)
+    elif UNKNOWN_COMMAND_PATTERN.match(text):  # everything else that looks like a cmd
+        unknown_cmd = UNKNOWN_COMMAND_PATTERN.findall(text)[0]
+        say(f'Sorry <@{user_id}>, there is no command "{unknown_cmd}"')
+
+    # all other messages just do not get a reply
 
 
 # Events
@@ -212,9 +223,3 @@ def autojoin_new_channels(event, say):
         "Keep doing your nerdy stuff, I will keep track of your karmas :)"
     )
     say(text=text, channel=new_channel_id)
-
-
-# Handling everyting else
-@app.event("message")  # type: ignore
-def handle_message_events(body, logger):
-    logger.info(body)
