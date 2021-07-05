@@ -2,7 +2,7 @@ import datetime
 import re
 from typing import Callable, Dict, Tuple, Union
 
-from karmabot.db import db_session
+from karmabot.db.database import database
 from karmabot.db.karma_note import KarmaNote
 from karmabot.db.karma_user import KarmaUser
 
@@ -21,7 +21,9 @@ def note(user_id: str, channel: str, text: str) -> Union[None, str]:
     user_id = user_id.strip("<>@")
 
     # retrieve current user
-    user = db_session.create_session().query(KarmaUser).get(user_id)
+    with database.session_manager() as session:
+        user = session.query(KarmaUser).get(user_id)
+
     cmd, _ = _parse_note_cmd(text)
 
     note_cmd_fnc = NOTE_COMMANDS.get(cmd, _command_not_found)
@@ -42,9 +44,9 @@ def _add_note(text: str, user: KarmaUser) -> str:
         user_id=user.user_id, timestamp=datetime.datetime.now(), note=note_msg
     )
 
-    session = db_session.create_session()
-    session.add(note)
-    session.commit()
+    with database.session_manager() as session:
+        session.add(note)
+        session.commit()
 
     return f"Hey {user.username}, you've just stored a note."
 
@@ -56,11 +58,11 @@ def _del_note(text: str, user: KarmaUser) -> str:
     if not note_id:
         return f"Sorry {user.username}, it seems you did not provide a valid id."
 
-    session = db_session.create_session()
-    query = session.query(KarmaNote).filter_by(id=note_id, user_id=user.user_id)
+    with database.session_manager() as session:
+        query = session.query(KarmaNote).filter_by(id=note_id, user_id=user.user_id)
 
-    row_count = query.delete()
-    session.commit()  # otherwise, the deletion is not performed
+        row_count = query.delete()
+        session.commit()  # otherwise, the deletion is not performed
 
     if row_count:
         return f"Hey {user.username}, your note was successfully deleted."
@@ -104,19 +106,16 @@ def _parse_note_cmd(text: str) -> Tuple[str, str]:
 
 
 def _get_notes_for_user(user: KarmaUser) -> list:
-    return (
-        db_session.create_session()
-        .query(KarmaNote)
-        .filter_by(user_id=user.user_id)
-        .all()
-    )
+    with database.session_manager() as session:
+        notes = session.query(KarmaNote).filter_by(user_id=user.user_id).all()
+    return notes
 
 
 def _note_exists(msg: str, user: KarmaUser) -> bool:
-    session = db_session.create_session()
-    q = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
-
-    return session.query(q.exists()).scalar()  # returns True or False
+    with database.session_manager() as session:
+        q = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
+        note_exists = session.query(q.exists()).scalar()  # returns True or False
+    return note_exists
 
 
 NOTE_COMMANDS: Dict[str, Callable] = {

@@ -69,13 +69,13 @@ def compile_command_pattern(commands: Dict[str, Callable]) -> re.Pattern:
 
     full_commands = fr"^<@{KARMABOT_ID}>\s*({all_commands})(\s.*)?$"
 
-    return re.compile(full_commands)
+    return re.compile(full_commands, re.IGNORECASE)
 
 
 def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
     special_words = "|".join(replies.keys())
     pattern = fr"(?<!<@{KARMABOT_ID}>\s)({special_words})"
-    return re.compile(pattern, re.MULTILINE)
+    return re.compile(pattern, flags=re.MULTILINE | re.IGNORECASE)
 
 
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
@@ -111,14 +111,16 @@ def create_commands_table(commands):
 
 # Top priority: process karma
 @app.message(KARMA_ACTION_PATTERN)  # type: ignore
-def karma_action(message):
+def karma_action(message, say):
     msg = unicodedata.normalize("NFKD", message["text"])
 
     karma_giver = message["user"]
     channel_id = message["channel"]
     karma_changes = KARMA_ACTION_PATTERN.findall(msg)
 
-    process_karma_changes(karma_giver, channel_id, karma_changes)
+    text = process_karma_changes(karma_giver, channel_id, karma_changes)
+
+    say(text)
 
 
 # Help
@@ -145,7 +147,7 @@ def reply_help(message, say):
 # Message replies
 @app.message(SPECIAL_WORDS_PATTERN)  # type: ignore
 def reply_special_words(message, say):
-    msg = message["text"]
+    msg = message["text"].lower()
     special_word = SPECIAL_WORDS_PATTERN.findall(msg)[0]
     special_reply = SPECIAL_REPLIES.get(special_word)
 

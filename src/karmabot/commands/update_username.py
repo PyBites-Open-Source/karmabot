@@ -2,7 +2,7 @@ import logging
 
 import karmabot.bot as bot
 import karmabot.slack
-from karmabot.db.db_session import create_session
+from karmabot.db.database import database
 from karmabot.db.karma_user import KarmaUser
 
 
@@ -12,8 +12,8 @@ def update_username(**kwargs):
     if user_id:
         user_id = user_id.strip("<>@")
 
-    session = create_session()
-    karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
+    with database.session_manager() as session:
+        karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
 
     if not karma_user:
         return "User not found"
@@ -37,9 +37,9 @@ def update_username(**kwargs):
             "profile and retry."
         )
 
-    karma_user.username = new_username
-    session.commit()
-    session.close()
+    with database.session_manager() as session:
+        karma_user.username = new_username
+        session.commit()
 
     return (
         f"Sucessfully updated your KarmaUser name "
@@ -53,12 +53,11 @@ def get_user_name(**kwargs):
     if user_id:
         user_id = user_id.strip("<>@")
 
-    session = create_session()
-    karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
+    with database.session_manager() as session:
+        karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
 
     if not karma_user:
         return "Sorry, you are not yet known to karmabot. Try to give some Karma! :)"
     username = karma_user.username
-    session.close()
 
     return f"Your current username for karmabot is '{username}'"
