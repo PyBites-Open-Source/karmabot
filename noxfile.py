@@ -9,12 +9,12 @@ from nox.sessions import Session
 package = "karmabot"
 locations = "src", "tests", "noxfile.py"
 env = {
-    "KARMABOT_SLACK_USER": "FAKE_KARMA_ID",
-    "KARMABOT_SLACK_TOKEN": "FAKE_TOKEN",
-    "KARMABOT_SLACK_INVITE_USER_TOKEN": "FAKE_INVITE_USER_TOKEN",
-    "KARMABOT_GENERAL_CHANNEL": "GENERAL",
+    "KARMABOT_SLACK_BOT_TOKEN": "FAKE_BOT_TOKEN",
+    "KARMABOT_SLACK_APP_TOKEN": "FAKE_APP_TOKEN",
+    "KARMABOT_SLACK_USER": "FAKE_BOT_USER",
+    "KARMABOT_GENERAL_CHANNEL": "FAKE_GENERAL_CHANNEL",
     "KARMABOT_ADMINS": "FAKE_ADMIN",
-    "KARMABOT_DATABASE_URL": "FAKE_URL",
+    "KARMABOT_DATABASE_URL": "FAKE_DB_URL",
 }
 
 nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
