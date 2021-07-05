@@ -8,3 +8,7 @@ class CommandNotFoundException(Exception):
 
 class CommandExecutionException(Exception):
     pass
+
+
+class NotInitializedException(Exception):
+    pass
