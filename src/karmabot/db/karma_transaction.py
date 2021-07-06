@@ -7,7 +7,7 @@ from karmabot.db.modelbase import SqlAlchemyBase
 
 
 class KarmaTransaction(SqlAlchemyBase):
-    """ Models a karma transaction in the DB """
+    """Models a karma transaction in the DB"""
 
     __tablename__ = "karma_transaction"
 

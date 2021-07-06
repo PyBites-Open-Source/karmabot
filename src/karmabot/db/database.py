@@ -12,8 +12,9 @@ from karmabot.exceptions import NotInitializedException
 
 
 class Database:
-
-    def __init__(self, connection_string: str = settings.DATABASE_URL, echo: bool = False) -> None:
+    def __init__(
+        self, connection_string: str = settings.DATABASE_URL, echo: bool = False
+    ) -> None:
 
         self.connection_string = connection_string
         self.echo = echo
@@ -37,6 +38,7 @@ class Database:
 
     def create_models(self):
         import karmabot.db.__all_models  # noqa: F401
+
         if not self._engine:
             raise NotInitializedException("SqlAlchemy engine is not initialized")
         SqlAlchemyBase.metadata.create_all(self._engine)
