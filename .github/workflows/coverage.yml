@@ -12,10 +12,7 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    env:
-      KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
-      KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
-      CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
@@ -25,3 +22,7 @@ jobs:
       - run: pip install nox==2020.12.31
       - run: pip install poetry==1.1.6
       - run: nox --sessions tests-3.8 coverage
+        env:
+          KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
+          KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
+          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
