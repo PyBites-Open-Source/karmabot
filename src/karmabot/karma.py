@@ -1,7 +1,5 @@
 import logging
 
-from sqlalchemy.orm.session import Session
-
 import karmabot.bot as bot
 import karmabot.slack as slack
 from karmabot.db.database import database
@@ -13,9 +11,9 @@ from karmabot.settings import KARMABOT_ID, MAX_POINTS
 
 class Karma:
     def __init__(self, giver_id, receiver_id, channel_id):
-        with database.session_manager() as session:
-            self.giver: KarmaUser = session.query(KarmaUser).get(giver_id)
-            self.receiver: KarmaUser = session.query(KarmaUser).get(receiver_id)
+        self.session = database.session
+        self.giver: KarmaUser = self.session.query(KarmaUser).get(giver_id)
+        self.receiver: KarmaUser = self.session.query(KarmaUser).get(receiver_id)
 
         if not self.giver:
             self.giver = self._create_karma_user(giver_id)
@@ -37,9 +35,8 @@ class Karma:
         username = slack.get_available_username(user_profile)
 
         new_user = KarmaUser(user_id=user_id, username=username)
-        with database.session_manager() as session:
-            session.add(new_user)
-            session.commit()
+        self.session.add(new_user)
+        self.session.commit()
 
         logging.info(f"Created new KarmaUser: {repr(new_user)}")
         return new_user
@@ -99,21 +96,20 @@ class Karma:
             karma=points,
         )
 
-        with database.session_manager() as session:
-            session.add(transaction)
-            session.commit()
+        self.session.add(transaction)
+        self.session.commit()
 
-            finished_transaction = (
-                session.query(KarmaTransaction)
-                .order_by(KarmaTransaction.id.desc())
-                .first()
-            )
-            logging.info(repr(finished_transaction))
+        finished_transaction = (
+            self.session.query(KarmaTransaction)
+            .order_by(KarmaTransaction.id.desc())
+            .first()
+        )
+        logging.info(repr(finished_transaction))
 
     def change_karma(self, points):
         """ Updates Karma in the database """
         if not isinstance(points, int):
-            err ="change_karma should not be called with a non int points arg!"
+            err = "change_karma should not be called with a non int points arg!"
             raise RuntimeError(err)
 
         try:
@@ -122,6 +118,8 @@ class Karma:
 
             points = self._calc_final_score(points)
             self.receiver.karma_points += points
+            self.session.commit()
+
             self._save_transaction(points)
 
             if self.receiver.user_id == KARMABOT_ID:
@@ -132,6 +130,7 @@ class Karma:
         finally:
             logging.info(f"[Karmachange] {self.giver.user_id} to "
                          f"{self.receiver.user_id}: {points}")
+            self.session.close()
 
 
 def _parse_karma_change(karma_change):
