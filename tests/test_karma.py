@@ -1,8 +1,8 @@
 import pytest
 
-from karmabot.db import db_session
-from karmabot.db.karma_user import KarmaUser
-from karmabot.karma import Karma, _parse_karma_change
+import karmabot.bot  # noqa
+from karmabot.db.database import database
+from karmabot.karma import Karma, KarmaUser, _parse_karma_change
 from karmabot.settings import KARMA_ACTION_PATTERN, KARMABOT_ID
 
 
@@ -40,19 +40,20 @@ def test_parse_karma_change(test_change, expected):
         ("EFG123", "ABC123", "CHANNEL42", -3),
     ],
 )
-def test_change_karma(mock_filled_db_session, test_changes, mock_slack_api_call):
-    session = db_session.create_session()
-    pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
+def test_change_karma(conversations_info_fake_channel, mock_filled_db_session, test_changes):
+    with database.session_manager() as session:
+        pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
 
     karma = Karma(test_changes[0], test_changes[1], test_changes[2])
     karma.change_karma(test_changes[3])
 
-    post_change = session.query(KarmaUser).get(test_changes[1]).karma_points
+    with database.session_manager() as session:
+        post_change = session.query(KarmaUser).get(test_changes[1]).karma_points
+
     assert post_change == (pre_change_karma + test_changes[3])
-    session.close()
 
 
-def test_change_karma_msg(mock_filled_db_session):
+def test_change_karma_msg(save_transaction_disabled, mock_filled_db_session):
     karma = Karma("ABC123", "XYZ123", "CHANNEL42")
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
 
@@ -70,7 +71,7 @@ def test_change_karma_exceptions(mock_filled_db_session):
         karma.change_karma(2)
 
 
-def test_change_karma_bot_self(mock_filled_db_session):
+def test_change_karma_bot_self(save_transaction_disabled, mock_filled_db_session):
     karma = Karma("ABC123", KARMABOT_ID, "CHANNEL42")
     assert (
         karma.change_karma(2) == "Thanks pybob for the extra karma, my karma is 12 now"
