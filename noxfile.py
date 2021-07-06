@@ -53,7 +53,7 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
     os.unlink(requirements.name)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def tests(session: Session) -> None:
     """Run the test suite."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
@@ -64,7 +64,7 @@ def tests(session: Session) -> None:
     session.run("pytest", *args, env=env)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def lint(session: Session) -> None:
     """Lint using flake8."""
     args = session.posargs or locations
@@ -77,7 +77,7 @@ def lint(session: Session) -> None:
     session.run("flake8", *args)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def black(session: Session) -> None:
     """Run black code formatter."""
     args = session.posargs or locations
@@ -85,7 +85,7 @@ def black(session: Session) -> None:
     session.run("black", *args)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or locations
@@ -93,7 +93,7 @@ def mypy(session: Session) -> None:
     session.run("mypy", *args)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     with tempfile.NamedTemporaryFile(delete=False) as requirements:
@@ -113,7 +113,7 @@ def safety(session: Session) -> None:
     os.unlink(requirements.name)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def coverage(session: Session) -> None:
     """Upload coverage data."""
     install_with_constraints(session, "coverage[toml]", "codecov")
