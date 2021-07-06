@@ -1,3 +1,4 @@
+import os
 from collections import namedtuple
 
 import pytest
@@ -25,14 +26,6 @@ def save_transaction_disabled(monkeypatch):
         return
 
     monkeypatch.setattr("karmabot.karma.Karma._save_transaction", _disabled)
-
-
-# @pytest.fixture
-# def deactivate_slack_auth(monkeypatch):
-#     def _disabled_auth(*args):
-#         pass
-
-#     monkeypatch.setattr("slack_bolt.App._init_middleware_list", _disabled_auth)
 
 
 @pytest.fixture
