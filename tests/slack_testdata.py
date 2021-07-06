@@ -11,7 +11,7 @@ TEST_USERINFO = {
             "real_name": "Bob Belderbos",
             "profile": {
                 "real_name": "Bob Belderbos",
-                "real_name_normalized": "Patrick",
+                "real_name_normalized": "Bob Belderbos",
                 "display_name": "pybob",
                 "display_name_normalized": "pybob",
             },

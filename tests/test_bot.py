@@ -8,11 +8,19 @@ from karmabot.settings import KARMABOT_ID
 @pytest.mark.parametrize(
     "test_message, expected",
     [
-        ({"text": "<@EFG123> +++", "user": "ABC123", "channel": "FAKE_CHANNEL"}, "Julian Sequeira's karma increased to 125"),
-        ({"text": "<@XYZ123> +++++", "user": "ABC123", "channel": "FAKE_CHANNEL"}, "clamytoe's karma increased to 424"),
-    ]
+        (
+            {"text": "<@EFG123> +++", "user": "ABC123", "channel": "FAKE_CHANNEL"},
+            "Julian Sequeira's karma increased to 125",
+        ),
+        (
+            {"text": "<@XYZ123> +++++", "user": "ABC123", "channel": "FAKE_CHANNEL"},
+            "clamytoe's karma increased to 424",
+        ),
+    ],
 )
-def test_karma_action(mock_filled_db_session, save_transaction_disabled, capfd, test_message, expected):
+def test_karma_action(
+    mock_filled_db_session, save_transaction_disabled, capfd, test_message, expected
+):
     karma_action(test_message, print)  # type: ignore
     out, err = capfd.readouterr()
     assert out.strip() == expected
@@ -23,8 +31,11 @@ def test_karma_action(mock_filled_db_session, save_transaction_disabled, capfd, 
     [
         ({"text": "Cheers everybody"}, "To _cheers_ I say: :beers:"),
         ({"text": "What about zen?"}, "To _zen_ I say: `import this`"),
-        ({"text": "Anyone likes braces, huh?"}, "To _braces_ I say: `SyntaxError: not a chance`")
-    ]
+        (
+            {"text": "Anyone likes braces, huh?"},
+            "To _braces_ I say: `SyntaxError: not a chance`",
+        ),
+    ],
 )
 def test_reply_special_words(capfd, test_message, expected):
 
@@ -60,12 +71,17 @@ def test_reply_commands_private():
 
 @pytest.mark.parametrize(
     "test_message, expected",
-    [({"text": f"<@{KARMABOT_ID}> yada yada",
-       "user": "FAKE_USER",
-       "channel": "FAKE_CHANNEL",
-       "channel_type": "public_channel"},
-      'Sorry <@FAKE_USER>, there is no command "yada"'),
-     ],
+    [
+        (
+            {
+                "text": f"<@{KARMABOT_ID}> yada yada",
+                "user": "FAKE_USER",
+                "channel": "FAKE_CHANNEL",
+                "channel_type": "public_channel",
+            },
+            'Sorry <@FAKE_USER>, there is no command "yada"',
+        ),
+    ],
 )
 def test_reply_commands_unknown(capfd, test_message, expected):
     reply_commands(test_message, print)  # type: ignore

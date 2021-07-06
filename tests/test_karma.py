@@ -40,7 +40,9 @@ def test_parse_karma_change(test_change, expected):
         ("EFG123", "ABC123", "CHANNEL42", -3),
     ],
 )
-def test_change_karma(conversations_info_fake_channel, mock_filled_db_session, test_changes):
+def test_change_karma(
+    conversations_info_fake_channel, mock_filled_db_session, test_changes
+):
     with database.session_manager() as session:
         pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
 

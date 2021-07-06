@@ -1,4 +1,3 @@
-import datetime
 from collections import namedtuple
 
 import pytest
@@ -11,9 +10,12 @@ from karmabot.db.karma_transaction import KarmaTransaction
 from karmabot.db.karma_user import KarmaUser
 from karmabot.settings import KARMABOT_ID
 
-from .slack_testdata import TEST_CHANNEL_HISTORY, TEST_CHANNEL_INFO, TEST_USERINFO
-
-USERS = {"ABC123": "pybob", "EFG123": "Julian Sequeira", "XYZ123": "clamytoe", KARMABOT_ID: "karmabot"}
+USERS = {
+    "ABC123": "pybob",
+    "EFG123": "Julian Sequeira",
+    "XYZ123": "clamytoe",
+    KARMABOT_ID: "karmabot",
+}
 SlackResponse = namedtuple("SlackResponse", "status_code, data")
 
 
@@ -25,13 +27,25 @@ def save_transaction_disabled(monkeypatch):
     monkeypatch.setattr("karmabot.karma.Karma._save_transaction", _disabled)
 
 
+# @pytest.fixture
+# def deactivate_slack_auth(monkeypatch):
+#     def _disabled_auth(*args):
+#         pass
+
+#     monkeypatch.setattr("slack_bolt.App._init_middleware_list", _disabled_auth)
+
+
 @pytest.fixture
 def conversations_info_fake_channel(monkeypatch):
     def mock_conversation_info(channel):
-        response = SlackResponse(status_code=200, data={"channel": {"name": f"{channel}"}})
+        response = SlackResponse(
+            status_code=200, data={"channel": {"name": f"{channel}"}}
+        )
         return response
 
-    monkeypatch.setattr("karmabot.bot.app.client.conversations_info", mock_conversation_info)
+    monkeypatch.setattr(
+        "karmabot.bot.app.client.conversations_info", mock_conversation_info
+    )
 
 
 @pytest.fixture
@@ -42,7 +56,10 @@ def users_profile_get_fake_user(monkeypatch):
         response = SlackResponse(status_code=200, data={"profile": profile})
         return response
 
-    monkeypatch.setattr("karmabot.bot.app.client.users_profile_get", mock_users_profile_get)
+    monkeypatch.setattr(
+        "karmabot.bot.app.client.users_profile_get", mock_users_profile_get
+    )
+
 
 @pytest.fixture(scope="session")
 def engine():

@@ -1,5 +1,3 @@
-import pytest
-
 # TODO
 # def _channel_score(channel):
 #     channel_info = channel["channel"]
