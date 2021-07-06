@@ -20,6 +20,50 @@ DEFAULT_NR_CHANNELS = 7
 Channel = namedtuple("Channel", "id name purpose num_members latest_ts latest_subtype")
 
 
+def channel_is_potential(channel):
+    is_channel = channel["is_channel"]
+    is_member = channel["is_member"]
+    is_general = channel["is_general"]
+    is_private = channel["is_private"]
+    return is_channel and is_member and is_general and is_private
+
+
+def collect_channel_info(channel):
+    channel_id = channel["id"]
+    try:
+        info_response: Dict = bot.app.client.conversations_info(
+            channel=channel_id, include_num_members=True
+        )
+        if not info_response["ok"]:
+            raise SlackApiError("converstation.info error", info_response)
+
+        history_response: Dict = bot.app.client.conversations_history(
+            channel=channel_id, limit=1
+        )
+        if not history_response["ok"]:
+            raise SlackApiError("conversation.history error", history_response)
+
+    except SlackApiError as e:
+        logging.error(e)
+        return "I am truly sorry but something went wrong ;("
+
+    channel_info: Dict = info_response["channel"]
+    channel_history: Dict = history_response["messages"][0]
+
+    latest_ts = channel_history.get("ts")
+    latest_type = channel_history.get("type")
+    if latest_ts:
+        info = Channel(
+            channel["id"],
+            channel["name"],
+            channel_info["purpose"]["value"],
+            channel_info["num_members"],
+            float(latest_ts),
+            latest_type,
+        )
+        return info
+
+
 def get_recommended_channels(**kwargs):
     """Show some of our Community's favorite channels you can join"""
     text = kwargs.get("text")
@@ -51,53 +95,10 @@ def get_recommended_channels(**kwargs):
     # retrieve channel info for each channel in channel list
     # only consider channels that are not the general channel, that are not private and that have at least one message
     for channel in channels:
-        channel_is_potential = (
-            channel["is_channel"]
-            and channel["is_member"]
-            and not channel["is_general"]
-            and not channel["is_private"]
-        )
-
-        if channel_is_potential:
-            # we have to stick with channel.info, also it could be
-            # that the latest message is a bot or join message
-            # but channels.history is not allowed for bots.
-            # However, it seems that in the future, Slack will update the bot permissions
-            # see: https://api.slack.com/methods/channels.history
-            channel_id = channel["id"]
-            try:
-                info_response: Dict = bot.app.client.conversations_info(
-                    channel=channel_id, include_num_members=True
-                )
-                if not info_response["ok"]:
-                    raise SlackApiError("converstation.info error", info_response)
-
-                history_response: Dict = bot.app.client.conversations_history(
-                    channel=channel_id, limit=1
-                )
-                if not history_response["ok"]:
-                    raise SlackApiError("conversation.history error", history_response)
-
-            except SlackApiError as e:
-                logging.error(e)
-                return "I am truly sorry but something went wrong ;("
-
-            channel_info: Dict = info_response["channel"]
-            channel_history: Dict = history_response["messages"][0]
-
-            latest_ts = channel_history.get("ts")
-            latest_type = channel_history.get("type")
-            if latest_ts:
-                potential_channels.append(
-                    Channel(
-                        channel["id"],
-                        channel["name"],
-                        channel_info["purpose"]["value"],
-                        channel_info["num_members"],
-                        float(latest_ts),
-                        latest_type,
-                    )
-                )
+        if channel_is_potential(channel):
+            info = collect_channel_info(channel)
+            if info:
+                potential_channels.append(info)
 
     # now weight channels and return message
     potential_channels = sorted(
@@ -176,10 +177,3 @@ def seconds_since_last_post(channel: Channel) -> Optional[float]:
         latest_ts = float(max(msgs, key=itemgetter("ts"))["ts"])
 
     return (dt.now() - dt.fromtimestamp(latest_ts)).total_seconds()
-
-
-if __name__ == "__main__":
-    user, channel, text = "bob", "#general", "some message"
-    kwargs = dict(user=user, channel=channel, text=text)
-    output = get_recommended_channels(**kwargs)
-    print(output)
