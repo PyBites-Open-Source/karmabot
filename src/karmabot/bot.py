@@ -82,6 +82,7 @@ ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
 PUBLIC_COMMAND_PATTERN = compile_command_pattern(PUBLIC_BOT_COMMANDS)
 PRIVATE_COMMAND_PATTERN = compile_command_pattern(PRIVATE_BOT_COMMANDS)
 UNKNOWN_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(\w*)")
+HELP_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(help|commands)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 
@@ -124,7 +125,7 @@ def karma_action(message, say):
 
 
 # Help
-@app.message(f"<@{KARMABOT_ID}> help")  # type: ignore
+@app.message(HELP_COMMAND_PATTERN)  # type: ignore
 def reply_help(message, say):
     user_id = message["user"]
     channel_type = message["channel_type"]
