@@ -87,7 +87,7 @@ SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 
 # Init
-app = App(token=SLACK_BOT_TOKEN)  # type: ignore
+app = App(token=SLACK_BOT_TOKEN, name="Karmabot")  # type: ignore
 
 
 # Helpers
