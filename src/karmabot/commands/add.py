@@ -5,9 +5,10 @@ MSG = """Hey {username}, so you want to propose a new command eh?
 Awesome! Here are the steps:
 1. Karmabot repo: https://github.com/pybites/karmabot
 2. Fork the repo, make your branch.
-3. Add your command script under the commands/ subdirectory.
+3. Add your command script under the commands subdirectory.
 4. Open a PR of your branch against PyBites repo.
 5. Bob/Julian/Community to approve and merge it in.
+6. Join the slack channel: #karmabot_dev
 
 Here is a walk-through video:
 https://www.youtube.com/watch?v=Yx9qYl6lmzM&t=2s
