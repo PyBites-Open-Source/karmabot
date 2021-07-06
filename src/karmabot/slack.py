@@ -2,6 +2,7 @@ import re
 
 SLACK_ID_PATTERN = re.compile(r"^<@[^>]+>$")
 
+
 def get_slack_id(user_id: str) -> str:
     """
     Formats a plain user_id (ABC123XYZ) to use slack identity

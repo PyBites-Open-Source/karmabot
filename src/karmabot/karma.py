@@ -107,7 +107,7 @@ class Karma:
         logging.info(repr(finished_transaction))
 
     def change_karma(self, points):
-        """ Updates Karma in the database """
+        """Updates Karma in the database"""
         if not isinstance(points, int):
             err = "change_karma should not be called with a non int points arg!"
             raise RuntimeError(err)
@@ -128,8 +128,10 @@ class Karma:
                 return self._create_msg(points)
 
         finally:
-            logging.info(f"[Karmachange] {self.giver.user_id} to "
-                         f"{self.receiver.user_id}: {points}")
+            logging.info(
+                f"[Karmachange] {self.giver.user_id} to "
+                f"{self.receiver.user_id}: {points}"
+            )
             self.session.close()
 
 
