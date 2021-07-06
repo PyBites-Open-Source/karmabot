@@ -10,33 +10,31 @@ repository = "https://github.com/PyBites-Open-Source/karmabot"
 version = "1.4"
 
 [tool.poetry.dependencies]
-SQLAlchemy = "^1.4.2"
-feedparser = "6.0.2"
-humanize = "^3.3.0"
+SQLAlchemy = "^1.4.20"
+feedparser = "^6.0.8"
+humanize = "^3.10.0"
 importlib-metadata = "^3.7.3"
-psycopg2-binary = "^2.8.6"
+psycopg2-binary = "^2.9.1"
 pyjokes = "^0.6.0"
 python = "^3.8"
-python-dotenv = "^0.15.0"
+python-dotenv = "^0.18.0"
 slack-bolt = "^1.6.1"
-slack-sdk = "^3.4.2"
-slackeventsapi = "^2.2.1"
+slack-sdk = "^3.7.0"
 
 [tool.poetry.dev-dependencies]
-black = "^20.8b1"
+black = "^21.6b0"
 codecov = "^2.1.11"
 coverage = {extras = ["toml"], version = "^5.5"}
-flake8 = "^3.9.0"
+flake8 = "^3.9.2"
 flake8-bandit = "^2.1.2"
-flake8-bugbear = "^21.3"
+flake8-bugbear = "^21.4.3"
 freezegun = "^1.1.0"
-isort = "^5.8.0"
-mutpy = "^0.6.1"
-mypy = "^0.812"
+isort = "^5.9.1"
+mypy = "^0.910"
 nox = "^2021.6.12"
-pytest = "^6.2.2"
-pytest-cov = "^2.11.1"
-pytest-mock = "^3.5.1"
+pytest = "^6.2.4"
+pytest-cov = "^2.12.1"
+pytest-mock = "^3.6.1"
 safety = "^1.10.3"
 
 [tool.poetry.scripts]
@@ -76,8 +74,23 @@ line-length = 88
 target-version = ["py38", "py39"]
 
 [tool.isort]
-known_third_party = "dotenv,feedparser,humanize,pyjokes,pytest,requests,slackclient,sqlalchemy"
+known_third_party = "dotenv,feedparser,humanize,pyjokes,pytest,requests,sqlalchemy,freezegun,slack_bolt,slack_sdk"
 profile = "black"
+
+[tool.mypy]
+mypy_path = "src,tests"
+pretty = true
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "freezegun",
+  "requests"
+]
+ignore_missing_imports = true
 
 [build-system]
 build-backend = "poetry.masonry.api"
