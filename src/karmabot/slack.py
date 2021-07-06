@@ -2,7 +2,6 @@ import re
 
 SLACK_ID_PATTERN = re.compile(r"^<@[^>]+>$")
 
-
 def get_slack_id(user_id: str) -> str:
     """
     Formats a plain user_id (ABC123XYZ) to use slack identity
@@ -47,3 +46,5 @@ def get_available_username(user_profile):
     real_name = user_profile["real_name_normalized"]
     if real_name:
         return real_name
+
+    raise ValueError("User Profile data missing name information")
