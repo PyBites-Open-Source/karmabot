@@ -1,4 +1,4 @@
-name: "Karmabot Tests"
+name: Karmabot Tests
 
 on:
   push:
@@ -9,24 +9,31 @@ on:
     branches:
       - develop
 
-
-
 jobs:
-  test_job:
+  tests:
     runs-on: ubuntu-latest
-    env:
-      KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
-      KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
     strategy:
       matrix:
         python-version: [3.8, 3.9]
     name: Python ${{ matrix.python-version }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - name: checkout repo content
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - run: pip install nox==2020.12.31
-      - run: pip install poetry==1.1.6
-      - run: nox
+
+      - name: install nox
+        run: pip install nox==2021.6.12
+
+      - name: install poetry
+        run: pip install poetry==1.1.6
+
+      - name: run tests
+        env:
+          KARMABOT_SLACK_BOT_TOKEN: ${{ secrets.KARMABOT_SLACK_BOT_TOKEN }}
+          KARMABOT_SLACK_APP_TOKEN: ${{ secrets.KARMABOT_SLACK_APP_TOKEN }}
+        run: nox
