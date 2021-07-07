@@ -18,9 +18,8 @@ from karmabot.settings import KARMABOT_ID
         ),
     ],
 )
-def test_karma_action(
-    mock_filled_db_session, save_transaction_disabled, capfd, test_message, expected
-):
+@pytest.mark.usefixtures("mock_filled_db_session", "save_transaction_disabled")
+def test_karma_action(capfd, test_message, expected):
     karma_action(test_message, print)  # type: ignore
     out, err = capfd.readouterr()
     assert out.strip() == expected

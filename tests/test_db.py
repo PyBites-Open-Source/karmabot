@@ -17,13 +17,15 @@ def test_karma_user_repr(karma_users):
     "test_user_id, expected",
     [("ABC123", "pybob"), ("EFG123", "Julian Sequeira"), ("XYZ123", "clamytoe")],
 )
-def test_lookup_username(mock_filled_db_session, test_user_id, expected):
+@pytest.mark.usefixtures("mock_filled_db_session")
+def test_lookup_username(test_user_id, expected):
     with database.session_manager() as session:
         karma_user = session.query(KarmaUser).get(test_user_id)
     assert karma_user.username == expected
 
 
-def test_create_karma_user(mock_empty_db_session, users_profile_get_fake_user):
+@pytest.mark.usefixtures("mock_empty_db_session", "users_profile_get_fake_user")
+def test_create_karma_user():
     karma = Karma("ABC123", "XYZ123", "CHANNEL42")
     assert karma.giver.username == "pybob"
     assert karma.receiver.username == "clamytoe"
