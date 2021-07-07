@@ -160,7 +160,7 @@ def process_karma_changes(karma_giver, channel_id, karma_changes):
 
         try:
             text = karma.change_karma(points)
-        except Exception as exc:
+        except (RuntimeError, ValueError) as exc:
             text = str(exc)
 
         return text

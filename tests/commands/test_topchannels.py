@@ -1,4 +1,3 @@
-# TODO
 # def _channel_score(channel):
 #     channel_info = channel["channel"]
 #     return calc_channel_score(

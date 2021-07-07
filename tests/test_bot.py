@@ -84,7 +84,7 @@ def test_reply_commands_private():
 )
 def test_reply_commands_unknown(capfd, test_message, expected):
     reply_commands(test_message, print)  # type: ignore
-    out, err = capfd.readouterr()
+    out, _ = capfd.readouterr()
     assert out.strip() == expected
 
 

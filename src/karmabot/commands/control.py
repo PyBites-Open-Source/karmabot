@@ -13,8 +13,9 @@ def join_public_channels(**kwargs):
     if response["ok"]:
         public_channels = response["channels"]
     else:
-        logging.error("Could not retrieve public channel list for init join")
-        return
+        error = "Could not retrieve public channel list"
+        logging.error(error)
+        return error
 
     channels_joined = []
     for channel in public_channels:
