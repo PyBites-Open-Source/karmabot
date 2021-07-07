@@ -15,8 +15,8 @@ jobs:
   test_job:
     runs-on: ubuntu-latest
     env:
-      KARMABOT_SLACK_BOT_TOKEN: '${{secrets.KARMABOT_SLACK_BOT_TOKEN}}'
-      KARMABOT_SLACK_APP_TOKEN: '${{secrets.KARMABOT_SLACK_APP_TOKEN}}'
+      KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
+      KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
     strategy:
       matrix:
         python-version: [3.8, 3.9]
