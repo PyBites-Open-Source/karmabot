@@ -9,9 +9,14 @@ on:
     branches:
       - develop
 
+
+
 jobs:
   test_job:
     runs-on: ubuntu-latest
+    env:
+      KARMABOT_SLACK_BOT_TOKEN: '${{secrets.KARMABOT_SLACK_BOT_TOKEN}}'
+      KARMABOT_SLACK_APP_TOKEN: '${{secrets.KARMABOT_SLACK_APP_TOKEN}}'
     strategy:
       matrix:
         python-version: [3.8, 3.9]
@@ -22,8 +27,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-          KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
-          KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
       - run: pip install nox==2020.12.31
       - run: pip install poetry==1.1.6
       - run: nox
