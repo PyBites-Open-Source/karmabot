@@ -7,7 +7,7 @@ from slack_bolt import App
 # Commands
 from karmabot.commands.add import add_command
 from karmabot.commands.age import pybites_age
-from karmabot.commands.control import join_public_channels
+from karmabot.commands.control import general_channel_id, join_public_channels, your_id
 from karmabot.commands.doc import doc_command
 from karmabot.commands.feed import get_pybites_last_entries
 from karmabot.commands.joke import joke
@@ -35,6 +35,8 @@ from karmabot.settings import (
 ADMIN_BOT_COMMANDS = {
     "top_karma": top_karma,
     "join_public_channels": join_public_channels,
+    "your_id": your_id,
+    "general_channel_id": general_channel_id,
 }
 PUBLIC_BOT_COMMANDS = {
     "add": add_command,

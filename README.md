@@ -104,6 +104,7 @@ Go to your [slack app](https://api.slack.com/apps/) and click on **Add features 
     - im:read
     - im:write
     - users.profile:read
+    - users:read
 
 ## Development pattern for contributors
 

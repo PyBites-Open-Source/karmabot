@@ -1,6 +1,8 @@
 import logging
+from typing import Dict, List
 
 import karmabot.bot as bot
+from karmabot.slack import get_user_id
 
 
 def join_public_channels(**kwargs):
@@ -28,3 +30,32 @@ def join_public_channels(**kwargs):
         return f"I joined the following public channels: {channels_text}"
 
     return "There were no new public channels to join!"
+
+
+def your_id(**kwargs):
+    message = kwargs.get("text", "")
+    bot_slack_id = message.split()[0]
+    bot_user_id = get_user_id(bot_slack_id)
+
+    if bot_user_id:
+        return f"My user id is: {bot_user_id}"
+
+    return "Sorry could not retrieve my user id"
+
+
+def general_channel_id(**kwargs):
+    response: Dict = bot.app.client.conversations_list(
+        exclude_archived=True, types="public_channel"
+    )
+
+    if not response["ok"]:
+        logging.error(f'Error for API call "channels.list": {response["error"]}')
+        return "I am truly sorry but something went wrong ;("
+
+    channels: List[Dict] = response["channels"]
+    for channel in channels:
+        if channel["is_general"]:
+            general_id = channel["id"]
+            return f"The general channel id is: {general_id}"
+
+    return "Sorry, could not find the general channel id :("
