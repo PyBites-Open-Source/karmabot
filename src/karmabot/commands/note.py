@@ -113,7 +113,7 @@ def _get_notes_for_user(user: KarmaUser) -> list:
 
 def _note_exists(msg: str, user: KarmaUser) -> bool:
     with database.session_manager() as session:
-        note = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
+        selected_note = session.query(KarmaNote).filter_by(note=msg, user_id=user.user_id)
         note_exists = session.query(note.exists()).scalar()  # returns True or False
     return note_exists
 
