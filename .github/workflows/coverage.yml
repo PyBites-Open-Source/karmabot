@@ -14,15 +14,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v1
+      - name: checkout repo content
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v1
         with:
           python-version: "3.8"
           architecture: x64
-      - run: pip install nox==2020.12.31
-      - run: pip install poetry==1.1.6
-      - run: nox --sessions tests-3.8 coverage
-        env:
-          KARMABOT_SLACK_BOT_TOKEN: ${{secrets.KARMABOT_SLACK_BOT_TOKEN}}
-          KARMABOT_SLACK_APP_TOKEN: ${{secrets.KARMABOT_SLACK_APP_TOKEN}}
-          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+
+      - name: install nox
+        run: pip install nox==2021.6.12
+
+      - name: install poetry
+        run: pip install poetry==1.1.6
+
+      - name: run coverage
+        run: nox --sessions tests-3.8 coverage
+
+      - name: upload coverage
+        uses: codecov/codecov-action@v1
