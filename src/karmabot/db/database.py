@@ -12,6 +12,8 @@ from karmabot.exceptions import NotInitializedException
 
 
 class Database:
+    """Class for handlading the database connection and provide access to sessions"""
+
     def __init__(
         self, connection_string: str = settings.DATABASE_URL, echo: bool = False
     ) -> None:
@@ -20,7 +22,7 @@ class Database:
         self.echo = echo
 
         self._engine = None
-        self._SessionFactory = None
+        self._SessionFactory = None  # noqa
 
     def connect(self):
         """Sets up connection to DB and initializes models"""
