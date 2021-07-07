@@ -25,7 +25,7 @@ def channel_is_potential(channel):
     is_member = channel["is_member"]
     is_general = channel["is_general"]
     is_private = channel["is_private"]
-    return is_channel and is_member and is_general and is_private
+    return is_channel and is_member and not is_general and not is_private
 
 
 def collect_channel_info(channel):
@@ -43,8 +43,8 @@ def collect_channel_info(channel):
         if not history_response["ok"]:
             raise SlackApiError("conversation.history error", history_response)
 
-    except SlackApiError as e:
-        logging.error(e)
+    except SlackApiError as exc:
+        logging.error(exc)
         return "I am truly sorry but something went wrong ;("
 
     channel_info: Dict = info_response["channel"]
@@ -62,6 +62,8 @@ def collect_channel_info(channel):
             latest_type,
         )
         return info
+
+    return None
 
 
 def get_recommended_channels(**kwargs):
@@ -87,7 +89,7 @@ def get_recommended_channels(**kwargs):
     )
 
     if not response["ok"]:
-        logging.error(f'Error for API call "channels.list": {response["error"]}')
+        logging.error('Error for API call "channels.list": %s', response["error"])
         return "I am truly sorry but something went wrong ;("
 
     channels: List[Dict] = response["channels"]
@@ -140,12 +142,11 @@ def get_messages(
     if ignore_message_types is None:
         ignore_message_types = {"channel_join"}
 
-    # TODO
     response = bot.app.client.conversations_history(
         channel=channel.id, user=KARMABOT_ID
     )
 
-    return [msg for msg in response["messages"]]
+    return response["messages"]
 
 
 def calc_channel_score(channel: Channel):

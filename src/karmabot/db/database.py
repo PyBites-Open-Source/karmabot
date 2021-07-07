@@ -24,7 +24,7 @@ class Database:
 
     def connect(self):
         """Sets up connection to DB and initializes models"""
-        logging.debug(f"Connecting to DB with {self.connection_string}")
+        logging.debug("Connecting to DB with %s", self.connection_string)
 
         self._engine = sa.create_engine(self.connection_string, echo=self.echo)
         try:

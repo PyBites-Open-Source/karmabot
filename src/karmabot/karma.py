@@ -28,7 +28,7 @@ class Karma:
         status = response.status_code
 
         if status != 200:
-            logging.info(f"Cannot get user info for {user_id} - API error: {status}")
+            logging.info("Cannot get user info for %s - API error: %s", user_id, status)
             raise GetUserInfoException
 
         user_profile = response.data["profile"]
@@ -38,7 +38,7 @@ class Karma:
         self.session.add(new_user)
         self.session.commit()
 
-        logging.info(f"Created new KarmaUser: {repr(new_user)}")
+        logging.info("Created new KarmaUser: %s", repr(new_user))
         return new_user
 
     def _calc_final_score(self, points):
@@ -129,8 +129,10 @@ class Karma:
 
         finally:
             logging.info(
-                f"[Karmachange] {self.giver.user_id} to "
-                f"{self.receiver.user_id}: {points}"
+                "[Karmachange] %s to %s: %s",
+                self.giver.user_id,
+                self.receiver.user_id,
+                points,
             )
             self.session.close()
 

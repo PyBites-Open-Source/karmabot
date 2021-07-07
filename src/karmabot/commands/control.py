@@ -49,7 +49,7 @@ def general_channel_id(**kwargs):
     )
 
     if not response["ok"]:
-        logging.error(f'Error for API call "channels.list": {response["error"]}')
+        logging.error('Error for API call "channels.list": %s', response["error"])
         return "I am truly sorry but something went wrong ;("
 
     channels: List[Dict] = response["channels"]

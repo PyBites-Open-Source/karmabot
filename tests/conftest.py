@@ -124,7 +124,7 @@ def filled_db_session(engine, tables, karma_users):
 
 @pytest.fixture
 def mock_filled_db_session(monkeypatch, filled_db_session):
-    def mock_session_factory(*args, **kwargs):
+    def mock_session_factory():
         return filled_db_session
 
     monkeypatch.setattr(database, "_SessionFactory", mock_session_factory)
@@ -132,7 +132,7 @@ def mock_filled_db_session(monkeypatch, filled_db_session):
 
 @pytest.fixture
 def mock_empty_db_session(monkeypatch, empty_db_session):
-    def mock_session_factory(*args, **kwargs):
+    def mock_session_factory():
         return empty_db_session
 
     monkeypatch.setattr(database, "_SessionFactory", mock_session_factory)
