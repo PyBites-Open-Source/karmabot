@@ -13,6 +13,9 @@ env = {
     "KARMABOT_GENERAL_CHANNEL": "FAKE_GENERAL_CHANNEL",
     "KARMABOT_ADMINS": "FAKE_ADMIN",
     "KARMABOT_DATABASE_URL": "FAKE_DB_URL",
+    "KARMABOT_SLACK_APP_TOKEN": "FAKE_APP_TOKEN",
+    "KARMABOT_SLACK_BOT_TOKEN": "FAKE_BOT_TOKEN",
+    "KARMABOT_TEST_MODE": "true",
 }
 
 nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
@@ -114,6 +117,6 @@ def safety(session: Session) -> None:
 @nox.session(python="3.8")
 def coverage(session: Session) -> None:
     """Upload coverage data."""
-    install_with_constraints(session, "coverage[toml]", "codecov")
-    session.run("coverage", "xml", "--fail-under=0")
-    session.run("codecov", *session.posargs)
+    install_with_constraints(session, "coverage[toml]")
+    session.run("coverage", "report", "--fail-under=40")
+    session.run("coverage", "xml", "--fail-under=40")

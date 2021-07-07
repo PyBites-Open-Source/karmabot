@@ -28,6 +28,7 @@ from karmabot.settings import (
     KARMA_ACTION_PATTERN,
     KARMABOT_ID,
     SLACK_BOT_TOKEN,
+    TEST_MODE,
 )
 
 # command constants
@@ -86,8 +87,14 @@ HELP_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(help|commands)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 
-# Init
-app = App(token=SLACK_BOT_TOKEN, name="Karmabot")  # type: ignore
+# Slack Bolt App Init
+# For testing we disable the token_verification, such that no valied token is required
+TOKEN_VERIFICATION = not TEST_MODE
+app = App(
+    token=SLACK_BOT_TOKEN,
+    name="Karmabot",
+    token_verification_enabled=TOKEN_VERIFICATION,
+)  # type: ignore
 
 
 # Helpers

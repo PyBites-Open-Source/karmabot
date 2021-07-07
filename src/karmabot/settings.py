@@ -33,12 +33,13 @@ KARMABOT_ID = _get_env_var("KARMABOT_SLACK_USER")
 DATABASE_URL = _get_env_var("KARMABOT_DATABASE_URL")
 SLACK_APP_TOKEN = _get_env_var("KARMABOT_SLACK_APP_TOKEN")
 SLACK_BOT_TOKEN = _get_env_var("KARMABOT_SLACK_BOT_TOKEN")
+TEST_MODE = True if _get_env_var("KARMABOT_TEST_MODE") == "true" else False
+logging.info(f"Test mode enabled: {TEST_MODE}")
 
 # Slack
 GENERAL_CHANNEL = _get_env_var("KARMABOT_GENERAL_CHANNEL")
 ADMINS = _get_env_var("KARMABOT_ADMINS")
 ADMINS = ADMINS.split(",")  # type: ignore
-
 
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)

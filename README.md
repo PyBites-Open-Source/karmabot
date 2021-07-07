@@ -53,6 +53,9 @@ KARMABOT_ADMINS=
 
 # Backend
 KARMABOT_DATABASE_URL=
+
+# Testing
+KARMABOT_TEST_MODE=
 ```
 
 KARMABOT_SLACK_BOT_TOKEN
@@ -74,6 +77,9 @@ KARMABOT_ADMINS
 KARMABOT_DATABASE_URL
   : The database url which should be compatible with SqlAlchemy. For the provided docker file use `postgresql://user42:pw42@localhost:5432/karmabot`.
   :heavy_exclamation_mark: To start the provided Docker-based Postgres server, be sure you have Docker Compose [installed](https://docs.docker.com/compose/install/) and run `docker-compose up -d` from the karmabot directory.
+
+KARMABOT_TEST_MODE=
+  : Determines if the code is run in test mode. User `KARMABOT_TEST_MODE=true` to enable testing mode. Everything else will default to `false`. This setting has to be provided as `true`, if you want run tests without a valid `KARMABOT_SLACK_BOT_TOKEN`. Otherwise, you will receive an exceptions with `slack_bolt.error.BoltError: token is invalid ...`.
 
 If you do not want to use a file you have to provide environment variables with the above names. If no file is present we default to environment variables.
 
@@ -125,6 +131,8 @@ For testing you need to install [nox](https://nox.thea.codes/en/stable/) separat
 If `nox` cannot be found, use `python -m nox` instead.
 
 For different sessions see the `nox.py` file. You can run `nox --list` to see a list of all available sessions.
+
+If you want to run tests locally via `pytest` you have to provide a valid `.karmabot` settings file or the respective enviroment variables.
 
 Please make sure all tests and checks pass before opening pull requests!
 
