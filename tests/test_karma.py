@@ -33,7 +33,7 @@ def test_parse_karma_change(test_change, expected):
 
 
 @pytest.mark.parametrize(
-    "test_changes",
+    "giver, receiver, channel, amount",
     [
         ("ABC123", "XYZ123", "CHANNEL42", 2),
         ("XYZ123", "ABC123", "CHANNEL42", 5),
@@ -41,17 +41,18 @@ def test_parse_karma_change(test_change, expected):
     ],
 )
 @pytest.mark.usefixtures("conversations_info_fake_channel", "mock_filled_db_session")
-def test_change_karma(test_changes):
-    with database.session_manager() as session:
-        pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
-
-    karma = Karma(test_changes[0], test_changes[1], test_changes[2])
-    karma.change_karma(test_changes[3])
+def test_change_karma(giver, receiver, channel, amount):
 
     with database.session_manager() as session:
-        post_change = session.query(KarmaUser).get(test_changes[1]).karma_points
+        pre_change_karma = session.query(KarmaUser).get(receiver).karma_points
 
-    assert post_change == (pre_change_karma + test_changes[3])
+    karma = Karma(giver, receiver, channel)
+    karma.change_karma(amount)
+
+    with database.session_manager() as session:
+        post_change = session.query(KarmaUser).get(receiver).karma_points
+
+    assert post_change == (pre_change_karma + amount)
 
 
 @pytest.mark.usefixtures("save_transaction_disabled", "mock_filled_db_session")
