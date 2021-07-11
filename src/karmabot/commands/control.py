@@ -34,6 +34,7 @@ def join_public_channels(**kwargs):
 
 
 def your_id(**kwargs):
+    """Shows the user id of karmabot"""
     message = kwargs.get("text", "")
     bot_slack_id = message.split()[0]
     bot_user_id = get_user_id(bot_slack_id)
@@ -45,6 +46,7 @@ def your_id(**kwargs):
 
 
 def general_channel_id(**kwargs):
+    """Shows the channel id of the general channel"""
     response: Dict = bot.app.client.conversations_list(
         exclude_archived=True, types="public_channel"
     )

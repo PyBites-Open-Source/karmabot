@@ -30,6 +30,7 @@ from karmabot.settings import (
     SLACK_BOT_TOKEN,
     TEST_MODE,
 )
+from karmabot.slack import MessageChannelType
 
 # command constants
 ADMIN_BOT_COMMANDS = {
@@ -112,11 +113,11 @@ def create_commands_table(commands):
     """Print this help text"""
     ret = "\n".join(
         [
-            "{:<30}: {}".format(name, func.__doc__.strip())
+            f"{name:<30}: {func.__doc__.strip()}"
             for name, func in sorted(commands.items())
         ]
     )
-    return "```{}```".format(ret)
+    return f"```{ret}```"
 
 
 # Top priority: process karma
@@ -146,7 +147,7 @@ def reply_help(message, say):
         create_commands_table(PRIVATE_BOT_COMMANDS),
     ]
 
-    if user_id in ADMINS and channel_type == "im":
+    if user_id in ADMINS and channel_type == MessageChannelType.IM.value:
         help_msg.append("\n3. Admin only commands")
         help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
 
@@ -186,21 +187,25 @@ def reply_commands(message, say):
     cmd_result = None
 
     admin_match = ADMIN_COMMAND_PATTERN.match(text)
-    if admin_match and channel_type == "im" and user_id in ADMINS:
+    if (
+        admin_match
+        and channel_type == MessageChannelType.IM.value
+        and user_id in ADMINS
+    ):
         cmd_result = perform_command(ADMIN_BOT_COMMANDS, admin_match, kwargs)
         if not cmd_result:
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
 
     private_match = PRIVATE_COMMAND_PATTERN.match(text)
-    if private_match and channel_type == "im":
+    if private_match and channel_type == MessageChannelType.IM.value:
         cmd_result = perform_command(PRIVATE_BOT_COMMANDS, private_match, kwargs)
         if not cmd_result:
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
 
     public_match = PUBLIC_COMMAND_PATTERN.match(text)
-    if public_match and channel_type == "channel":
+    if public_match and channel_type == MessageChannelType.CHANNEL.value:
         cmd_result = perform_command(PUBLIC_BOT_COMMANDS, public_match, kwargs)
         if not cmd_result:
             say(COMMAND_ERROR)

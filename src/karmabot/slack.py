@@ -1,6 +1,12 @@
 import re
+from enum import Enum
 
 SLACK_ID_PATTERN = re.compile(r"^<@[^>]+>$")
+
+
+class MessageChannelType(Enum):
+    IM = "im"
+    CHANNEL = "channel"
 
 
 def get_slack_id(user_id: str) -> str:
