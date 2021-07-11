@@ -21,12 +21,10 @@ def test_get_available_username(test_profile, expected):
 
 
 def test_get_available_username_wrong_format():
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(ValueError, match="User Profile data missing name information"):
         get_available_username(
             {"display_name_normalized": None, "real_name_normalized": None}
         )
-
-    assert str(exc.value) == "User Profile data missing name information"
 
 
 @pytest.mark.parametrize(
