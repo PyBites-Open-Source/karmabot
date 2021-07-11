@@ -21,7 +21,7 @@ from karmabot.settings import KARMABOT_ID
 @pytest.mark.usefixtures("mock_filled_db_session", "save_transaction_disabled")
 def test_karma_action(capfd, test_message, expected):
     karma_action(test_message, print)  # type: ignore
-    out, _ = capfd.readouterr()
+    out = capfd.readouterr()[0]
     assert out.strip() == expected
 
 
@@ -39,7 +39,7 @@ def test_karma_action(capfd, test_message, expected):
 def test_reply_special_words(capfd, test_message, expected):
 
     reply_special_words(test_message, print)  # type: ignore
-    out, _ = capfd.readouterr()
+    out = capfd.readouterr()[0]
     assert out.strip() == expected
 
 
@@ -51,7 +51,7 @@ def test_reply_help(capfd):
     }
 
     reply_help(message, print)  # type: ignore
-    out, _ = capfd.readouterr()
+    out = capfd.readouterr()[0]
     assert "age" in out
     assert "Print PyBites age in days" in out
 
@@ -84,7 +84,7 @@ def test_reply_commands_private():
 )
 def test_reply_commands_unknown(capfd, test_message, expected):
     reply_commands(test_message, print)  # type: ignore
-    out, _ = capfd.readouterr()
+    out = capfd.readouterr()[0]
     assert out.strip() == expected
 
 
