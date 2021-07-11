@@ -35,9 +35,7 @@ def top_karma(**kwargs):
 
     if top_users:
         for top_user in top_users:
-            output.append(
-                "{:<20} -> {}".format(top_user.username, top_user.karma_points)
-            )
+            output.append(f"{top_user.username:<20} -> {top_user.karma_points}")
         ret = "\n".join(output)
         return "```{}```".format(ret)
 
