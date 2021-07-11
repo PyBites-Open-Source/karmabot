@@ -24,7 +24,7 @@ def update_username(**kwargs):
     status = response.status_code
 
     if status != 200:
-        logging.info("Cannot get user info for %s - API error: %s", user_id, status)
+        logging.error("Cannot get user info for %s - API error: %s", user_id, status)
         return "Sorry, I could not retrieve your user information from the slack API :("
 
     user_profile = response.data["profile"]
