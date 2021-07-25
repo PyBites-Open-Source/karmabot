@@ -1,32 +1,16 @@
-import logging
-import time
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from karmabot.db import db_session
-from karmabot.karma import process_karma_changes
-from karmabot.settings import KARMA_ACTION
-from karmabot.slack import check_connection, parse_next_msg
+from karmabot.bot import app
+from karmabot.db.database import database
+from karmabot.settings import SLACK_APP_TOKEN
 
 
 def main():
+    database.connect()
+    database.create_models()
 
-    db_session.global_init()
-    check_connection()
-
-    while True:
-        time.sleep(1)
-
-        # Processes all interaction but karma changes
-        message = parse_next_msg()
-        if not message:
-            continue
-
-        # Finds and processes karma changes
-        karma_changes = KARMA_ACTION.findall(message.text)
-        if not karma_changes:
-            continue
-
-        logging.info(f"Karma changes: {str(karma_changes)}")
-        process_karma_changes(message, karma_changes)
+    handler = SocketModeHandler(app, SLACK_APP_TOKEN)
+    handler.start()
 
 
 if __name__ == "__main__":

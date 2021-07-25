@@ -9,12 +9,13 @@ from nox.sessions import Session
 package = "karmabot"
 locations = "src", "tests", "noxfile.py"
 env = {
-    "KARMABOT_SLACK_USER": "FAKE_KARMA_ID",
-    "KARMABOT_SLACK_TOKEN": "FAKE_TOKEN",
-    "KARMABOT_SLACK_INVITE_USER_TOKEN": "FAKE_INVITE_USER_TOKEN",
-    "KARMABOT_GENERAL_CHANNEL": "GENERAL",
+    "KARMABOT_SLACK_USER": "FAKE_BOT_USER",
+    "KARMABOT_GENERAL_CHANNEL": "FAKE_GENERAL_CHANNEL",
     "KARMABOT_ADMINS": "FAKE_ADMIN",
-    "KARMABOT_DATABASE_URL": "FAKE_URL",
+    "KARMABOT_DATABASE_URL": "FAKE_DB_URL",
+    "KARMABOT_SLACK_APP_TOKEN": "FAKE_APP_TOKEN",
+    "KARMABOT_SLACK_BOT_TOKEN": "FAKE_BOT_TOKEN",
+    "KARMABOT_TEST_MODE": "true",
 }
 
 nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
@@ -53,7 +54,7 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
     os.unlink(requirements.name)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def tests(session: Session) -> None:
     """Run the test suite."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
@@ -64,7 +65,7 @@ def tests(session: Session) -> None:
     session.run("pytest", *args, env=env)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def lint(session: Session) -> None:
     """Lint using flake8."""
     args = session.posargs or locations
@@ -77,7 +78,7 @@ def lint(session: Session) -> None:
     session.run("flake8", *args)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def black(session: Session) -> None:
     """Run black code formatter."""
     args = session.posargs or locations
@@ -85,7 +86,7 @@ def black(session: Session) -> None:
     session.run("black", *args)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or locations
@@ -93,7 +94,7 @@ def mypy(session: Session) -> None:
     session.run("mypy", *args)
 
 
-@nox.session(python=["3.7", "3.8"])
+@nox.session(python=["3.8", "3.9"])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     with tempfile.NamedTemporaryFile(delete=False) as requirements:
@@ -113,9 +114,9 @@ def safety(session: Session) -> None:
     os.unlink(requirements.name)
 
 
-@nox.session(python="3.7")
+@nox.session(python="3.8")
 def coverage(session: Session) -> None:
     """Upload coverage data."""
-    install_with_constraints(session, "coverage[toml]", "codecov")
-    session.run("coverage", "xml", "--fail-under=0")
-    session.run("codecov", *session.posargs)
+    install_with_constraints(session, "coverage[toml]")
+    session.run("coverage", "report", "--fail-under=40")
+    session.run("coverage", "xml", "--fail-under=40")

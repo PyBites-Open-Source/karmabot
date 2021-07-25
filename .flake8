@@ -1,7 +1,7 @@
 [flake8]
-exclude = .git,__pycache__,old,build,dist
+exclude = .git,.github,__pycache__,old,build,dist,.venv,.pytest_cache,.nox,.coverage,.karmabot
 max-line-length = 88
 max-complexity = 10
-ignore = E203,E501,W503,S311
+extend-ignore = E501,S311
 application-import-names = karmabot,tests
 per-file-ignores = tests/*:S101

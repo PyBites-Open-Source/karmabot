@@ -1,9 +1,9 @@
 import pytest
 
-from karmabot.db import db_session
-from karmabot.db.karma_user import KarmaUser
-from karmabot.karma import Karma, _parse_karma_change
-from karmabot.settings import KARMA_ACTION, KARMABOT_ID
+import karmabot.bot  # noqa
+from karmabot.db.database import database
+from karmabot.karma import Karma, KarmaUser, _parse_karma_change
+from karmabot.settings import KARMA_ACTION_PATTERN, KARMABOT_ID
 
 
 # Karma
@@ -17,7 +17,7 @@ from karmabot.settings import KARMA_ACTION, KARMABOT_ID
     ],
 )
 def test_karma_regex(test_message, expected):
-    karma_changes = KARMA_ACTION.findall(test_message)
+    karma_changes = KARMA_ACTION_PATTERN.findall(test_message)
     user_id, voting = karma_changes[0]
 
     assert user_id == expected[0]
@@ -33,26 +33,30 @@ def test_parse_karma_change(test_change, expected):
 
 
 @pytest.mark.parametrize(
-    "test_changes",
+    "giver, receiver, channel, amount",
     [
         ("ABC123", "XYZ123", "CHANNEL42", 2),
         ("XYZ123", "ABC123", "CHANNEL42", 5),
         ("EFG123", "ABC123", "CHANNEL42", -3),
     ],
 )
-def test_change_karma(mock_filled_db_session, test_changes, mock_slack_api_call):
-    session = db_session.create_session()
-    pre_change_karma = session.query(KarmaUser).get(test_changes[1]).karma_points
+@pytest.mark.usefixtures("conversations_info_fake_channel", "mock_filled_db_session")
+def test_change_karma(giver, receiver, channel, amount):
 
-    karma = Karma(test_changes[0], test_changes[1], test_changes[2])
-    karma.change_karma(test_changes[3])
+    with database.session_manager() as session:
+        pre_change_karma = session.query(KarmaUser).get(receiver).karma_points
 
-    post_change = session.query(KarmaUser).get(test_changes[1]).karma_points
-    assert post_change == (pre_change_karma + test_changes[3])
-    session.close()
+    karma = Karma(giver, receiver, channel)
+    karma.change_karma(amount)
+
+    with database.session_manager() as session:
+        post_change = session.query(KarmaUser).get(receiver).karma_points
+
+    assert post_change == (pre_change_karma + amount)
 
 
-def test_change_karma_msg(mock_filled_db_session):
+@pytest.mark.usefixtures("save_transaction_disabled", "mock_filled_db_session")
+def test_change_karma_msg():
     karma = Karma("ABC123", "XYZ123", "CHANNEL42")
     assert karma.change_karma(4) == "clamytoe's karma increased to 424"
 
@@ -60,6 +64,7 @@ def test_change_karma_msg(mock_filled_db_session):
     assert karma.change_karma(-3) == "pybob's karma decreased to 389"
 
 
+@pytest.mark.usefixtures("mock_filled_db_session")
 def test_change_karma_exceptions(mock_filled_db_session):
     with pytest.raises(RuntimeError):
         karma = Karma("ABC123", "XYZ123", "CHANNEL42")
@@ -70,7 +75,8 @@ def test_change_karma_exceptions(mock_filled_db_session):
         karma.change_karma(2)
 
 
-def test_change_karma_bot_self(mock_filled_db_session):
+@pytest.mark.usefixtures("save_transaction_disabled", "mock_filled_db_session")
+def test_change_karma_bot_self():
     karma = Karma("ABC123", KARMABOT_ID, "CHANNEL42")
     assert (
         karma.change_karma(2) == "Thanks pybob for the extra karma, my karma is 12 now"

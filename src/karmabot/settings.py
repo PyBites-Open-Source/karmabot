@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 
 from dotenv import load_dotenv
-from slackclient import SlackClient
 
 
 def _get_env_var(env_var: str):
@@ -26,24 +25,26 @@ def _get_env_var(env_var: str):
 
 dotenv_path = Path(".").resolve() / ".karmabot"
 if dotenv_path.exists():
-    logging.info("Loading environmental variables from .karmabot.")
+    logging.info("Loading environmental variables from: '%s'", dotenv_path)
     load_dotenv(dotenv_path)
 
 # Environment variables
 KARMABOT_ID = _get_env_var("KARMABOT_SLACK_USER")
-SLACK_TOKEN = _get_env_var("KARMABOT_SLACK_TOKEN")
-SLACK_INVITE_TOKEN = _get_env_var("KARMABOT_SLACK_INVITE_USER_TOKEN")
 DATABASE_URL = _get_env_var("KARMABOT_DATABASE_URL")
+SLACK_APP_TOKEN = _get_env_var("KARMABOT_SLACK_APP_TOKEN")
+SLACK_BOT_TOKEN = _get_env_var("KARMABOT_SLACK_BOT_TOKEN")
+TEST_MODE = bool(_get_env_var("KARMABOT_TEST_MODE") == "true")
+logging.info("Test mode enabled: %s", TEST_MODE)
 
 # Slack
 GENERAL_CHANNEL = _get_env_var("KARMABOT_GENERAL_CHANNEL")
 ADMINS = _get_env_var("KARMABOT_ADMINS")
 ADMINS = ADMINS.split(",")  # type: ignore
-SLACK_ID_FORMAT = re.compile(r"^<@[^>]+>$")
-SLACK_CLIENT = SlackClient(SLACK_TOKEN)
 
 # Karma
 # the first +/- is merely signaling, start counting (regex capture)
 # from second +/- onwards, so bob++ adds 1 point, bob+++ = +2, etc
-KARMA_ACTION = re.compile(r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)", flags=re.MULTILINE)
+KARMA_ACTION_PATTERN = re.compile(
+    r"(?:^| )(\S{2,}?)\s?[\+\-]([\+\-]+)", flags=re.MULTILINE
+)
 MAX_POINTS = 5

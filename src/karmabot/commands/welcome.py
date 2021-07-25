@@ -1,7 +1,7 @@
 """ private command, not callable """
 from random import choice
 
-import karmabot
+import karmabot.slack
 
 # thanks Erik!
 WELCOME_MSG = """Welcome {user} ++!
@@ -45,6 +45,6 @@ def welcome_user(user_id: str) -> str:
     """Welcome a new PyBites community member"""
     questions = WELCOME_QUESTIONS.split("\n")
     random_question = choice(questions)  # noqa: S311
-    slack_id = karmabot.slack.format_user_id(user_id)
+    slack_id = karmabot.slack.get_slack_id(user_id)
 
     return WELCOME_MSG.format(user=slack_id, welcome_question=random_question)

@@ -6,7 +6,7 @@ from karmabot.db.modelbase import SqlAlchemyBase
 
 
 class KarmaNote(SqlAlchemyBase):
-    """ Models a simple note system in the DB """
+    """Models a simple note system in the DB"""
 
     __tablename__ = "karma_note"
 

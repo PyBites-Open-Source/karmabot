@@ -10,7 +10,7 @@ Karmabot's main features is the management of Karma within the slack community s
 
 ![karma example](https://www.pogross.de/uploads/karmabot.png)
 
-https://www.youtube.com/watch?v=Yx9qYl6lmzM&amp;t=2s
+[Demo Youtube Video](https://www.youtube.com/watch?v=Yx9qYl6lmzM&amp;t=2s)
 
 Additional commands / features are:
 
@@ -31,42 +31,80 @@ After installing you can start karmabot by using the command
 karmabot
 ```
 
-However, you need to supply some settings prior to this.
+However, you need to some setup and supply some settings prior to this.
 
-### Settings
+### Setup
+
+For app creation and tokens please follow the [slack-bolt guide](https://slack.dev/bolt-python/tutorial/getting-started) and enable [socket mode](https://slack.dev/bolt-python/concepts#socket-mode).
+
+#### Settings
 
 By default we will look for a `.karmabot` file in the directory you used the `karmabot` command. The file should supply the following information.
 
 ```env
+# Slack bot app
+KARMABOT_SLACK_BOT_TOKEN=
+KARMABOT_SLACK_APP_TOKEN=
+
+# Workspace
 KARMABOT_SLACK_USER=
-KARMABOT_SLACK_TOKEN=
-KARMABOT_SLACK_INVITE_USER_TOKEN=
-KARMABOT_DATABASE_URL=
 KARMABOT_GENERAL_CHANNEL=
 KARMABOT_ADMINS=
+
+# Backend
+KARMABOT_DATABASE_URL=
+
+# Testing
+KARMABOT_TEST_MODE=
 ```
 
-- KARMABOT_SLACK_USER
-  The [bot's slack user id](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace). Once you've created your own Karmabot app, you can view its configuration details from the [My Apps](https://api.slack.com/apps/) page. The user ID shows up under **Basic Information --> App Credentials --> App ID**.
+KARMABOT_SLACK_BOT_TOKEN
+:   The [SLACK_BOT_TOKEN](https://slack.dev/bolt-python/tutorial/getting-started) for your bot. You will find it under **OAuth & Permission 🠊 Bot User OAuth Access Token** in your [app](https://api.slack.com/apps/). The token starts with `xoxb-`.
 
-- KARMABOT_SLACK_TOKEN
-  The [auth token](https://slack.com/help/articles/115005265703-Create-a-bot-for-your-workspace) for your bot. You can find the token from the [My Apps](https://api.slack.com/apps/) page for your Karmabot under **OAuth & Permissions --> Tokens for Your Workspace --> Bot User OAuth Access Token**. It starts with `xoxb-`.
+KARMABOT_SLACK_APP_TOKEN
+: The SLACK_APP_TOKEN used for running the bot in [Socket Mode](https://slack.dev/bolt-python/concepts#socket-mode). You will find it unter **Basic Information 🠊 App-Level Tokens** in your [app](https://api.slack.com/apps/).
+  The token starts with `xapp-`.
 
-- KARMABOT_SLACK_INVITE_USER_TOKEN
-  An invite token to invite the bot to new channels. Bots cannot autojoin channels, but we implemented an invite procedure for this.
+KARMABOT_SLACK_USER
+: The bot's user id. Initially, you can fill in a placeholder. Once you've run your own Karmabot for the first time, you can ask it as admin in private chat via `@Karmabot your_id`. This will return a value starting with `U`, e.g., `U0123XYZ`. Replace your placeholder with this value.
 
-- KARMABOT_DATABASE_URL
-  The database url which should be compatible with SqlAlchemy. For the provided docker file use postgres://user42:pw42@localhost:5432/karmabot.
+KARMABOT_GENERAL_CHANNEL
+: The channel id of your main channel in slack. Initially, you can fill in a placeholder. Once you've run your own Karmabot for the first time, you can ask it as admin in private chat via `@Karmabot general_channel_id`. This will return a value starting with `C`, e.g., `C0123XYZ`. Replace your placeholder with this value.
 
-  - **Note:** To start the provided Docker-based Postgres server, be sure you have Docker Compose [installed](https://docs.docker.com/compose/install/) and run `docker-compose up` from the karmabot directory.
+KARMABOT_ADMINS
+: The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access separated by commas.
 
-- KARMABOT_GENERAL_CHANNEL
-  The channel id of your main channel slack
+KARMABOT_DATABASE_URL
+  : The database url which should be compatible with SqlAlchemy. For the provided docker file use `postgresql://user42:pw42@localhost:5432/karmabot`.
+  :heavy_exclamation_mark: To start the provided Docker-based Postgres server, be sure you have Docker Compose [installed](https://docs.docker.com/compose/install/) and run `docker-compose up -d` from the karmabot directory.
 
-- KARMABOT_ADMINS
-  The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access separated by commas.
+KARMABOT_TEST_MODE=
+  : Determines if the code is run in test mode. User `KARMABOT_TEST_MODE=true` to enable testing mode. Everything else will default to `false`. This setting has to be provided as `true`, if you want run tests without a valid `KARMABOT_SLACK_BOT_TOKEN`. Otherwise, you will receive an exceptions with `slack_bolt.error.BoltError: token is invalid ...`.
 
 If you do not want to use a file you have to provide environment variables with the above names. If no file is present we default to environment variables.
+
+#### Permissions
+
+Go to your [slack app](https://api.slack.com/apps/) and click on **Add features and functionality**. Then go into the following categories and set permissions.
+
+- Event Subscriptions
+  - Enable Events 🠊 Toggle the slider to on
+  - Subscribe to bot events 🠊 Add via the **Add Bot User Event** button
+    - channel_create
+    - message.channels
+    - message.im
+- Permissions
+  - Scopes 🠊 Add the folowwing persions via the **Add an OAuth Scope** button
+    - app_mentions:read
+    - channels:history
+    - channels:join
+    - channels:read
+    - chat:write
+    - im:history
+    - im:read
+    - im:write
+    - users.profile:read
+    - users:read
 
 ## Development pattern for contributors
 
@@ -94,6 +132,8 @@ For testing you need to install [nox](https://nox.thea.codes/en/stable/) separat
 If `nox` cannot be found, use `python -m nox` instead.
 
 For different sessions see the `nox.py` file. You can run `nox --list` to see a list of all available sessions.
+
+If you want to run tests locally via `pytest` you have to provide a valid `.karmabot` settings file or the respective enviroment variables.
 
 Please make sure all tests and checks pass before opening pull requests!
 

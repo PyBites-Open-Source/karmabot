@@ -20,4 +20,4 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-logging.info("Script started")
+logging.info("Karmabot started")

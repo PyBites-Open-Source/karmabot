@@ -15,5 +15,6 @@ services:
   adminer:
     image: adminer:latest
     restart: always
+    container_name: "karmabot_adminer"
     ports:
       - 8080:8080

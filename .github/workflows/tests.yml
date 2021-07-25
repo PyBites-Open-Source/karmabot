@@ -1,4 +1,5 @@
-name: Tests
+name: Karmabot Tests
+
 on:
   push:
     branches:
@@ -7,19 +8,29 @@ on:
   pull_request:
     branches:
       - develop
+
 jobs:
   tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.8, 3.9]
     name: Python ${{ matrix.python-version }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: x64
-    - run: pip install nox==2020.8.22
-    - run: pip install poetry==1.1.4
-    - run: nox
+      - name: checkout repo content
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+
+      - name: install nox
+        run: pip install nox==2021.6.12
+
+      - name: install poetry
+        run: pip install poetry==1.1.6
+
+      - name: run tests
+        run: nox

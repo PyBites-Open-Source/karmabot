@@ -3,7 +3,7 @@ from typing import Union
 
 import pyjokes
 
-import karmabot
+import karmabot.slack
 
 PYJOKE_HREF = "<https://pyjok.es/|PyJoke>"
 CATEGORIES = list(pyjokes.jokes_en.jokes_en.keys())
@@ -11,25 +11,20 @@ CATEGORIES = list(pyjokes.jokes_en.jokes_en.keys())
 
 def joke(**kwargs) -> Union[str, None]:
     """Posts a random PyJoke in the public or private channel"""
+    user_id, text = kwargs.get("user_id"), kwargs.get("text")
 
-    # TODO: slack._get_cmd needs improvemed parsing to consider text
-    # after commandes: e.g. joke chuck
+    if user_id is not None and text is not None:
+        slack_id = karmabot.slack.get_slack_id(user_id)
+        words = text.lower().split()
 
-    id_arg, text_arg = kwargs.get("user_id"), kwargs.get("text")
-
-    if id_arg is not None and text_arg is not None:
-        user_id = karmabot.slack.format_user_id(str(id_arg))
-        user_text = str(text_arg).lower()
-
-        user_category = user_text.split()[-1] if len(user_text.split()) > 3 else ""
+        user_category = words[-1] if len(words) > 2 else ""
         category = _get_closest_category(user_category)
-
     else:
         return None
 
     joke_text = pyjokes.get_joke(category=category)
 
-    return f"Hey {user_id}, here is a {PYJOKE_HREF} for you: _{joke_text}_"
+    return f"Hey {slack_id}, here is a {PYJOKE_HREF} for you: _{joke_text}_"
 
 
 def _get_closest_category(input: str):

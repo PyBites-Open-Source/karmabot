@@ -23,8 +23,8 @@ def my_command(**kwargs: dict) -> str:  # type: ignore
     # kwargs will hold user, channel, text (from a Slack message object)
 
     # use them like this, or just delete these line:
-    user = kwargs.get("user")  # noqa: F841
-    channel = kwargs.get("channel")  # noqa: F841
+    user_id = kwargs.get("user_id")  # noqa: F841
+    channel_id = kwargs.get("channel")  # noqa: F841
     msg_text = kwargs.get("text")  # noqa: F841
 
     # return a message string
@@ -34,7 +34,7 @@ def my_command(**kwargs: dict) -> str:  # type: ignore
 
 if __name__ == "__main__":
     #  standalone test
-    user, channel, text = "bob", "#general", "some message"
+    user, channel, text = "ABCD123", "XYZ789", "some message"
     kwargs = dict(user=user, channel=channel, text=text)
     output = my_command(**kwargs)  # type: ignore
     print(output)
