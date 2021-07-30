@@ -50,7 +50,10 @@ def test_reply_help(capfd):
         "channel_type": "public_channel",
     }
 
-    reply_help(message, print)  # type: ignore
+    def fake_print(text, channel):
+        print(text)
+
+    reply_help(message, fake_print)  # type: ignore
     out = capfd.readouterr()[0]
     assert "age" in out
     assert "Print PyBites age in days" in out

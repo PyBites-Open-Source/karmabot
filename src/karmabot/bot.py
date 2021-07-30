@@ -39,7 +39,7 @@ ADMIN_BOT_COMMANDS = {
     "your_id": your_id,
     "general_channel_id": general_channel_id,
 }
-PUBLIC_BOT_COMMANDS = {
+CHANNEL_BOT_COMMANDS = {
     "add": add_command,
     "age": pybites_age,
     "joke": joke,
@@ -48,7 +48,7 @@ PUBLIC_BOT_COMMANDS = {
     "topchannels": get_recommended_channels,
     "zen": import_this,
 }
-PRIVATE_BOT_COMMANDS = {
+DM_BOT_COMMANDS = {
     "doc": doc_command,
     "feed": get_pybites_last_entries,
     "joke": joke,
@@ -83,8 +83,8 @@ def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
 
 
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
-PUBLIC_COMMAND_PATTERN = compile_command_pattern(PUBLIC_BOT_COMMANDS)
-PRIVATE_COMMAND_PATTERN = compile_command_pattern(PRIVATE_BOT_COMMANDS)
+CHANNEL_COMMAND_PATTERN = compile_command_pattern(CHANNEL_BOT_COMMANDS)
+DM_COMMAND_PATTERN = compile_command_pattern(DM_BOT_COMMANDS)
 UNKNOWN_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(\w*)")
 HELP_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(help|commands)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
@@ -137,22 +137,23 @@ def karma_action(message, say):
 # Help
 @app.message(HELP_COMMAND_PATTERN)  # type: ignore
 def reply_help(message, say):
+    """Sends the list of available commands as DM to the user"""
     user_id = message["user"]
     channel_type = message["channel_type"]
 
     help_msg = [
         "\n1. Channel commands (format: `@karmabot command`)",
-        create_commands_table(PUBLIC_BOT_COMMANDS),
+        create_commands_table(CHANNEL_BOT_COMMANDS),
         "\n2. Message commands (type `@karmabot command` in a DM to the bot)",
-        create_commands_table(PRIVATE_BOT_COMMANDS),
+        create_commands_table(DM_BOT_COMMANDS),
     ]
 
-    if user_id in ADMINS and channel_type == MessageChannelType.IM.value:
+    if user_id in ADMINS and channel_type == MessageChannelType.DM.value:
         help_msg.append("\n3. Admin only commands")
         help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
 
     text = "\n".join(help_msg)
-    say(text)
+    say(text=text, channel=user_id)
 
 
 # Message replies
@@ -189,7 +190,7 @@ def reply_commands(message, say):
     admin_match = ADMIN_COMMAND_PATTERN.match(text)
     if (
         admin_match
-        and channel_type == MessageChannelType.IM.value
+        and channel_type == MessageChannelType.DM.value
         and user_id in ADMINS
     ):
         cmd_result = perform_command(ADMIN_BOT_COMMANDS, admin_match, kwargs)
@@ -197,16 +198,19 @@ def reply_commands(message, say):
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
 
-    private_match = PRIVATE_COMMAND_PATTERN.match(text)
-    if private_match and channel_type == MessageChannelType.IM.value:
-        cmd_result = perform_command(PRIVATE_BOT_COMMANDS, private_match, kwargs)
+    private_match = DM_COMMAND_PATTERN.match(text)
+    if private_match and channel_type == MessageChannelType.DM.value:
+        cmd_result = perform_command(DM_BOT_COMMANDS, private_match, kwargs)
         if not cmd_result:
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
 
-    public_match = PUBLIC_COMMAND_PATTERN.match(text)
-    if public_match and channel_type == MessageChannelType.CHANNEL.value:
-        cmd_result = perform_command(PUBLIC_BOT_COMMANDS, public_match, kwargs)
+    public_match = CHANNEL_COMMAND_PATTERN.match(text)
+    if public_match and channel_type in [
+        MessageChannelType.CHANNEL.value,
+        MessageChannelType.GROUP.value,
+    ]:
+        cmd_result = perform_command(CHANNEL_BOT_COMMANDS, public_match, kwargs)
         if not cmd_result:
             say(COMMAND_ERROR)
             raise CommandExecutionException(text)
