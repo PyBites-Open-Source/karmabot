@@ -46,6 +46,7 @@ pytest = "^6.2.4"
 pytest-cov = "^2.12.1"
 pytest-mock = "^3.6.1"
 safety = "^1.10.3"
+pre-commit = "^2.13.0"
 
 [tool.poetry.scripts]
 karmabot = "karmabot.main:main"
