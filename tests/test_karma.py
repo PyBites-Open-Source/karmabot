@@ -120,7 +120,6 @@ def test_change_karma_bot_self():
 )
 @pytest.mark.usefixtures("save_transaction_disabled", "mock_filled_db_session")
 def test_process_karma_changes(karma_giver, channel_id, karma_changes, expected):
-    messages = process_karma_changes(karma_giver, channel_id, karma_changes)
+    karma_replies = process_karma_changes(karma_giver, channel_id, karma_changes)
 
-    for actual, expected in zip(messages, expected):
-        assert actual == expected
+    assert karma_replies == expected
