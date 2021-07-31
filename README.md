@@ -62,7 +62,7 @@ KARMABOT_SLACK_BOT_TOKEN
 :   The [SLACK_BOT_TOKEN](https://slack.dev/bolt-python/tutorial/getting-started) for your bot. You will find it under **OAuth & Permission 🠊 Bot User OAuth Access Token** in your [app](https://api.slack.com/apps/). The token starts with `xoxb-`.
 
 KARMABOT_SLACK_APP_TOKEN
-: The SLACK_APP_TOKEN used for running the bot in [Socket Mode](https://slack.dev/bolt-python/concepts#socket-mode). You will find it unter **Basic Information 🠊 App-Level Tokens** in your [app](https://api.slack.com/apps/).
+: The SLACK_APP_TOKEN used for running the bot in [Socket Mode](https://slack.dev/bolt-python/concepts#socket-mode). You will find it under **Basic Information 🠊 App-Level Tokens** in your [app](https://api.slack.com/apps/).
   The token starts with `xapp-`.
 
 KARMABOT_SLACK_USER
@@ -91,14 +91,17 @@ Go to your [slack app](https://api.slack.com/apps/) and click on **Add features 
   - Enable Events 🠊 Toggle the slider to on
   - Subscribe to bot events 🠊 Add via the **Add Bot User Event** button
     - channel_create
+    - groups:read
     - message.channels
     - message.im
 - Permissions
-  - Scopes 🠊 Add the folowwing persions via the **Add an OAuth Scope** button
+  - Scopes 🠊 Add the following permissions via the **Add an OAuth Scope** button
     - app_mentions:read
     - channels:history
     - channels:join
     - channels:read
+    - groups:read
+    - groups:write
     - chat:write
     - im:history
     - im:read

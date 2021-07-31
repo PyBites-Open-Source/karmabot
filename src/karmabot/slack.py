@@ -5,8 +5,9 @@ SLACK_ID_PATTERN = re.compile(r"^<@[^>]+>$")
 
 
 class MessageChannelType(Enum):
-    IM = "im"
+    DM = "im"
     CHANNEL = "channel"
+    GROUP = "group"
 
 
 def get_slack_id(user_id: str) -> str:
