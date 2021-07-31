@@ -1,3 +1,4 @@
+import logging
 import re
 import unicodedata
 from typing import Callable, Dict
@@ -129,9 +130,10 @@ def karma_action(message, say):
     channel_id = message["channel"]
     karma_changes = KARMA_ACTION_PATTERN.findall(msg)
 
-    text = process_karma_changes(karma_giver, channel_id, karma_changes)
+    messages = process_karma_changes(karma_giver, channel_id, karma_changes)
 
-    say(text)
+    for message in messages:
+        say(message)
 
 
 # Help
@@ -170,7 +172,7 @@ def reply_special_words(message, say):
 
 # Commands
 @app.event("message")  # type: ignore
-def reply_commands(message, say):
+def reply_commands(message, say):  # noqa
     """
     Handles all the commands in one place
 
@@ -179,10 +181,14 @@ def reply_commands(message, say):
     first matching function would "swallow" the message and not forwared
     it further down the line
     """
-    user_id = message["user"]
-    channel_id = message["channel"]
-    text = message["text"]
-    channel_type = message["channel_type"]
+    try:
+        user_id = message["user"]
+        channel_id = message["channel"]
+        text = message["text"]
+        channel_type = message["channel_type"]
+    except KeyError as exc:
+        logging.error("reply_commands error! Message was: %s", message, exc_info=exc)
+        return
 
     kwargs = {"user_id": user_id, "channel": channel_id, "text": text}
     cmd_result = None
