@@ -10,7 +10,7 @@ class KarmaNote(SqlAlchemyBase):
 
     __tablename__ = "karma_note"
 
-    id: int = sa.Column(
+    id: int = sa.Column(  # noqa
         sa.BigInteger().with_variant(sa.Integer, "sqlite"),
         primary_key=True,
         autoincrement=True,

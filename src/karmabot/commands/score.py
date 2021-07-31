@@ -37,6 +37,6 @@ def top_karma(**kwargs):
         for top_user in top_users:
             output.append(f"{top_user.username:<20} -> {top_user.karma_points}")
         ret = "\n".join(output)
-        return "```{}```".format(ret)
+        return f"```{ret}```"
 
     return "Sorry, no users found"

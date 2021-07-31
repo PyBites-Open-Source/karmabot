@@ -4,10 +4,10 @@ import requests
 
 PLATFORM = "https://codechalleng.es"
 CC_ES = "CodeChalleng.es"
-TIPS_ENDPOINT = "{}/api/tips".format(PLATFORM)
-NEW_TIP_LINK = "{}/inbox/new/pytip/".format(PLATFORM)
+TIPS_ENDPOINT = f"{PLATFORM}/api/tips"
+NEW_TIP_LINK = f"{PLATFORM}/inbox/new/pytip/"
 
-ADD_TIP = "\nSource: {} | Share more tips: {}\n".format(CC_ES, NEW_TIP_LINK)
+ADD_TIP = f"\nSource: {CC_ES} | Share more tips: {NEW_TIP_LINK}\n"
 
 
 def get_random_tip(**kwargs):
@@ -15,11 +15,14 @@ def get_random_tip(**kwargs):
     resp = requests.get(TIPS_ENDPOINT)
     tips = resp.json()
     tip = random.choice(tips)
-    msg = "> {}\n".format(tip["tip"])
+    msg = f"> {tip['tip']}\n"
+
     if tip["link"]:
-        msg += "\n{}\n".format(tip["link"])
+        msg += f"\n{tip['link']}\n"
+
     if tip["code"]:
-        msg += "\n```{}```\n".format(tip["code"])
+        msg += f"\n```{tip['code']}```\n"
+
     msg += ADD_TIP
     return msg
 
