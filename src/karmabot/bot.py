@@ -130,10 +130,10 @@ def karma_action(message, say):
     channel_id = message["channel"]
     karma_changes = KARMA_ACTION_PATTERN.findall(msg)
 
-    messages = process_karma_changes(karma_giver, channel_id, karma_changes)
+    karma_replies = process_karma_changes(karma_giver, channel_id, karma_changes)
 
-    for message in messages:
-        say(message)
+    reply = "\n\n".join(karma_replies)
+    say(reply)
 
 
 # Help
