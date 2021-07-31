@@ -91,8 +91,8 @@ Go to your [slack app](https://api.slack.com/apps/) and click on **Add features 
   - Enable Events 🠊 Toggle the slider to on
   - Subscribe to bot events 🠊 Add via the **Add Bot User Event** button
     - channel_create
-    - groups:read
     - message.channels
+    - message.groups
     - message.im
 - Permissions
   - Scopes 🠊 Add the following permissions via the **Add an OAuth Scope** button
@@ -100,9 +100,10 @@ Go to your [slack app](https://api.slack.com/apps/) and click on **Add features 
     - channels:history
     - channels:join
     - channels:read
+    - chat:write
+    - groups:history
     - groups:read
     - groups:write
-    - chat:write
     - im:history
     - im:read
     - im:write
