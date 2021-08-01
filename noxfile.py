@@ -74,6 +74,11 @@ def lint(session: Session) -> None:
         "flake8",
         "flake8-bandit",
         "flake8-bugbear",
+        "flake8-blind-except",
+        "flake8-builtins",
+        "flake8-logging-format",
+        "flake8-debugger",
+        "flake8-use-fstring",
     )
     session.run("flake8", *args)
 

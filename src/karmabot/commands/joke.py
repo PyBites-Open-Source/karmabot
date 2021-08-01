@@ -27,8 +27,8 @@ def joke(**kwargs) -> Union[str, None]:
     return f"Hey {slack_id}, here is a {PYJOKE_HREF} for you: _{joke_text}_"
 
 
-def _get_closest_category(input: str):
-    category = difflib.get_close_matches(input, CATEGORIES)
+def _get_closest_category(input_category: str):
+    category = difflib.get_close_matches(input_category, CATEGORIES)
     category = category[0] if category else "all"
 
     return category

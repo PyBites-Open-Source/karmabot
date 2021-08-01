@@ -2,7 +2,7 @@ import pytest
 
 import karmabot.bot  # noqa
 from karmabot.db.database import database
-from karmabot.karma import Karma, KarmaUser, _parse_karma_change
+from karmabot.karma import Karma, KarmaUser, _parse_karma_change, process_karma_changes
 from karmabot.settings import KARMA_ACTION_PATTERN, KARMABOT_ID
 
 
@@ -93,3 +93,33 @@ def test_change_karma_bot_self():
         karma.change_karma(-3)
         == "Not cool pybob lowering my karma to 12, but you are probably right, I will work harder next time"
     )
+
+
+@pytest.mark.parametrize(
+    "karma_giver, channel_id, karma_changes, expected",
+    [
+        (
+            "ABC123",
+            "FOO123",
+            [("<@EFG123>", "++"), ("<@XYZ123>", "++")],
+            [
+                "Julian Sequeira's karma increased to 125",
+                "clamytoe's karma increased to 422",
+            ],
+        ),
+        (
+            "XYZ123",
+            "FOO123",
+            [("<@ABC123>", "+++"), ("<@EFG123>", "++++")],
+            [
+                "pybob's karma increased to 395",
+                "Julian Sequeira's karma increased to 127",
+            ],
+        ),
+    ],
+)
+@pytest.mark.usefixtures("save_transaction_disabled", "mock_filled_db_session")
+def test_process_karma_changes(karma_giver, channel_id, karma_changes, expected):
+    karma_replies = process_karma_changes(karma_giver, channel_id, karma_changes)
+
+    assert karma_replies == expected

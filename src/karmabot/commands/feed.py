@@ -19,7 +19,7 @@ def get_pybites_last_entries(**kwargs):
         title = item["title"]
         published = item["published"]
         url = item["link"]
-        output.append("{} ({})\n{}\n".format(title, published, url))
+        output.append(f"{title} ({published})\n{url}\n")
 
     return "\n".join(output)
 

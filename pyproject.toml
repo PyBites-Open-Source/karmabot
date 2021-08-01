@@ -47,6 +47,11 @@ pytest-cov = "^2.12.1"
 pytest-mock = "^3.6.1"
 safety = "^1.10.3"
 pre-commit = "^2.13.0"
+flake8-blind-except = "^0.2.0"
+flake8-builtins = "^1.5.3"
+flake8-logging-format = "^0.6.0"
+flake8-debugger = "^4.0.0"
+flake8-use-fstring = "^1.1"
 
 [tool.poetry.scripts]
 karmabot = "karmabot.main:main"

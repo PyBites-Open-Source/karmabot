@@ -147,6 +147,7 @@ def _parse_karma_change(karma_change):
 
 
 def process_karma_changes(karma_giver, channel_id, karma_changes):
+    messages = []
     for karma_change in karma_changes:
         receiver_id, points = _parse_karma_change(karma_change)
         try:
@@ -163,4 +164,6 @@ def process_karma_changes(karma_giver, channel_id, karma_changes):
         except (RuntimeError, ValueError) as exc:
             text = str(exc)
 
-        return text
+        messages.append(text)
+
+    return messages
