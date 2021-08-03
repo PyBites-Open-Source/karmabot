@@ -113,7 +113,13 @@ def safety(session: Session) -> None:
             external=True,
         )
         install_with_constraints(session, "safety")
-        session.run("safety", "check", f"--file={requirements.name}", "--full-report")
+        session.run(
+            "safety",
+            "check",
+            f"--file={requirements.name}",
+            "--full-report",
+            "--ignore=41002",
+        )
 
     requirements.close()
     os.unlink(requirements.name)
