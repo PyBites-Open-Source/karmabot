@@ -12,18 +12,15 @@ on:
 jobs:
   safety:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.9]
-    name: Python ${{ matrix.python-version }}
+
     steps:
       - name: checkout repo content
         uses: actions/checkout@v2
 
       - name: setup python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"
           architecture: x64
 
       - name: install nox
@@ -33,4 +30,4 @@ jobs:
         run: pip install poetry==1.1.7
 
       - name: run safety
-        run: nox --sessions safety-${{ matrix.python-version }}
+        run: nox --sessions safety-3.9
