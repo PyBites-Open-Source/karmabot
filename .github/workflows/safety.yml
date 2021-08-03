@@ -1,4 +1,4 @@
-name: Coverage
+name: Safety
 
 on:
   push:
@@ -10,9 +10,12 @@ on:
       - develop
 
 jobs:
-  coverage:
+  safety:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
+    name: Python ${{ matrix.python-version }}
     steps:
       - name: checkout repo content
         uses: actions/checkout@v2
@@ -20,7 +23,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v1
         with:
-          python-version: "3.9"
+          python-version: ${{ matrix.python-version }}
           architecture: x64
 
       - name: install nox
@@ -29,8 +32,5 @@ jobs:
       - name: install poetry
         run: pip install poetry==1.1.7
 
-      - name: run coverage
-        run: nox --sessions tests-3.9 coverage
-
-      - name: upload coverage
-        uses: codecov/codecov-action@v1
+      - name: run safety
+        run: nox --sessions safety-${{ matrix.python-version }}

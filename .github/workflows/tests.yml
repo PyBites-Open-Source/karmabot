@@ -1,4 +1,4 @@
-name: Karmabot Tests
+name: Tests
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         run: pip install nox==2021.6.12
 
       - name: install poetry
-        run: pip install poetry==1.1.6
+        run: pip install poetry==1.1.7
 
       - name: run tests
-        run: nox
+        run: nox --sessions tests-${{ matrix.python-version }}
