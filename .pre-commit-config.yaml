@@ -7,7 +7,7 @@ repos:
       - id: trailing-whitespace
       - id: debug-statements
 
-  - repo: https://gitlab.com/pycqa/flake8
+  - repo: https://github.com/PyCQA/flake8
     rev: 3.9.2
     hooks:
       - id: flake8
@@ -20,7 +20,7 @@ repos:
         args: ["--profile", "black", "--filter-files"]
 
   - repo: https://github.com/psf/black
-    rev: 21.7b0
+    rev: 21.8b0
     hooks:
       - id: black
         language_version: python3
@@ -32,6 +32,6 @@ repos:
         args: [--no-strict-optional, --ignore-missing-imports]
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.23.1
+    rev: v2.25.0
     hooks:
       - id: pyupgrade
