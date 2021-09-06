@@ -90,6 +90,7 @@ Go to your [slack app](https://api.slack.com/apps/) and click on **Add features 
 - Event Subscriptions
   - Enable Events 🠊 Toggle the slider to on
   - Subscribe to bot events 🠊 Add via the **Add Bot User Event** button
+    - team_join
     - channel_create
     - message.channels
     - message.groups
