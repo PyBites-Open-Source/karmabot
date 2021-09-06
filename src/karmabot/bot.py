@@ -233,10 +233,10 @@ def reply_commands(message, say):  # noqa
 # Events
 @app.event("team_join")  # type: ignore
 def welcome_new_user(event, say):
-    user_id = event["user"]
-
+    user_id = event["user"]["id"]
     text = welcome_user(user_id)
-    say(text=text, channel=GENERAL_CHANNEL)
+    logging.info(f"Sending welcome DM to new member {user_id}")
+    say(text=text, channel=user_id)
 
 
 @app.event("channel_created")  # type: ignore
