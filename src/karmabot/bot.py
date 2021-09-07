@@ -25,7 +25,6 @@ from karmabot.karma import process_karma_changes
 # Settings
 from karmabot.settings import (
     ADMINS,
-    GENERAL_CHANNEL,
     KARMA_ACTION_PATTERN,
     KARMABOT_ID,
     SLACK_BOT_TOKEN,
