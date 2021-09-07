@@ -25,7 +25,6 @@ from karmabot.karma import process_karma_changes
 # Settings
 from karmabot.settings import (
     ADMINS,
-    GENERAL_CHANNEL,
     KARMA_ACTION_PATTERN,
     KARMABOT_ID,
     SLACK_BOT_TOKEN,
@@ -233,10 +232,10 @@ def reply_commands(message, say):  # noqa
 # Events
 @app.event("team_join")  # type: ignore
 def welcome_new_user(event, say):
-    user_id = event["user"]
-
+    user_id = event["user"]["id"]
     text = welcome_user(user_id)
-    say(text=text, channel=GENERAL_CHANNEL)
+    logging.info("Sending welcome DM to new member %s", user_id)
+    say(text=text, channel=user_id)
 
 
 @app.event("channel_created")  # type: ignore
