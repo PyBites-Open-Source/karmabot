@@ -234,7 +234,7 @@ def reply_commands(message, say):  # noqa
 def welcome_new_user(event, say):
     user_id = event["user"]["id"]
     text = welcome_user(user_id)
-    logging.info(f"Sending welcome DM to new member {user_id}")
+    logging.info("Sending welcome DM to new member %s", user_id)
     say(text=text, channel=user_id)
 
 
