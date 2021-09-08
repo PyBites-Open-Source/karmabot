@@ -2,7 +2,7 @@
 from random import choice
 
 import karmabot.slack
-from karmabot.settings import get_env_var
+from karmabot.settings import KARMABOT_ID, get_env_var
 
 # thanks Erik!
 WELCOME_MSG = """Welcome {user} ++!
@@ -44,7 +44,7 @@ What other programming languages do you know and/or use?"""
 
 
 def _get_admins() -> str:
-    admins_env = get_env_var("KARMABOT_ADMINS").split(",")
+    admins_env = get_env_var("KARMABOT_ADMINS", default=KARMABOT_ID).split(",")
     admins = ", ".join(f"<@{admin}>" for admin in admins_env)
     return " and".join(admins.rsplit(",", maxsplit=1))
 
