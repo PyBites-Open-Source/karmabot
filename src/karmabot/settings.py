@@ -6,11 +6,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def _get_env_var(env_var: str):
+def _get_env_var(env_var: str, default=None):
     env_var_value = os.environ.get(env_var)
 
     # explicit check for None as None is returned by environ.get for non existing keys
     if env_var_value is None:
+        if default is not None:
+            return default
+
         raise KeyError(
             f"{env_var} was not found. Please check your .karmabot file as well as the README.md."
         )
@@ -33,7 +36,7 @@ KARMABOT_ID = _get_env_var("KARMABOT_SLACK_USER")
 DATABASE_URL = _get_env_var("KARMABOT_DATABASE_URL")
 SLACK_APP_TOKEN = _get_env_var("KARMABOT_SLACK_APP_TOKEN")
 SLACK_BOT_TOKEN = _get_env_var("KARMABOT_SLACK_BOT_TOKEN")
-TEST_MODE = bool(_get_env_var("KARMABOT_TEST_MODE") == "true")
+TEST_MODE = _get_env_var("KARMABOT_TEST_MODE", default="false") == "true"
 logging.info("Test mode enabled: %s", TEST_MODE)
 
 # Slack
