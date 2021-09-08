@@ -2,6 +2,7 @@
 from random import choice
 
 import karmabot.slack
+from karmabot.settings import get_env_var
 
 # thanks Erik!
 WELCOME_MSG = """Welcome {user} ++!
@@ -16,7 +17,8 @@ Although you will meet some awesome folks here, you can also talk to me :)
 Type `help` here to get started ...
 
 Enjoy PyBites Slack and keep calm and code in Python!
-@pybob and @julian.sequeira
+
+{admins}
 """
 # some Pythonic welcome questions
 WELCOME_QUESTIONS = """How did you use Python for the first time?
@@ -41,10 +43,18 @@ What is your favorite editor?
 What other programming languages do you know and/or use?"""
 
 
+def _get_admins() -> str:
+    admins_env = get_env_var("KARMABOT_ADMINS").split(",")
+    admins = ", ".join(f"<@{admin}>" for admin in admins_env)
+    return " and".join(admins.rsplit(",", maxsplit=1))
+
+
 def welcome_user(user_id: str) -> str:
     """Welcome a new PyBites community member"""
     questions = WELCOME_QUESTIONS.split("\n")
     random_question = choice(questions)  # noqa: S311
     slack_id = karmabot.slack.get_slack_id(user_id)
-
-    return WELCOME_MSG.format(user=slack_id, welcome_question=random_question)
+    admins = _get_admins()
+    return WELCOME_MSG.format(
+        user=slack_id, welcome_question=random_question, admins=admins
+    )

@@ -1,7 +1,10 @@
-# Messages / Slack
+import os
+from unittest.mock import patch
+
 import pytest
 
 from karmabot.bot import karma_action, reply_commands, reply_help, reply_special_words
+from karmabot.commands.welcome import welcome_user
 from karmabot.settings import KARMABOT_ID
 
 
@@ -91,8 +94,13 @@ def test_reply_commands_unknown(capfd, test_message, expected):
     assert out.strip() == expected
 
 
-def test_welcome_new_user():
-    pass
+@patch("random.choice")
+def test_welcome_new_user(choice_mock):
+    choice_mock.return_value = "What is your favorite Python module?"
+    admins = "U4RTDPKUH,U4TN52NG6,U4SJVFMEG,UKS45DGFQ,U5V0ZJTFF,UH5NGGK0E"
+    with patch.dict(os.environ, {"KARMABOT_ADMINS": admins}):
+        welcome_msg = welcome_user("bob")
+        print(welcome_msg)
 
 
 def autojoin_new_channels():

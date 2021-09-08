@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def _get_env_var(env_var: str):
+def get_env_var(env_var: str):
     env_var_value = os.environ.get(env_var)
 
     # explicit check for None as None is returned by environ.get for non existing keys
@@ -29,16 +29,16 @@ if dotenv_path.exists():
     load_dotenv(dotenv_path)
 
 # Environment variables
-KARMABOT_ID = _get_env_var("KARMABOT_SLACK_USER")
-DATABASE_URL = _get_env_var("KARMABOT_DATABASE_URL")
-SLACK_APP_TOKEN = _get_env_var("KARMABOT_SLACK_APP_TOKEN")
-SLACK_BOT_TOKEN = _get_env_var("KARMABOT_SLACK_BOT_TOKEN")
-TEST_MODE = bool(_get_env_var("KARMABOT_TEST_MODE") == "true")
+KARMABOT_ID = get_env_var("KARMABOT_SLACK_USER")
+DATABASE_URL = get_env_var("KARMABOT_DATABASE_URL")
+SLACK_APP_TOKEN = get_env_var("KARMABOT_SLACK_APP_TOKEN")
+SLACK_BOT_TOKEN = get_env_var("KARMABOT_SLACK_BOT_TOKEN")
+TEST_MODE = bool(get_env_var("KARMABOT_TEST_MODE") == "true")
 logging.info("Test mode enabled: %s", TEST_MODE)
 
 # Slack
-GENERAL_CHANNEL = _get_env_var("KARMABOT_GENERAL_CHANNEL")
-ADMINS = _get_env_var("KARMABOT_ADMINS")
+GENERAL_CHANNEL = get_env_var("KARMABOT_GENERAL_CHANNEL")
+ADMINS = get_env_var("KARMABOT_ADMINS")
 ADMINS = ADMINS.split(",")  # type: ignore
 
 # Karma
