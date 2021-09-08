@@ -94,13 +94,29 @@ def test_reply_commands_unknown(capfd, test_message, expected):
     assert out.strip() == expected
 
 
-@patch("random.choice")
+@patch("karmabot.commands.welcome.choice")
 def test_welcome_new_user(choice_mock):
     choice_mock.return_value = "What is your favorite Python module?"
-    admins = "U4RTDPKUH,U4TN52NG6,U4SJVFMEG,UKS45DGFQ,U5V0ZJTFF,UH5NGGK0E"
+    admins = "U4RTDPKUH,U4TN52NG6,U4SJVFMEG"
     with patch.dict(os.environ, {"KARMABOT_ADMINS": admins}):
-        welcome_msg = welcome_user("bob")
-        print(welcome_msg)
+        actual_msg = welcome_user("bob")
+        expected_msg = """Welcome <@bob> ++!
+
+            Introduce yourself in #general if you like ...
+            - What do you use Python for?
+            - What is your day job?
+            - And: >>> random.choice(pybites_init_questions)
+            What is your favorite Python module?
+
+            Although you will meet some awesome folks here, you can also talk to me :)
+            Type `help` here to get started ...
+
+            Enjoy PyBites Slack and keep calm and code in Python!
+
+            <@U4RTDPKUH>, <@U4TN52NG6> and <@U4SJVFMEG>"""
+        assert [line.lstrip() for line in actual_msg.strip().splitlines()] == [
+            line.lstrip() for line in expected_msg.strip().splitlines()
+        ]
 
 
 def autojoin_new_channels():
