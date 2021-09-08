@@ -6,11 +6,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def get_env_var(env_var: str):
+def get_env_var(env_var: str, default: str = None) -> str:
     env_var_value = os.environ.get(env_var)
 
     # explicit check for None as None is returned by environ.get for non existing keys
     if env_var_value is None:
+        if default is not None:
+            return default
+
         raise KeyError(
             f"{env_var} was not found. Please check your .karmabot file as well as the README.md."
         )
