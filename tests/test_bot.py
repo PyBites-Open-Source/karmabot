@@ -1,7 +1,9 @@
-# Messages / Slack
+from unittest.mock import patch
+
 import pytest
 
 from karmabot.bot import karma_action, reply_commands, reply_help, reply_special_words
+from karmabot.commands.welcome import welcome_user
 from karmabot.settings import KARMABOT_ID
 
 
@@ -91,8 +93,27 @@ def test_reply_commands_unknown(capfd, test_message, expected):
     assert out.strip() == expected
 
 
-def test_welcome_new_user():
-    pass
+@patch("karmabot.commands.welcome.choice")
+def test_welcome_new_user(choice_mock):
+    choice_mock.return_value = "What is your favorite Python module?"
+    actual_msg = welcome_user("bob")
+    expected_msg = """Welcome <@bob> ++!
+
+        Introduce yourself in #general if you like ...
+        - What do you use Python for?
+        - What is your day job?
+        - And: >>> random.choice(pybites_init_questions)
+        What is your favorite Python module?
+
+        Although you will meet some awesome folks here, you can also talk to me :)
+        Type `help` here to get started ...
+
+        Enjoy PyBites Slack and keep calm and code in Python!
+
+        <@FAKE_ADMIN1>, <@FAKE_ADMIN2> and <@FAKE_ADMIN3>"""
+    assert [line.lstrip() for line in actual_msg.strip().splitlines()] == [
+        line.lstrip() for line in expected_msg.strip().splitlines()
+    ]
 
 
 def autojoin_new_channels():
