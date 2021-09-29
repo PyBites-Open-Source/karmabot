@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "karmabot"
-version = "1.4"
+version = "2.0"
 description = "PyBites Karmabot - A Python based Slack Chatbot for Community interaction"
 homepage = "https://github.com/PyBites-Open-Source/karmabot"
 keywords = ["karmabot"]
