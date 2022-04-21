@@ -151,3 +151,7 @@ Make sure to delete the `.nox` folder when you switch from Windows to WSL and vi
 To ensure consistency you can use pre-commit. `pip install pre-commit` and after cloning the karmabot repo run `pre-commit install` within the project folder.
 
 This will enable pre-commit hooks for checking before every commit.
+
+### The story
+
+Listen to Karmabot's core developer / maintainer Patrick Groß share the backstory of this project [on our podcast](https://www.pybitespodcast.com/1501156/8317703-022-the-karmabot-story-and-contributing-to-open-source).
