@@ -152,6 +152,6 @@ To ensure consistency you can use pre-commit. `pip install pre-commit` and after
 
 This will enable pre-commit hooks for checking before every commit.
 
-### The story
+### The story
 
 Listen to Karmabot's core developer / maintainer Patrick Groß share the backstory of this project [on our podcast](https://www.pybitespodcast.com/1501156/8317703-022-the-karmabot-story-and-contributing-to-open-source).
