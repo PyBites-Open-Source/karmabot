@@ -31,7 +31,7 @@ After installing you can start karmabot by using the command
 karmabot
 ```
 
-However, you need to some setup and supply some settings prior to this.
+However, you need to do some setup and supply some settings prior to this.
 
 ### Setup
 
