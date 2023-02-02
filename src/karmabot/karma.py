@@ -79,7 +79,6 @@ class Karma:
         return text
 
     def _save_transaction(self, points):
-
         response = bot.app.client.conversations_info(channel=self.channel_id)
 
         if response.status_code != 200:

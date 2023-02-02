@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-def get_env_var(env_var: str, default: str = None) -> str:
+def get_env_var(env_var: str, default: str | None = None) -> str:
     env_var_value = os.environ.get(env_var)
 
     # explicit check for None as None is returned by environ.get for non existing keys

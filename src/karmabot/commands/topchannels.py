@@ -43,8 +43,8 @@ def collect_channel_info(channel):
         if not history_response["ok"]:
             raise SlackApiError("conversation.history error", history_response)
 
-    except SlackApiError as exc:
-        logging.error(exc)
+    except SlackApiError:
+        logging.exception("Slack error")
         return "I am truly sorry but something went wrong ;("
 
     channel_info: Dict = info_response["channel"]

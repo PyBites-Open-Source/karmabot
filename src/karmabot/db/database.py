@@ -17,7 +17,6 @@ class Database:
     def __init__(
         self, connection_string: str = settings.DATABASE_URL, echo: bool = False
     ) -> None:
-
         self.connection_string = connection_string
         self.echo = echo
 
