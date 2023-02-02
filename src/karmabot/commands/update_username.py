@@ -13,7 +13,7 @@ def update_username(**kwargs):
         user_id = user_id.strip("<>@")
 
     with database.session_manager() as session:
-        karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
+        karma_user: KarmaUser = session.get(KarmaUser, user_id)
 
     if not karma_user:
         return "User not found"
@@ -54,7 +54,7 @@ def get_user_name(**kwargs):
         user_id = user_id.strip("<>@")
 
     with database.session_manager() as session:
-        karma_user: KarmaUser = session.query(KarmaUser).get(user_id)
+        karma_user: KarmaUser = session.get(KarmaUser, user_id)
 
     if not karma_user:
         return "Sorry, you are not yet known to karmabot. Try to give some Karma! :)"

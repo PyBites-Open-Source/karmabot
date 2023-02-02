@@ -8,12 +8,14 @@ from karmabot.db.karma_user import KarmaUser
 from karmabot.exceptions import GetUserInfoException
 from karmabot.settings import KARMABOT_ID, MAX_POINTS
 
+from sqlalchemy import select
+
 
 class Karma:
     def __init__(self, giver_id, receiver_id, channel_id):
         self.session = database.session
-        self.giver: KarmaUser = self.session.query(KarmaUser).get(giver_id)
-        self.receiver: KarmaUser = self.session.query(KarmaUser).get(receiver_id)
+        self.giver: KarmaUser = self.session.get(KarmaUser, giver_id)
+        self.receiver: KarmaUser = self.session.get(KarmaUser, receiver_id)
 
         if not self.giver:
             self.giver = self._create_karma_user(giver_id)
@@ -99,9 +101,13 @@ class Karma:
         self.session.commit()
 
         finished_transaction = (
-            self.session.query(KarmaTransaction)
-            .order_by(KarmaTransaction.id.desc())
-            .first()
+            self.session.execute(
+                select(KarmaTransaction).order_by(KarmaTransaction.id.desc())
+            ).first()
+            # SQLAlchemy migration
+            # self.session.query(KarmaTransaction)
+            # .order_by(KarmaTransaction.id.desc())
+            # .first()
         )
         logging.info(repr(finished_transaction))
 

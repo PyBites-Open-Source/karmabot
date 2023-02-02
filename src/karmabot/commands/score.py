@@ -2,6 +2,8 @@ import karmabot.slack
 from karmabot.db.database import database
 from karmabot.db.karma_user import KarmaUser
 
+from sqlalchemy import select
+
 TOP_NUMBER = 10
 
 
@@ -11,7 +13,7 @@ def get_karma(**kwargs):
     slack_id = karmabot.slack.get_slack_id(user_id)
 
     with database.session_manager() as session:
-        kama_user = session.query(KarmaUser).get(user_id)
+        kama_user = session.get(KarmaUser, user_id)
 
     if not kama_user:
         return "User not found"
@@ -28,9 +30,16 @@ def top_karma(**kwargs):
 
     with database.session_manager() as session:
         top_users = (
-            session.query(KarmaUser)
-            .order_by(KarmaUser.karma_points.desc())
-            .limit(TOP_NUMBER)
+            session.execute(
+                select(KarmaUser)
+                .order_by(KarmaUser.karma_points.desc())
+                .limit(TOP_NUMBER)
+            ).all()
+            # TODO:does not work :(
+            # SQLAlchemy 2.0 migration
+            # session.query(KarmaUser)
+            # .order_by(KarmaUser.karma_points.desc())
+            # .limit(TOP_NUMBER)
         )
 
     if top_users:
