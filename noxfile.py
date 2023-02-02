@@ -16,7 +16,8 @@ env = {
     "KARMABOT_SLACK_APP_TOKEN": "FAKE_APP_TOKEN",
     "KARMABOT_SLACK_BOT_TOKEN": "FAKE_BOT_TOKEN",
     "KARMABOT_TEST_MODE": "true",
-    "SQLALCHEMY_SILENCE_UBER_WARNING": "1",
+    "SQLALCHEMY_SILENCE_UBER_WARNING": "0",
+    "SQLALCHEMY_WARN_20": "1",
 }
 
 nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
