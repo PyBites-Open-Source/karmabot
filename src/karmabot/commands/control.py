@@ -5,7 +5,7 @@ import karmabot.bot as bot
 from karmabot.slack import get_user_id
 
 
-def join_public_channels(**kwargs):
+def join_public_channels(**kwargs) -> str:
     """Makes the bot join all public channels he is not in yet"""
     response = bot.app.client.conversations_list(
         exclude_archived=True, types="public_channel"
@@ -18,6 +18,9 @@ def join_public_channels(**kwargs):
         return error
 
     channels_joined = []
+    if not public_channels:
+        return "Could not find any public channels"
+
     for channel in public_channels:
         if not channel["is_member"]:  # only join channels you are not already in
             bot.app.client.conversations_join(channel=channel["id"])
@@ -33,7 +36,7 @@ def join_public_channels(**kwargs):
     return "There were no new public channels to join!"
 
 
-def your_id(**kwargs):
+def your_id(**kwargs) -> str:
     """Shows the user id of karmabot"""
     message = kwargs.get("text", "")
     bot_slack_id = message.split()[0]
@@ -45,9 +48,9 @@ def your_id(**kwargs):
     return "Sorry could not retrieve my user id"
 
 
-def general_channel_id(**kwargs):
+def general_channel_id(**kwargs) -> str:
     """Shows the channel id of the general channel"""
-    response: Dict = bot.app.client.conversations_list(
+    response = bot.app.client.conversations_list(
         exclude_archived=True, types="public_channel"
     )
 
