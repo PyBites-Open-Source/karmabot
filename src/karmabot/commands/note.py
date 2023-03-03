@@ -117,10 +117,13 @@ def _get_notes_for_user(user: KarmaUser) -> list:
 
 def _note_exists(msg: str, user: KarmaUser) -> bool:
     with database.session_manager() as session:
-        note_exists = session.execute(
-            select(KarmaNote).filter_by(note=msg, user_id=user.user_id).exists()
-        ).scalar()
-    return note_exists
+        statement = select(KarmaNote).filter_by(note=msg, user_id=user.user_id)
+        note = session.execute(statement).first()
+
+        if note:
+            return True
+
+    return False
 
 
 NOTE_COMMANDS: Dict[str, Callable] = {
