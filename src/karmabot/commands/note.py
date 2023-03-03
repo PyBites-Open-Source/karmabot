@@ -118,9 +118,9 @@ def _get_notes_for_user(user: KarmaUser) -> list:
 def _note_exists(msg: str, user: KarmaUser) -> bool:
     with database.session_manager() as session:
         statement = select(KarmaNote).filter_by(note=msg, user_id=user.user_id)
-        note = session.execute(statement).first()
+        db_note = session.execute(statement).first()
 
-        if note:
+        if db_note:
             return True
 
     return False
