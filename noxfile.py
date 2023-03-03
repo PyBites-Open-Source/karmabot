@@ -128,6 +128,6 @@ def safety(session: Session) -> None:
 @nox.session(python="3.10")
 def coverage(session: Session) -> None:
     """Upload coverage data."""
-    install_with_constraints(session, "coverage")
+    install_with_constraints(session, "coverage[toml]")
     session.run("coverage", "report", "--fail-under=40")
     session.run("coverage", "xml", "--fail-under=40")
