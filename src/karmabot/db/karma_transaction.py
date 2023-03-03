@@ -11,7 +11,7 @@ class KarmaTransaction(SqlAlchemyBase):
 
     __tablename__ = "karma_transaction"
 
-    id: int = sa.Column(  # noqa
+    id: int = sa.Column(  # type: ignore
         sa.BigInteger().with_variant(Integer, "sqlite"),
         primary_key=True,
         autoincrement=True,
