@@ -2,11 +2,11 @@ import datetime
 import re
 from typing import Callable, Dict, Tuple, Union
 
+from sqlalchemy import select
+
 from karmabot.db.database import database
 from karmabot.db.karma_note import KarmaNote
 from karmabot.db.karma_user import KarmaUser
-
-from sqlalchemy import select
 
 NOTE_CMD_PATTERN = re.compile(r"note\s(\w+)\s?(.*)")
 

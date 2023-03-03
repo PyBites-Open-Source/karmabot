@@ -1,5 +1,7 @@
 import logging
 
+from sqlalchemy import select
+
 import karmabot.bot as bot
 import karmabot.slack as slack
 from karmabot.db.database import database
@@ -7,8 +9,6 @@ from karmabot.db.karma_transaction import KarmaTransaction
 from karmabot.db.karma_user import KarmaUser
 from karmabot.exceptions import GetUserInfoException
 from karmabot.settings import KARMABOT_ID, MAX_POINTS
-
-from sqlalchemy import select
 
 
 class Karma:

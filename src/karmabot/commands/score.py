@@ -1,8 +1,8 @@
+from sqlalchemy import select
+
 import karmabot.slack
 from karmabot.db.database import database
 from karmabot.db.karma_user import KarmaUser
-
-from sqlalchemy import select
 
 TOP_NUMBER = 10
 
