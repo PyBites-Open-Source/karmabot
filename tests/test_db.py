@@ -20,7 +20,7 @@ def test_karma_user_repr(karma_users):
 @pytest.mark.usefixtures("mock_filled_db_session")
 def test_lookup_username(test_user_id, expected):
     with database.session_manager() as session:
-        karma_user = session.query(KarmaUser).get(test_user_id)
+        karma_user = session.get(KarmaUser, test_user_id)
     assert karma_user.username == expected
 
 
@@ -31,8 +31,8 @@ def test_create_karma_user():
     assert karma.receiver.username == "clamytoe"
 
     with database.session_manager() as session:
-        first = session.query(KarmaUser).get("ABC123")
-        second = session.query(KarmaUser).get("XYZ123")
+        first = session.get(KarmaUser, "ABC123")
+        second = session.get(KarmaUser, "XYZ123")
 
     assert first.username == "pybob"
     assert second.username == "clamytoe"

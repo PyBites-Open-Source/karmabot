@@ -2,6 +2,8 @@ import datetime
 import re
 from typing import Callable, Dict, Tuple, Union
 
+from sqlalchemy import select
+
 from karmabot.db.database import database
 from karmabot.db.karma_note import KarmaNote
 from karmabot.db.karma_user import KarmaUser
@@ -22,7 +24,7 @@ def note(user_id: str, channel: str, text: str) -> Union[None, str]:
 
     # retrieve current user
     with database.session_manager() as session:
-        user = session.query(KarmaUser).get(user_id)
+        user = session.get(KarmaUser, user_id)
 
     cmd, _ = _parse_note_cmd(text)
 
@@ -59,7 +61,9 @@ def _del_note(text: str, user: KarmaUser) -> str:
         return f"Sorry {user.username}, it seems you did not provide a valid id."
 
     with database.session_manager() as session:
-        query = session.query(KarmaNote).filter_by(id=note_id, user_id=user.user_id)
+        query = session.execute(
+            select(KarmaNote).filter_by(id=note_id, user_id=user.user_id)
+        )
 
         row_count = query.delete()
         session.commit()  # otherwise, the deletion is not performed
@@ -107,19 +111,19 @@ def _parse_note_cmd(text: str) -> Tuple[str, str]:
 
 def _get_notes_for_user(user: KarmaUser) -> list:
     with database.session_manager() as session:
-        notes = session.query(KarmaNote).filter_by(user_id=user.user_id).all()
+        notes = session.execute(select(KarmaNote).filter_by(user_id=user.user_id)).all()
     return notes
 
 
 def _note_exists(msg: str, user: KarmaUser) -> bool:
     with database.session_manager() as session:
-        selected_note = session.query(KarmaNote).filter_by(
-            note=msg, user_id=user.user_id
-        )
-        note_exists = session.query(
-            selected_note.exists()
-        ).scalar()  # returns True or False
-    return note_exists
+        statement = select(KarmaNote).filter_by(note=msg, user_id=user.user_id)
+        db_note = session.execute(statement).first()
+
+        if db_note:
+            return True
+
+    return False
 
 
 NOTE_COMMANDS: Dict[str, Callable] = {

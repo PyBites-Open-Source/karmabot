@@ -16,6 +16,8 @@ env = {
     "KARMABOT_SLACK_APP_TOKEN": "FAKE_APP_TOKEN",
     "KARMABOT_SLACK_BOT_TOKEN": "FAKE_BOT_TOKEN",
     "KARMABOT_TEST_MODE": "true",
+    "SQLALCHEMY_SILENCE_UBER_WARNING": "0",
+    "SQLALCHEMY_WARN_20": "1",
 }
 
 nox.options.sessions = "tests", "lint", "black", "mypy", "safety"
@@ -42,7 +44,6 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
         session.run(
             "poetry",
             "export",
-            "--dev",
             "--format=requirements.txt",
             "--without-hashes",
             f"--output={requirements.name}",
@@ -54,18 +55,16 @@ def install_with_constraints(session: Session, *args: str, **kwargs: Any) -> Non
     os.unlink(requirements.name)
 
 
-@nox.session(python=["3.8", "3.9"])
+@nox.session(python=["3.10", "3.11"])
 def tests(session: Session) -> None:
     """Run the test suite."""
     args = session.posargs or ["--cov", "-m", "not e2e"]
-    session.run("poetry", "install", "--no-dev", external=True)
-    install_with_constraints(
-        session, "coverage[toml]", "pytest", "pytest-cov", "pytest-mock"
-    )
+    session.run("poetry", "install", "--only", "main", external=True)
+    install_with_constraints(session, "coverage", "pytest", "pytest-cov", "pytest-mock")
     session.run("pytest", *args, env=env)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def lint(session: Session) -> None:
     """Lint using flake8."""
     args = session.posargs or locations
@@ -83,7 +82,7 @@ def lint(session: Session) -> None:
     session.run("flake8", *args)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def black(session: Session) -> None:
     """Run black code formatter."""
     args = session.posargs or locations
@@ -91,7 +90,7 @@ def black(session: Session) -> None:
     session.run("black", *args)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def mypy(session: Session) -> None:
     """Type-check using mypy."""
     args = session.posargs or locations
@@ -99,14 +98,15 @@ def mypy(session: Session) -> None:
     session.run("mypy", *args)
 
 
-@nox.session(python=["3.8", "3.9"])
+@nox.session(python=["3.10", "3.11"])
 def safety(session: Session) -> None:
     """Scan dependencies for insecure packages."""
     with tempfile.NamedTemporaryFile(delete=False) as requirements:
         session.run(
             "poetry",
             "export",
-            "--dev",
+            "--with",
+            "dev",
             "--format=requirements.txt",
             "--without-hashes",
             f"--output={requirements.name}",
@@ -125,7 +125,7 @@ def safety(session: Session) -> None:
     os.unlink(requirements.name)
 
 
-@nox.session(python="3.8")
+@nox.session(python="3.10")
 def coverage(session: Session) -> None:
     """Upload coverage data."""
     install_with_constraints(session, "coverage[toml]")
