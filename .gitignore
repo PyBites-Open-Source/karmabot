@@ -146,6 +146,7 @@ dmypy.json
 *.mypy_cache
 *.nox
 .isort.cfg
+.vscode
 
 data
 .karmabot

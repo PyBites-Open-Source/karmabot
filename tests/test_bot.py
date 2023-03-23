@@ -39,7 +39,6 @@ def test_karma_action(capfd, test_message, expected):
     ],
 )
 def test_reply_special_words(capfd, test_message, expected):
-
     reply_special_words(test_message, print)  # type: ignore
     out = capfd.readouterr()[0]
     assert out.strip() == expected
