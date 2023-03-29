@@ -1,6 +1,5 @@
 [tool.poetry]
 name = "karmabot"
-version = "2.0.1"
 authors = ["PyBites <info@pybit.es>", "Patrick-Oliver Groß <mail@pogross.de>"]
 classifiers = [
   "License :: OSI Approved :: MIT License",
