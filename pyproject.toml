@@ -15,7 +15,6 @@ homepage = "https://github.com/PyBites-Open-Source/karmabot"
 keywords = ["karmabot"]
 license = "MIT"
 maintainers = ["Patrick-Oliver Groß <mail@pogross.de>"]
-name = "karmabot"
 readme = "README.md"
 repository = "https://github.com/PyBites-Open-Source/karmabot"
 version = "3.1.0"
