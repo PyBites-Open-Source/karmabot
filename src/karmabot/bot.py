@@ -71,22 +71,22 @@ def compile_command_pattern(commands: Dict[str, Callable]) -> re.Pattern:
     command_words = commands.keys()
     all_commands = "|".join(command_words)
 
-    full_commands = fr"^<@{KARMABOT_ID}>\s*({all_commands})(\s.*)?$"
+    full_commands = rf"^<@{KARMABOT_ID}>\s*({all_commands})(\s.*)?$"
 
     return re.compile(full_commands, re.IGNORECASE)
 
 
 def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
     special_words = "|".join(replies.keys())
-    pattern = fr"(?<!<@{KARMABOT_ID}>\s)({special_words})"
+    pattern = rf"(?<!<@{KARMABOT_ID}>\s)({special_words})"
     return re.compile(pattern, flags=re.MULTILINE | re.IGNORECASE)
 
 
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
 CHANNEL_COMMAND_PATTERN = compile_command_pattern(CHANNEL_BOT_COMMANDS)
 DM_COMMAND_PATTERN = compile_command_pattern(DM_BOT_COMMANDS)
-UNKNOWN_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(\w*)")
-HELP_COMMAND_PATTERN = re.compile(fr"^<@{KARMABOT_ID}>\s(help|commands)")
+UNKNOWN_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(\w*)")
+HELP_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(help|commands)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 

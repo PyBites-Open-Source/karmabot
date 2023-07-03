@@ -42,7 +42,6 @@ def test_parse_karma_change(test_change, expected):
 )
 @pytest.mark.usefixtures("conversations_info_fake_channel", "mock_filled_db_session")
 def test_change_karma(giver, receiver, channel, amount):
-
     with database.session_manager() as session:
         pre_change_karma = session.query(KarmaUser).get(receiver).karma_points
 
