@@ -1,5 +1,12 @@
 ci:
-    autoupdate_schedule: quarterly
+    autofix_commit_msg: |
+        [pre-commit.ci] auto fixes from pre-commit.com hooks
+    autofix_prs: true
+    autoupdate_branch: 'develop'
+    autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+    autoupdate_schedule: monthly
+    skip: []
+    submodules: false
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -14,7 +21,14 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        additional_dependencies: ["flake8-bandit", "flake8-bugbear"]
+        additional_dependencies:
+          - "flake8-bandit"
+          - "flake8-bugbear"
+          - "flake8-blind-except"
+          - "flake8-builtins"
+          - "flake8-logging-format"
+          - "flake8-debugger"
+          - "flake8-use-fstring"
 
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0

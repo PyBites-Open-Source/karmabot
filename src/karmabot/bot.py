@@ -83,8 +83,8 @@ def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
 
 
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
-CHANNEL_COMMAND_PATTERN = compile_command_pattern(CHANNEL_BOT_COMMANDS)
-DM_COMMAND_PATTERN = compile_command_pattern(DM_BOT_COMMANDS)
+CHANNEL_COMMAND_PATTERN = compile_command_pattern(CHANNEL_BOT_COMMANDS)  # type: ignore
+DM_COMMAND_PATTERN = compile_command_pattern(DM_BOT_COMMANDS)  # type: ignore
 UNKNOWN_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(\w*)")
 HELP_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(help|commands)")
 SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
@@ -185,8 +185,8 @@ def reply_commands(message, say):  # noqa
         channel_id = message["channel"]
         text = message["text"]
         channel_type = message["channel_type"]
-    except KeyError as exc:
-        logging.error("reply_commands error! Message was: %s", message, exc_info=exc)
+    except KeyError:
+        logging.exception("reply_commands error! Message was: %s", message)
         return
 
     kwargs = {"user_id": user_id, "channel": channel_id, "text": text}
