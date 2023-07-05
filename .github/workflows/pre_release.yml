@@ -21,10 +21,12 @@ jobs:
 
       - name: Install Poetry
         run: poetry install
-      - name: Configure Poetry Repository
+
+      - name: Set testpypi repo
         run: poetry config repositories.testpypi https://test.pypi.org/legacy/
 
-      - name: Configure Poetry Token
+      - name: Set testpypi token
         run: poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_API_TOKEN }}
+
       - name: Publish package
         run: poetry publish --build -r testpypi
