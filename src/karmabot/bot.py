@@ -27,6 +27,7 @@ from karmabot.settings import (
     ADMINS,
     KARMA_ACTION_PATTERN,
     KARMABOT_ID,
+    LOG_CHANNEL,
     SLACK_BOT_TOKEN,
     TEST_MODE,
 )
@@ -130,9 +131,8 @@ def karma_action(message, say):
     karma_changes = KARMA_ACTION_PATTERN.findall(msg)
 
     karma_replies = process_karma_changes(karma_giver, channel_id, karma_changes)
-
-    reply = "\n\n".join(karma_replies)
-    say(reply)
+    for reply in karma_replies:
+        say(reply, channel=LOG_CHANNEL)
 
 
 # Help
