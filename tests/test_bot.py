@@ -7,6 +7,10 @@ from karmabot.commands.welcome import welcome_user
 from karmabot.settings import KARMABOT_ID
 
 
+def _fake_say(text, channel=None):
+    print(text)
+
+
 @pytest.mark.parametrize(
     "test_message, expected",
     [
@@ -22,7 +26,7 @@ from karmabot.settings import KARMABOT_ID
 )
 @pytest.mark.usefixtures("mock_filled_db_session", "save_transaction_disabled")
 def test_karma_action(capfd, test_message, expected):
-    karma_action(test_message, print)  # type: ignore
+    karma_action(test_message, _fake_say)  # type: ignore
     out = capfd.readouterr()[0]
     assert out.strip() == expected
 
