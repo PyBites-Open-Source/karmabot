@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from karmabot.bot import karma_action, reply_commands, reply_help, reply_special_words
+from karmabot.bot import karma_action, reply_commands, reply_help
 from karmabot.commands.welcome import welcome_user
 from karmabot.settings import KARMABOT_ID
 
@@ -27,23 +27,6 @@ def _fake_say(text, channel=None):
 @pytest.mark.usefixtures("mock_filled_db_session", "save_transaction_disabled")
 def test_karma_action(capfd, test_message, expected):
     karma_action(test_message, _fake_say)  # type: ignore
-    out = capfd.readouterr()[0]
-    assert out.strip() == expected
-
-
-@pytest.mark.parametrize(
-    "test_message, expected",
-    [
-        ({"text": "Cheers everybody"}, "To _cheers_ I say: :beers:"),
-        ({"text": "What about zen?"}, "To _zen_ I say: `import this`"),
-        (
-            {"text": "Anyone likes braces, huh?"},
-            "To _braces_ I say: `SyntaxError: not a chance`",
-        ),
-    ],
-)
-def test_reply_special_words(capfd, test_message, expected):
-    reply_special_words(test_message, print)  # type: ignore
     out = capfd.readouterr()[0]
     assert out.strip() == expected
 
