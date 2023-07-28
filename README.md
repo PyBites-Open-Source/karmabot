@@ -73,7 +73,7 @@ KARMABOT_GENERAL_CHANNEL
 : The channel id of your main channel in slack. Initially, you can fill in a placeholder. Once you've run your own Karmabot for the first time, you can ask it as admin in private chat via `@Karmabot general_channel_id`. This will return a value starting with `C`, e.g., `C0123XYZ`. Replace your placeholder with this value.
 
 KARMABOT_LOG_CHANNEL
-: The channel id of the channel the bot logs messages in, e.g. Karma points ("In <channel>, <giver> boosted <receiver>'s karma to <new karma value>")
+: The channel id (Cxyz) of the channel the bot logs karma point changes to (e.g. "bobtester2's karma increased to 9")
 
 KARMABOT_ADMINS
 : The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access separated by commas.
