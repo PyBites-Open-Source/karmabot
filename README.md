@@ -49,6 +49,7 @@ KARMABOT_SLACK_APP_TOKEN=
 # Workspace
 KARMABOT_SLACK_USER=
 KARMABOT_GENERAL_CHANNEL=
+KARMABOT_LOG_CHANNEL=
 KARMABOT_ADMINS=
 
 # Backend
@@ -70,6 +71,9 @@ KARMABOT_SLACK_USER
 
 KARMABOT_GENERAL_CHANNEL
 : The channel id of your main channel in slack. Initially, you can fill in a placeholder. Once you've run your own Karmabot for the first time, you can ask it as admin in private chat via `@Karmabot general_channel_id`. This will return a value starting with `C`, e.g., `C0123XYZ`. Replace your placeholder with this value.
+
+KARMABOT_LOG_CHANNEL
+: The channel id (Cxyz) of the channel the bot logs karma point changes to (e.g. "bobtester2's karma increased to 9")
 
 KARMABOT_ADMINS
 : The [slack user ids](https://api.slack.com/methods/users.identity) of the users that should have admin command access separated by commas.
@@ -152,6 +156,6 @@ To ensure consistency you can use pre-commit. `pip install pre-commit` and after
 
 This will enable pre-commit hooks for checking before every commit.
 
-### The story
+### The story behind Karmabot
 
 Listen to Karmabot's core developer / maintainer Patrick Groß sharing the backstory of this project [on our podcast](https://www.pybitespodcast.com/1501156/8317703-022-the-karmabot-story-and-contributing-to-open-source).

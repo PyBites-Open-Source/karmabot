@@ -2,11 +2,12 @@ import logging
 import os
 import re
 from pathlib import Path
+from typing import Union
 
 from dotenv import load_dotenv
 
 
-def get_env_var(env_var: str, default: str | None = None) -> str:
+def get_env_var(env_var: str, default: Union[str, None] = None) -> str:
     env_var_value = os.environ.get(env_var)
 
     # explicit check for None as None is returned by environ.get for non existing keys
@@ -41,6 +42,7 @@ logging.info("Test mode enabled: %s", TEST_MODE)
 
 # Slack
 GENERAL_CHANNEL = get_env_var("KARMABOT_GENERAL_CHANNEL")
+LOG_CHANNEL = get_env_var("KARMABOT_LOG_CHANNEL")
 ADMINS = get_env_var("KARMABOT_ADMINS")
 ADMINS = ADMINS.split(",")  # type: ignore
 

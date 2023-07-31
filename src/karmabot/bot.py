@@ -27,6 +27,7 @@ from karmabot.settings import (
     ADMINS,
     KARMA_ACTION_PATTERN,
     KARMABOT_ID,
+    LOG_CHANNEL,
     SLACK_BOT_TOKEN,
     TEST_MODE,
 )
@@ -59,13 +60,6 @@ DM_BOT_COMMANDS = {
     "updateusername": update_username,
 }
 
-# other constants
-SPECIAL_REPLIES = {
-    "zen": "`import this`",
-    "cheers": ":beers:",
-    "braces": "`SyntaxError: not a chance`",
-}
-
 
 def compile_command_pattern(commands: Dict[str, Callable]) -> re.Pattern:
     command_words = commands.keys()
@@ -76,18 +70,11 @@ def compile_command_pattern(commands: Dict[str, Callable]) -> re.Pattern:
     return re.compile(full_commands, re.IGNORECASE)
 
 
-def compile_special_reply_pattern(replies: Dict[str, str]) -> re.Pattern:
-    special_words = "|".join(replies.keys())
-    pattern = rf"(?<!<@{KARMABOT_ID}>\s)({special_words})"
-    return re.compile(pattern, flags=re.MULTILINE | re.IGNORECASE)
-
-
 ADMIN_COMMAND_PATTERN = compile_command_pattern(ADMIN_BOT_COMMANDS)
 CHANNEL_COMMAND_PATTERN = compile_command_pattern(CHANNEL_BOT_COMMANDS)  # type: ignore
 DM_COMMAND_PATTERN = compile_command_pattern(DM_BOT_COMMANDS)  # type: ignore
 UNKNOWN_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(\w*)")
 HELP_COMMAND_PATTERN = re.compile(rf"^<@{KARMABOT_ID}>\s(help|commands)")
-SPECIAL_WORDS_PATTERN = compile_special_reply_pattern(SPECIAL_REPLIES)
 COMMAND_ERROR = "Sorry, something went wrong when performing the requested command"
 
 # Slack Bolt App Init
@@ -130,9 +117,8 @@ def karma_action(message, say):
     karma_changes = KARMA_ACTION_PATTERN.findall(msg)
 
     karma_replies = process_karma_changes(karma_giver, channel_id, karma_changes)
-
-    reply = "\n\n".join(karma_replies)
-    say(reply)
+    for reply in karma_replies:
+        say(reply, channel=LOG_CHANNEL)
 
 
 # Help
@@ -155,18 +141,6 @@ def reply_help(message, say):
 
     text = "\n".join(help_msg)
     say(text=text, channel=user_id)
-
-
-# Message replies
-@app.message(SPECIAL_WORDS_PATTERN)  # type: ignore
-def reply_special_words(message, say):
-    msg = message["text"].lower()
-    special_word = SPECIAL_WORDS_PATTERN.findall(msg)[0]
-    special_reply = SPECIAL_REPLIES.get(special_word)
-
-    text = f"To _{special_word}_ I say: {special_reply}"
-
-    say(text)
 
 
 # Commands
