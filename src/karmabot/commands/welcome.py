@@ -1,4 +1,5 @@
 """ private command, not callable """
+
 from random import choice
 
 import karmabot.slack

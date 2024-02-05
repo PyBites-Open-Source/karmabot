@@ -1,4 +1,5 @@
 """The PyBites Karmabot for Slack."""
+
 try:
     from importlib.metadata import PackageNotFoundError, version  # type: ignore
 except ImportError:  # pragma: no cover
