@@ -1,5 +1,6 @@
 """A Karmabot pydoc interface.
 """
+
 import contextlib
 import io
 import pydoc

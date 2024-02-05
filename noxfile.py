@@ -1,4 +1,5 @@
 """Nox sessions."""
+
 import os
 import tempfile
 from typing import Any
