@@ -1,5 +1,4 @@
-"""A Karmabot pydoc interface.
-"""
+"""A Karmabot pydoc interface."""
 
 import contextlib
 import io

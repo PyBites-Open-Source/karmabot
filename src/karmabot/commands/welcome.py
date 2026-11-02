@@ -1,4 +1,4 @@
-""" private command, not callable """
+"""private command, not callable"""
 
 from random import choice
 
